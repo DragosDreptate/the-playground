@@ -35,6 +35,7 @@ import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 import { visibleRegistrationsFor } from "@/domain/models/registration";
+import { visibleMembersFor } from "@/domain/models/circle";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -299,7 +300,7 @@ export default async function PublicMomentPage({
         variant="public"
         moment={moment}
         circle={circle}
-        hosts={hosts}
+        hosts={visibleMembersFor(false, hosts)}
         registrations={visibleAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}

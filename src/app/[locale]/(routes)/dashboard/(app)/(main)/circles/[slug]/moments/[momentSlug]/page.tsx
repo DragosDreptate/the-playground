@@ -14,7 +14,7 @@ import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
-import { isActiveOrganizer } from "@/domain/models/circle";
+import { isActiveOrganizer, visibleMembersFor } from "@/domain/models/circle";
 import { visibleRegistrationsFor } from "@/domain/models/registration";
 import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
@@ -110,7 +110,7 @@ export default async function MomentDetailPage({
         variant="public"
         moment={moment}
         circle={circle}
-        hosts={hosts}
+        hosts={visibleMembersFor(false, hosts)}
         registrations={visibleAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
@@ -156,7 +156,7 @@ export default async function MomentDetailPage({
       variant="host"
       moment={moment}
       circle={circle}
-      hosts={hosts}
+      hosts={visibleMembersFor(false, hosts)}
       registrations={allAttendees}
       registeredCount={registeredCount}
       waitlistedCount={waitlistedCount}

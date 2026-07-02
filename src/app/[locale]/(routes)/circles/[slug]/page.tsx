@@ -315,7 +315,7 @@ export default async function PublicCirclePage({
 
           {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
           <CircleOrganizersList
-            organizers={circleOrganizers}
+            organizers={visibleMembersFor(false, circleOrganizers)}
             linkable={isConnected}
             label={t("detail.hostedBy")}
             anonymousFallback={anonymousFallback}

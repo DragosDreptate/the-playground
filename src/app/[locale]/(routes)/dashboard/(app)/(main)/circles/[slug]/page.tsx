@@ -225,7 +225,7 @@ export default async function CircleDetailPage({
           <div className="flex flex-col gap-4 max-lg:order-4">
 
           <CircleOrganizersList
-            organizers={circleOrganizers}
+            organizers={visibleMembersFor(false, circleOrganizers)}
             linkable
             label={t("detail.hostedBy")}
             anonymousFallback={anonymousFallback}
