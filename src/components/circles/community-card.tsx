@@ -131,9 +131,14 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
   // quasi opaque pour rester lisible sur n'importe quel visuel.
   const pendingBanner =
     circle.membershipStatus === "PENDING" ? (
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-center gap-1.5 bg-stone-950/85 px-3 py-2 text-xs font-medium text-amber-400">
-        <Clock className="size-3.5 shrink-0" />
-        <span className="truncate">{t("circleCard.roleBadge.pending")}</span>
+      // Fond opaque couleur de carte (masque la cover) + voile ambre 10% : reproduit
+      // exactement la teinte du bandeau des cartes événement (amber/10 sur le fond de
+      // carte bleu/violet), sans transparence sur l'image.
+      <div className="absolute inset-x-0 top-0 z-10 bg-card">
+        <div className="flex items-center justify-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+          <Clock className="size-3.5 shrink-0" />
+          <span className="truncate">{t("circleCard.roleBadge.pending")}</span>
+        </div>
       </div>
     ) : null;
 
