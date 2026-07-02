@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import { compressCommentPhoto } from "@/lib/image-compress";
@@ -330,6 +331,7 @@ export function CommentThread({
                   <UserAvatar
                     name={authorName}
                     image={comment.user.image}
+                    gradient={avatarGradientSeed(comment.user)}
                     size="sm"
                   />
 

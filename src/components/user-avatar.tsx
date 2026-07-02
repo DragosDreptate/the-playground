@@ -11,6 +11,12 @@ type UserAvatarProps = {
   email?: string | null;
   image?: string | null;
   size?: "sm" | "default" | "md" | "lg" | "xl";
+  /**
+   * Dégradé de fond du fallback (initiales), pré-calculé côté serveur sur une
+   * graine non-PII (`getMomentGradient(publicId ?? id)`). Fourni → mêmes couleurs
+   * que les piles d'avatars ; absent → aplat `bg-primary/10` par défaut.
+   */
+  gradient?: string | null;
 };
 
 function getInitials(name?: string | null, email?: string | null): string {
@@ -24,7 +30,7 @@ function getInitials(name?: string | null, email?: string | null): string {
   return email ? email[0].toUpperCase() : "?";
 }
 
-export function UserAvatar({ name, email, image, size = "default" }: UserAvatarProps) {
+export function UserAvatar({ name, email, image, size = "default", gradient }: UserAvatarProps) {
   const initials = getInitials(name, email);
 
   return (
@@ -38,7 +44,13 @@ export function UserAvatar({ name, email, image, size = "default" }: UserAvatarP
       )}
     >
       {image && <AvatarImage src={image} alt={name ?? ""} referrerPolicy="no-referrer" />}
-      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+      <AvatarFallback
+        className={cn(
+          "font-medium",
+          gradient ? "text-white" : "bg-primary/10 text-primary",
+        )}
+        style={gradient ? { background: gradient } : undefined}
+      >
         {initials}
       </AvatarFallback>
     </Avatar>

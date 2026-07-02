@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
 import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2, Globe, Linkedin, Github, Download } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
@@ -301,7 +302,7 @@ function MemberRow({
     });
   };
 
-  const avatar = <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />;
+  const avatar = <UserAvatar name={displayName} image={user.image} gradient={avatarGradientSeed(user)} size="md" />;
   const info = (
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-2">

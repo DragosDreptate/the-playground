@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Camera, Loader2 } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { uploadAvatarAction } from "@/app/actions/profile";
 import { resizeImage } from "@/lib/image-resize";
 import { cn } from "@/lib/utils";
 
 type AvatarUploadProps = {
+  id: string;
   name: string | null;
   email: string;
   /** URL de l'avatar actuel (OAuth ou uploadé). Null = initiales uniquement. */
@@ -19,7 +21,7 @@ type AvatarUploadProps = {
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-export function AvatarUpload({ name, email, image }: AvatarUploadProps) {
+export function AvatarUpload({ id, name, email, image }: AvatarUploadProps) {
   const t = useTranslations("Profile.avatar");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +101,7 @@ export function AvatarUpload({ name, email, image }: AvatarUploadProps) {
         className="group relative cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-default"
         aria-label={displayImage ? t("change") : t("add")}
       >
-        <UserAvatar name={name} email={email} image={displayImage} size="xl" />
+        <UserAvatar name={name} email={email} image={displayImage} gradient={avatarGradientSeed({ id })} size="xl" />
 
         {/* Overlay hover / upload */}
         <span

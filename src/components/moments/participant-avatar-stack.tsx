@@ -1,6 +1,6 @@
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import { getPublicDisplayName, getPublicUserInitials } from "@/lib/display-name";
-import { getMomentGradient } from "@/lib/gradient";
+import { avatarGradientSeed } from "@/lib/avatar";
 
 // Pendant de MemberAvatarStack côté Circle — domaines séparés car les types
 // d'entrée diffèrent (Registration vs CircleMembership).
@@ -19,10 +19,7 @@ export function ParticipantAvatarStack({
           <span key={r.id} className="group/avatar relative">
             <span
               className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
-              // Seed sur l'email quand dispo (vue Organisateur), sinon sur l'id
-              // stable : un viewer non-Organisateur reçoit un email blanchi ("")
-              // mais garde un dégradé distinct, sans PII. Cf. red team #1.
-              style={{ background: getMomentGradient(r.user.email || r.user.id) }}
+              style={{ background: avatarGradientSeed(r.user) }}
             >
               {r.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
