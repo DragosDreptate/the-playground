@@ -44,7 +44,6 @@ export function makeCommentWithUser(
       id: "user-1",
       firstName: "Alice",
       lastName: "Dupont",
-      email: "alice@example.com",
       image: null,
     },
     attachments: [],

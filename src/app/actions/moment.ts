@@ -834,12 +834,17 @@ export async function getMomentParticipantsPageAction(
   limit: number,
 ): Promise<GetMomentParticipantsPageResult> {
   const session = await auth();
+  // Même résolution que la page dashboard : un admin en « host mode » obtient une
+  // membership HOST synthétique, donc voit les emails dès la 1re page ET sur les
+  // pages suivantes. Sans ça, la redaction basée sur le rôle réel casserait la
+  // modération admin au-delà de la 1re page (emails p1, blanchis p2+).
+  const circleRepository = await resolveCircleRepository(session, prismaCircleRepository);
   try {
     return await getMomentParticipantsPage(
       { momentId, offset, limit, callerUserId: session?.user?.id ?? null },
       {
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository,
         registrationRepository: prismaRegistrationRepository,
       },
     );

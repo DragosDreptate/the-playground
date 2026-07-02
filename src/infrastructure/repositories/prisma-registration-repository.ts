@@ -1,4 +1,5 @@
 import { prisma } from "@/infrastructure/db/prisma";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import type {
   RegistrationRepository,
   CreateRegistrationInput,
@@ -350,7 +351,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       cSlug: string;
       cCoverImage: string | null;
       mRegistrationCount: bigint;
-      mTopAttendees: { firstName: string | null; lastName: string | null; email: string; image: string | null }[];
+      mTopAttendees: { id: string; firstName: string | null; lastName: string | null; image: string | null; publicId: string | null }[];
     };
 
     const rows = await prisma.$queryRaw<Row[]>`
@@ -381,7 +382,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
          WHERE r2."momentId" = m.id
            AND r2.status IN ('REGISTERED', 'CHECKED_IN')) AS "mRegistrationCount",
         (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
-          SELECT u."firstName", u."lastName", u.email, u.image
+          SELECT u.id, u."firstName", u."lastName", u.image, u.public_id AS "publicId"
           FROM registrations r3
           JOIN users u ON u.id = r3."userId"
           WHERE r3."momentId" = m.id AND r3.status = 'REGISTERED'
@@ -424,7 +425,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleSlug: row.cSlug,
         circleCoverImage: row.cCoverImage,
         registrationCount: Number(row.mRegistrationCount),
-        topAttendees: (row.mTopAttendees ?? []).map((u) => ({ user: u })),
+        topAttendees: (row.mTopAttendees ?? []).map((u) => ({ user: toUserAvatarInfo(u) })),
       },
     });
 

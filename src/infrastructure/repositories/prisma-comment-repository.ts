@@ -45,7 +45,6 @@ type PrismaCommentWithUser = PrismaComment & {
     id: string;
     firstName: string | null;
     lastName: string | null;
-    email: string;
     image: string | null;
   };
   attachments: PrismaCommentAttachment[];
@@ -58,7 +57,6 @@ function toDomainCommentWithUser(record: PrismaCommentWithUser): CommentWithUser
       id: record.user.id,
       firstName: record.user.firstName,
       lastName: record.user.lastName,
-      email: record.user.email,
       image: record.user.image,
     },
     attachments: record.attachments.map(toDomainCommentAttachment),
@@ -69,7 +67,6 @@ const userSelect = {
   id: true,
   firstName: true,
   lastName: true,
-  email: true,
   image: true,
 } as const;
 

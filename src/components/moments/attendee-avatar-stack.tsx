@@ -1,5 +1,4 @@
 import { getPublicUserInitials } from "@/lib/display-name";
-import { getMomentGradient } from "@/lib/gradient";
 import type { UserAvatarInfo } from "@/domain/models/user";
 
 export type Attendee = { user: UserAvatarInfo };
@@ -26,7 +25,7 @@ export function AttendeeAvatarStack({
       <div className="flex -space-x-1.5">
         {visible.map((a, i) => {
           const initials = getPublicUserInitials(a.user);
-          const gradient = getMomentGradient(a.user.email);
+          const gradient = a.user.gradient;
           return (
             <div
               key={i}

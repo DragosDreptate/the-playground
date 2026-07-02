@@ -14,7 +14,8 @@ import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
-import { isActiveOrganizer } from "@/domain/models/circle";
+import { isActiveOrganizer, visibleMembersFor } from "@/domain/models/circle";
+import { visibleRegistrationsFor } from "@/domain/models/registration";
 import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
@@ -70,7 +71,13 @@ export default async function MomentDetailPage({
     prismaMomentAttachmentRepository.findByMoment(moment.id),
   ]);
 
-  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  // PII (email) + identifiants Stripe réservés à l'Organisateur. Cette page est
+  // aussi servie aux membres non-Organisateurs et aux inscrits (variant "public"
+  // ci-dessous) : sans redaction, ils reçoivent les emails de tous les inscrits.
+  // Cf. red team #1. Pour l'Organisateur, visibleAttendees === allAttendees.
+  const visibleAttendees = visibleRegistrationsFor(isOrganizer, allAttendees);
+
+  const registeredParticipants = visibleAttendees.filter((r) => r.status === "REGISTERED");
   const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session.user.id);
   const participantsFirstPage = {
     participants: sortedForDisplay.slice(0, 20),
@@ -103,8 +110,8 @@ export default async function MomentDetailPage({
         variant="public"
         moment={moment}
         circle={circle}
-        hosts={hosts}
-        registrations={allAttendees}
+        hosts={visibleMembersFor(false, hosts)}
+        registrations={visibleAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
         comments={comments}
@@ -149,7 +156,7 @@ export default async function MomentDetailPage({
       variant="host"
       moment={moment}
       circle={circle}
-      hosts={hosts}
+      hosts={visibleMembersFor(false, hosts)}
       registrations={allAttendees}
       registeredCount={registeredCount}
       waitlistedCount={waitlistedCount}

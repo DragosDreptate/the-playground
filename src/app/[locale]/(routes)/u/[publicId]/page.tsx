@@ -78,7 +78,7 @@ export default async function UserPublicProfilePage({
           {user.image && <AvatarImage src={user.image} alt={fullName} />}
           <AvatarFallback
             className="text-2xl font-semibold text-white"
-            style={{ background: getMomentGradient(user.publicId) }}
+            style={{ background: user.gradient }}
           >
             {initials || "?"}
           </AvatarFallback>

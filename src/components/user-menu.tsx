@@ -27,11 +27,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { cn } from "@/lib/utils";
 import { useLocaleSwitcher } from "@/lib/use-locale-switcher";
 
 type UserMenuProps = {
   user: {
+    id?: string | null;
     name?: string | null;
     email?: string | null;
     image?: string | null;
@@ -47,7 +49,13 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-full p-0.5 outline-none transition-opacity hover:opacity-80">
-        <UserAvatar name={user.name} email={email} image={user.image} size="sm" />
+        <UserAvatar
+          name={user.name}
+          email={email}
+          image={user.image}
+          gradient={user.id ? avatarGradientSeed({ id: user.id }) : undefined}
+          size="sm"
+        />
         <ChevronDown className="text-muted-foreground h-3.5 w-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
