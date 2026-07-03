@@ -4,8 +4,9 @@ import { getCachedSession } from "@/lib/auth-cache";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardContent } from "./_components/dashboard-content";
+import { DashboardCommunitiesSkeleton } from "./_components/dashboard-communities-skeleton";
+import { DashboardTimelineSkeleton } from "./_components/dashboard-timeline-skeleton";
 import { DashboardFilterBar } from "./_components/dashboard-filter-bar";
 import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
 import { CreateCircleButton } from "@/components/dashboard/create-circle-button";
@@ -88,33 +89,21 @@ export default async function DashboardPage({
       </div>
 
       {/* Contenu — streamé en arrière-plan pendant que le shell s'affiche */}
-      <Suspense fallback={<DashboardContentSkeleton />}>
+      <Suspense
+        fallback={
+          activeTab === "circles" ? (
+            <DashboardCommunitiesSkeleton />
+          ) : (
+            <DashboardTimelineSkeleton />
+          )
+        }
+      >
         <DashboardContent
           userId={session.user.id}
           activeTab={activeTab}
           hostOnly={hostOnly}
         />
       </Suspense>
-    </div>
-  );
-}
-
-function DashboardContentSkeleton() {
-  return (
-    <div>
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex gap-0 py-3">
-          <div className="w-[100px] shrink-0 pr-4">
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex shrink-0 flex-col items-center">
-            <Skeleton className="size-2.5 rounded-full" />
-          </div>
-          <div className="min-w-0 flex-1 pl-4 pb-4">
-            <Skeleton className="h-[76px] w-full rounded-xl" />
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
