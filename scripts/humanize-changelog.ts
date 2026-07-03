@@ -81,7 +81,7 @@ Orienté bénéfices utilisateur, vocabulaire naturel, pas de jargon technique.
 Le dépôt et le changelog sont PUBLICS. Tu DOIS **omettre entièrement** toute entrée décrivant de l'outillage interne de modération, de sécurité ou d'anti-abus, car la divulguer aide les spammeurs à contourner les protections. À exclure systématiquement, sans exception :
 - Les outils d'administration / modération (audit de compte, détection de spam, blocage / déblocage de compte ou de domaine, révocation de sessions, badge « bloqué », console de modération des commentaires, file d'attente de validation).
 - Les garde-fous anti-abus visibles côté utilisateur mais qui révèlent la mécanique (ex. restrictions imposées aux comptes récents / de moins de 24h : contact des organisateurs grisé, mise en validation des commentaires).
-- Tout commit de scope `admin:`, et tout `security:` qui relève de la modération / du blocage / de la détection d'abus.
+- Tout commit de scope \`admin:\`, et tout \`security:\` qui relève de la modération / du blocage / de la détection d'abus.
 
 Ces fonctionnalités existent mais restent **invisibles dans le changelog public**. Si, après exclusion, une section (Ajouté / Amélioré / Corrigé) devient vide, ne pas l'inclure. Si toute la version ne contient que de l'anti-abus, ne garder que les éventuelles entrées user-facing neutres et adapter le titre en conséquence.
 
