@@ -130,11 +130,45 @@ export function RegistrationButton({
     onTrigger: () => runJoin("auto"),
   });
 
-  // Not authenticated: link to sign-in (same for free and paid)
+  // Intention d'inscription : clic manuel sur le CTA, connecté ou non (l'auto-
+  // inscription post-auth est exclue, l'intention a déjà été capturée avant l'auth).
+  // Permet de distinguer le désintérêt de l'abandon lié à l'authentification (#610).
+  function captureRegisterIntent(authenticated: boolean) {
+    posthog.capture(
+      "register_cta_clicked",
+      { moment_id: momentId, circle_id: circleId, authenticated },
+      // sendBeacon : non connecté, l'event doit survivre à la navigation vers /auth/sign-in.
+      authenticated ? undefined : { transport: "sendBeacon" }
+    );
+  }
+
+  // Non connecté : le CTA affiche l'action métier (même libellé que connecté),
+  // pas la friction — l'auth est une étape du flux (?join=1 → auto-inscription
+  // au retour).
   if (!isAuthenticated) {
+    if (price > 0 && isFull) {
+      return (
+        <Button className="w-full" size="sm" disabled>
+          {t("public.eventFull")}
+        </Button>
+      );
+    }
+    const label =
+      price > 0
+        ? t("public.registerPaid", {
+            price: formatPrice(price, currency, locale),
+            currency,
+          })
+        : requiresApproval
+          ? t("public.requestToJoin")
+          : isFull
+            ? t("public.joinWaitlist")
+            : t("public.registerFree");
     return (
       <Button className="w-full" size="sm" asChild>
-        <a href={signInUrl}>{t("public.signInToRegister")}</a>
+        <a href={signInUrl} onClick={() => captureRegisterIntent(false)}>
+          {label}
+        </a>
       </Button>
     );
   }
@@ -156,6 +190,7 @@ export function RegistrationButton({
           size="sm"
           disabled={isPending}
           onClick={() => {
+            captureRegisterIntent(true);
             startTransition(async () => {
               setError(null);
               const baseUrl = window.location.origin;
@@ -284,7 +319,10 @@ export function RegistrationButton({
         className="w-full"
         size="sm"
         disabled={isPending}
-        onClick={() => runJoin("click")}
+        onClick={() => {
+          captureRegisterIntent(true);
+          runJoin("click");
+        }}
       >
         {isPending
           ? tCommon("loading")

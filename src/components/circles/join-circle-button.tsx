@@ -14,9 +14,11 @@ import { useTranslations } from "next-intl";
 type Props = {
   circleId: string;
   requiresApproval?: boolean;
+  /** Non connecté : le CTA devient un lien vers l'auth (avec `?join=1`). */
+  signInUrl?: string | null;
 };
 
-export function JoinCircleButton({ circleId, requiresApproval = false }: Props) {
+export function JoinCircleButton({ circleId, requiresApproval = false, signInUrl = null }: Props) {
   const t = useTranslations("Circle.detail");
   const router = useRouter();
   const [state, setState] = useState<"idle" | "joined" | "pending">("idle");
@@ -44,13 +46,38 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
     });
   }
 
-  // Auto-adhésion post-auth : ce composant n'est monté que pour un utilisateur
-  // connecté non-membre. Si l'URL porte `?join=1` (CTA « Rejoindre » avant
+  // Auto-adhésion post-auth : si l'URL porte `?join=1` (CTA « Rejoindre » avant
   // authentification), déclenche l'adhésion au retour, sans re-cliquer.
+  // Uniquement en mode connecté non-membre (signInUrl null).
   useAutoJoin({
-    enabled: state === "idle",
+    enabled: state === "idle" && !signInUrl,
     onTrigger: () => runJoin("auto"),
   });
+
+  // Intention d'adhésion : clic manuel sur le CTA, connecté ou non (l'auto-
+  // adhésion post-auth est exclue, l'intention a déjà été capturée avant l'auth).
+  // Permet de distinguer le désintérêt de l'abandon lié à l'authentification (#610).
+  function captureJoinIntent(authenticated: boolean) {
+    posthog.capture(
+      "join_circle_cta_clicked",
+      { circle_id: circleId, authenticated },
+      // sendBeacon : non connecté, l'event doit survivre à la navigation vers /auth/sign-in.
+      authenticated ? undefined : { transport: "sendBeacon" }
+    );
+  }
+
+  // Non connecté : le CTA affiche l'action métier (« Rejoindre »), pas la
+  // friction — l'auth est une étape du flux (?join=1 → auto-adhésion au retour).
+  if (signInUrl) {
+    return (
+      <Button variant="default" size="sm" asChild className="w-full gap-2">
+        <a href={signInUrl} onClick={() => captureJoinIntent(false)}>
+          <Users className="size-4" />
+          {requiresApproval ? t("joinRequiresApproval") : t("join")}
+        </a>
+      </Button>
+    );
+  }
 
   if (state === "joined") {
     return (
@@ -74,7 +101,10 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
     <Button
       variant="default"
       size="sm"
-      onClick={() => runJoin("click")}
+      onClick={() => {
+        captureJoinIntent(true);
+        runJoin("click");
+      }}
       disabled={isPending}
       className="w-full gap-2"
     >
