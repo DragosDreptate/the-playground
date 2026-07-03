@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
 import { DashboardContent } from "./_components/dashboard-content";
+import { DashboardCommunitiesSkeleton } from "./_components/dashboard-communities-skeleton";
 import { DashboardTimelineSkeleton } from "./_components/dashboard-timeline-skeleton";
 import { DashboardFilterBar } from "./_components/dashboard-filter-bar";
 import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
@@ -88,7 +89,15 @@ export default async function DashboardPage({
       </div>
 
       {/* Contenu — streamé en arrière-plan pendant que le shell s'affiche */}
-      <Suspense fallback={<DashboardTimelineSkeleton />}>
+      <Suspense
+        fallback={
+          activeTab === "circles" ? (
+            <DashboardCommunitiesSkeleton />
+          ) : (
+            <DashboardTimelineSkeleton />
+          )
+        }
+      >
         <DashboardContent
           userId={session.user.id}
           activeTab={activeTab}
