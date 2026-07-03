@@ -27,6 +27,7 @@ import { useAutoJoin } from "@/components/auth/use-auto-join";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { CalendarEventData } from "@/lib/calendar";
+import { captureIntentEvent } from "@/lib/capture-intent";
 import posthog from "posthog-js";
 import { toast } from "sonner";
 
@@ -130,44 +131,43 @@ export function RegistrationButton({
     onTrigger: () => runJoin("auto"),
   });
 
-  // Intention d'inscription : clic manuel sur le CTA, connecté ou non (l'auto-
-  // inscription post-auth est exclue, l'intention a déjà été capturée avant l'auth).
-  // Permet de distinguer le désintérêt de l'abandon lié à l'authentification (#610).
+  // Intention d'inscription : clic manuel sur le CTA (l'auto-inscription
+  // post-auth est exclue, l'intention a déjà été capturée avant l'auth).
   function captureRegisterIntent(authenticated: boolean) {
-    posthog.capture(
+    captureIntentEvent(
       "register_cta_clicked",
-      { moment_id: momentId, circle_id: circleId, authenticated },
-      // sendBeacon : non connecté, l'event doit survivre à la navigation vers /auth/sign-in.
-      authenticated ? undefined : { transport: "sendBeacon" }
+      { moment_id: momentId, circle_id: circleId },
+      authenticated
     );
   }
 
-  // Non connecté : le CTA affiche l'action métier (même libellé que connecté),
-  // pas la friction — l'auth est une étape du flux (?join=1 → auto-inscription
-  // au retour).
+  // Libellé du CTA d'inscription gratuit — calculé une fois et partagé entre
+  // les branches visiteur et connecté : le visiteur doit voir exactement le
+  // même libellé métier avant et après l'authentification.
+  const joinLabel = requiresApproval
+    ? t("public.requestToJoin")
+    : isFull
+      ? t("public.joinWaitlist")
+      : t("public.registerFree");
+
+  // Non connecté, gratuit : le CTA affiche l'action métier, pas la friction —
+  // l'auth est une étape du flux (?join=1 → auto-inscription au retour). Le
+  // clic exprime l'intention d'inscription (#610). Le payant garde « Se
+  // connecter pour s'inscrire » : l'auto-inscription y est bloquée (pas
+  // d'auto-paiement), le libellé en deux temps reste donc honnête, et
+  // l'intention n'est capturée qu'au clic post-auth (un event par parcours).
   if (!isAuthenticated) {
-    if (price > 0 && isFull) {
+    if (price > 0) {
       return (
-        <Button className="w-full" size="sm" disabled>
-          {t("public.eventFull")}
+        <Button className="w-full" size="sm" asChild>
+          <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
       );
     }
-    const label =
-      price > 0
-        ? t("public.registerPaid", {
-            price: formatPrice(price, currency, locale),
-            currency,
-          })
-        : requiresApproval
-          ? t("public.requestToJoin")
-          : isFull
-            ? t("public.joinWaitlist")
-            : t("public.registerFree");
     return (
       <Button className="w-full" size="sm" asChild>
         <a href={signInUrl} onClick={() => captureRegisterIntent(false)}>
-          {label}
+          {joinLabel}
         </a>
       </Button>
     );
@@ -324,13 +324,7 @@ export function RegistrationButton({
           runJoin("click");
         }}
       >
-        {isPending
-          ? tCommon("loading")
-          : requiresApproval
-            ? t("public.requestToJoin")
-            : isFull
-              ? t("public.joinWaitlist")
-              : t("public.registerFree")}
+        {isPending ? tCommon("loading") : joinLabel}
       </Button>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">

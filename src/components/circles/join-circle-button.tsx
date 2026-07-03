@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import posthog from "posthog-js";
 import { toast } from "sonner";
+import { captureIntentEvent } from "@/lib/capture-intent";
 import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
@@ -54,17 +55,20 @@ export function JoinCircleButton({ circleId, requiresApproval = false, signInUrl
     onTrigger: () => runJoin("auto"),
   });
 
-  // Intention d'adhésion : clic manuel sur le CTA, connecté ou non (l'auto-
-  // adhésion post-auth est exclue, l'intention a déjà été capturée avant l'auth).
-  // Permet de distinguer le désintérêt de l'abandon lié à l'authentification (#610).
+  // Intention d'adhésion : clic manuel sur le CTA (l'auto-adhésion post-auth
+  // est exclue, l'intention a déjà été capturée avant l'auth).
   function captureJoinIntent(authenticated: boolean) {
-    posthog.capture(
-      "join_circle_cta_clicked",
-      { circle_id: circleId, authenticated },
-      // sendBeacon : non connecté, l'event doit survivre à la navigation vers /auth/sign-in.
-      authenticated ? undefined : { transport: "sendBeacon" }
-    );
+    captureIntentEvent("join_circle_cta_clicked", { circle_id: circleId }, authenticated);
   }
+
+  // Contenu partagé entre les branches visiteur et connecté : le visiteur doit
+  // voir exactement le même libellé métier avant et après l'authentification.
+  const joinContent = (
+    <>
+      <Users className="size-4" />
+      {requiresApproval ? t("joinRequiresApproval") : t("join")}
+    </>
+  );
 
   // Non connecté : le CTA affiche l'action métier (« Rejoindre »), pas la
   // friction — l'auth est une étape du flux (?join=1 → auto-adhésion au retour).
@@ -72,8 +76,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false, signInUrl
     return (
       <Button variant="default" size="sm" asChild className="w-full gap-2">
         <a href={signInUrl} onClick={() => captureJoinIntent(false)}>
-          <Users className="size-4" />
-          {requiresApproval ? t("joinRequiresApproval") : t("join")}
+          {joinContent}
         </a>
       </Button>
     );
@@ -108,8 +111,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false, signInUrl
       disabled={isPending}
       className="w-full gap-2"
     >
-      <Users className="size-4" />
-      {requiresApproval ? t("joinRequiresApproval") : t("join")}
+      {joinContent}
     </Button>
   );
 }

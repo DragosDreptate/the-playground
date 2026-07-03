@@ -629,6 +629,7 @@
       "cancelNonRefundableWarning": "This event is non-refundable. You will not be refunded.",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
+      "signInToRegister": "Sign in to join",
       "registrantsCount": "{count} joined",
       "eventFull": "Full",
       "attendeesCount": "{count} member(s)",

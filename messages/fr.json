@@ -629,6 +629,7 @@
       "cancelNonRefundableWarning": "Cet événement n'est pas remboursable. Vous ne serez pas remboursé.",
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",
+      "signInToRegister": "Se connecter pour s'inscrire",
       "registrantsCount": "{count} inscrits",
       "eventFull": "Complet",
       "attendeesCount": "{count} participant(s)",
