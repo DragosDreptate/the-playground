@@ -404,19 +404,18 @@ export default async function PublicCirclePage({
             </div>
           )}
 
-          {/* Bouton Rejoindre — visible uniquement pour les utilisateurs connectés non-membres */}
-          {showJoinButton && (
-            <JoinCircleButton circleId={circle.id} requiresApproval={circle.requiresApproval} />
-          )}
-
-          {/* CTA Se connecter — visible pour les visiteurs non-authentifiés */}
-          {showSignInToJoin && (
-            <Button variant="default" size="sm" asChild className="w-full gap-2">
-              <a href={signInUrlWithAutoJoin(locale, `/${locale}/circles/${slug}`)}>
-                <Users className="size-4" />
-                {t("detail.signInToJoin")}
-              </a>
-            </Button>
+          {/* Bouton Rejoindre — connecté non-membre (adhésion directe) ou
+              visiteur non connecté (lien vers l'auth avec intention ?join=1) */}
+          {(showJoinButton || showSignInToJoin) && (
+            <JoinCircleButton
+              circleId={circle.id}
+              requiresApproval={circle.requiresApproval}
+              signInUrl={
+                showSignInToJoin
+                  ? signInUrlWithAutoJoin(locale, `/${locale}/circles/${slug}`)
+                  : null
+              }
+            />
           )}
           </div>
           {/* /Groupe 2 */}

@@ -27,6 +27,7 @@ import { useAutoJoin } from "@/components/auth/use-auto-join";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { CalendarEventData } from "@/lib/calendar";
+import { captureIntentEvent } from "@/lib/capture-intent";
 import posthog from "posthog-js";
 import { toast } from "sonner";
 
@@ -130,11 +131,44 @@ export function RegistrationButton({
     onTrigger: () => runJoin("auto"),
   });
 
-  // Not authenticated: link to sign-in (same for free and paid)
+  // Intention d'inscription : clic manuel sur le CTA (l'auto-inscription
+  // post-auth est exclue, l'intention a déjà été capturée avant l'auth).
+  function captureRegisterIntent(authenticated: boolean) {
+    captureIntentEvent(
+      "register_cta_clicked",
+      { moment_id: momentId, circle_id: circleId },
+      authenticated
+    );
+  }
+
+  // Libellé du CTA d'inscription gratuit — calculé une fois et partagé entre
+  // les branches visiteur et connecté : le visiteur doit voir exactement le
+  // même libellé métier avant et après l'authentification.
+  const joinLabel = requiresApproval
+    ? t("public.requestToJoin")
+    : isFull
+      ? t("public.joinWaitlist")
+      : t("public.registerFree");
+
+  // Non connecté, gratuit : le CTA affiche l'action métier, pas la friction —
+  // l'auth est une étape du flux (?join=1 → auto-inscription au retour). Le
+  // clic exprime l'intention d'inscription (#610). Le payant garde « Se
+  // connecter pour s'inscrire » : l'auto-inscription y est bloquée (pas
+  // d'auto-paiement), le libellé en deux temps reste donc honnête, et
+  // l'intention n'est capturée qu'au clic post-auth (un event par parcours).
   if (!isAuthenticated) {
+    if (price > 0) {
+      return (
+        <Button className="w-full" size="sm" asChild>
+          <a href={signInUrl}>{t("public.signInToRegister")}</a>
+        </Button>
+      );
+    }
     return (
       <Button className="w-full" size="sm" asChild>
-        <a href={signInUrl}>{t("public.signInToRegister")}</a>
+        <a href={signInUrl} onClick={() => captureRegisterIntent(false)}>
+          {joinLabel}
+        </a>
       </Button>
     );
   }
@@ -156,6 +190,7 @@ export function RegistrationButton({
           size="sm"
           disabled={isPending}
           onClick={() => {
+            captureRegisterIntent(true);
             startTransition(async () => {
               setError(null);
               const baseUrl = window.location.origin;
@@ -284,15 +319,12 @@ export function RegistrationButton({
         className="w-full"
         size="sm"
         disabled={isPending}
-        onClick={() => runJoin("click")}
+        onClick={() => {
+          captureRegisterIntent(true);
+          runJoin("click");
+        }}
       >
-        {isPending
-          ? tCommon("loading")
-          : requiresApproval
-            ? t("public.requestToJoin")
-            : isFull
-              ? t("public.joinWaitlist")
-              : t("public.registerFree")}
+        {isPending ? tCommon("loading") : joinLabel}
       </Button>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
