@@ -41,7 +41,7 @@ const baseCspDirectives = [
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' js.stripe.com",
   "style-src 'self' 'unsafe-inline'",
   // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
-  "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
+  "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com media.licdn.com q.stripe.com",
   // Vidéos : pièces jointes lues directement depuis le store Vercel Blob
   // (sans media-src, la lecture retomberait sur default-src 'self' et serait bloquée)
   "media-src 'self' *.public.blob.vercel-storage.com",
