@@ -1225,13 +1225,21 @@
       "hostPendingMembershipMessage": "{playerName} souhaite rejoindre votre communauté « {circleName} ». Cette demande nécessite votre validation.",
       "manageCta": "Gérer les demandes"
     },
-    "paidCancellation": {
+    "hostCancellation": {
       "subject": "Désinscription : {playerName} — {momentTitle}",
-      "heading": "Désinscription d'un événement payant",
+      "heading": "Désinscription d'un événement",
       "message": "{playerName} s'est désinscrit de {momentTitle}.",
       "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
       "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
       "manageCta": "Gérer les inscriptions"
+    },
+    "cancellationConfirmation": {
+      "subject": "Inscription annulée : {momentTitle}",
+      "heading": "Votre inscription est annulée",
+      "message": "Votre inscription à {momentTitle} a bien été annulée. Si vous changez d'avis, l'événement reste accessible ci-dessous.",
+      "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
+      "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
+      "ctaLabel": "Voir l'événement"
     },
     "hostContactMessage": {
       "subject": "Un membre vous contacte sur The Playground",
@@ -1812,7 +1820,7 @@
         "item1": "Nouvelle inscription à l'un de vos événements (pour les organisateurs)",
         "item2": "Nouveau commentaire sur un événement",
         "item3": "Nouvel événement publié dans une communauté dont vous êtes membre",
-        "item4": "D'autres emails sont envoyés automatiquement et ne peuvent pas être désactivés : confirmation d'inscription, rappels avant l'événement, notifications de modification ou d'annulation.",
+        "item4": "D'autres emails sont envoyés automatiquement et ne peuvent pas être désactivés : confirmation d'inscription, confirmation de désinscription, rappels avant l'événement, notifications de modification ou d'annulation.",
         "item5": "Depuis les emails de notification de commentaire, un lien « Gérer mes préférences » vous amène directement à la page de réglages, sans passer par Mon espace."
       },
       "leave": {

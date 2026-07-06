@@ -1,17 +1,17 @@
 import { Button, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
-import type { HostPaidCancellationEmailData } from "@/domain/ports/services/email-service";
+import type { HostCancellationEmailData } from "@/domain/ports/services/email-service";
 import {
   ctaButton,
   headingLg as heading,
 } from "./components/email-styles";
 
-type Props = HostPaidCancellationEmailData & {
+type Props = HostCancellationEmailData & {
   baseUrl: string;
 };
 
-export function HostPaidCancellationEmail({
+export function HostCancellationEmail({
   momentSlug,
   circleSlug,
   baseUrl,

@@ -112,17 +112,14 @@ export async function cancelRegistrationAction(
       });
     }
 
-    const cancelledReg = result.registration;
-    if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
-      after(async () => {
-        try {
-          await sendHostPaidCancellationEmail(registrationId, userId, resolver);
-        } catch (err) {
-          console.error(err);
-          Sentry.captureException(err);
-        }
-      });
-    }
+    after(async () => {
+      try {
+        await sendCancellationEmails(registrationId, userId, resolver);
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    });
 
     invalidateDashboardCache(userId);
     if (result.promotedRegistration) {
@@ -133,7 +130,12 @@ export async function cancelRegistrationAction(
 
 // --- Email helpers (dispatchés via after() par les actions) ---
 
-async function sendHostPaidCancellationEmail(
+// Désinscription self-service : confirmation au participant (inconditionnelle,
+// email transactionnel) + notification aux organisateurs. Pour un événement
+// payant, les organisateurs sont toujours notifiés (suivi de l'argent) ; pour un
+// gratuit, la notification suit la préférence `notifyNewRegistration`
+// (symétrique de la notification d'inscription).
+async function sendCancellationEmails(
   registrationId: string,
   cancellingUserId: string,
   resolver: EmailLocaleResolver
@@ -150,40 +152,80 @@ async function sendHostPaidCancellationEmail(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const hosts = await prismaCircleRepository.findOrganizers(circle.id);
-  if (hosts.length === 0) return;
-
-  const playerName = getDisplayName(player.firstName, player.lastName, player.email);
+  const isPaid =
+    registration.paymentStatus === "PAID" || registration.paymentStatus === "REFUNDED";
   const isRefundable = moment.refundable;
+  const playerName = getDisplayName(player.firstName, player.lastName, player.email);
+  const amountFor = (locale: string) =>
+    formatPrice(moment.price, moment.currency, locale);
 
-  await Promise.all(
-    hosts.map(async (host) => {
-      const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-      const t = await resolver.translationsFor(host.userId);
-      const hostLocale = resolver.resolveFor(host.userId);
-      const amountFormatted = formatPrice(moment.price, moment.currency, hostLocale);
+  const playerT = await resolver.translationsFor(cancellingUserId);
+  const playerLocale = resolver.resolveFor(cancellingUserId);
+  const playerCtx = buildMomentEmailContext(moment, playerLocale);
+  const playerRefundMessage = !isPaid
+    ? null
+    : isRefundable
+      ? playerT("cancellationConfirmation.refunded", { amount: amountFor(playerLocale) })
+      : playerT("cancellationConfirmation.notRefunded");
 
-      return emailService.sendHostPaidCancellation({
-        to: host.user.email,
-        hostName,
-        playerName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        circleSlug: circle.slug,
-        amountRefunded: isRefundable ? amountFormatted : null,
-        strings: {
-          subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
-          heading: t("paidCancellation.heading"),
-          message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
-          refundMessage: isRefundable
-            ? t("paidCancellation.refunded", { amount: amountFormatted })
-            : t("paidCancellation.notRefunded"),
-          manageRegistrationsCta: t("paidCancellation.manageCta"),
-          footer: t("common.footer"),
-        },
-      });
-    })
-  );
+  const sendPlayerEmail = emailService.sendCancellationConfirmation({
+    to: player.email,
+    playerName,
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    momentDateMonth: playerCtx.momentDateMonth,
+    momentDateDay: playerCtx.momentDateDay,
+    circleName: circle.name,
+    circleSlug: circle.slug,
+    strings: {
+      subject: playerT("cancellationConfirmation.subject", { momentTitle: moment.title }),
+      heading: playerT("cancellationConfirmation.heading"),
+      message: playerT("cancellationConfirmation.message", { momentTitle: moment.title }),
+      refundMessage: playerRefundMessage,
+      ctaLabel: playerT("cancellationConfirmation.ctaLabel"),
+      footer: playerT("common.footer"),
+    },
+  });
+
+  const hosts = await prismaCircleRepository.findOrganizers(circle.id);
+  const prefsMap = isPaid
+    ? null
+    : await prismaUserRepository.findNotificationPreferencesByIds(
+        hosts.map((h) => h.userId)
+      );
+
+  const sendHostEmails = hosts.map(async (host) => {
+    if (prefsMap && !prefsMap.get(host.userId)?.notifyNewRegistration) return;
+
+    const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+    const t = await resolver.translationsFor(host.userId);
+    const hostLocale = resolver.resolveFor(host.userId);
+    const hostRefundMessage = !isPaid
+      ? null
+      : isRefundable
+        ? t("hostCancellation.refunded", { amount: amountFor(hostLocale) })
+        : t("hostCancellation.notRefunded");
+
+    return emailService.sendHostCancellation({
+      to: host.user.email,
+      hostName,
+      playerName,
+      momentTitle: moment.title,
+      momentSlug: moment.slug,
+      circleSlug: circle.slug,
+      amountRefunded: isPaid && isRefundable ? amountFor(hostLocale) : null,
+      strings: {
+        subject: t("hostCancellation.subject", { playerName, momentTitle: moment.title }),
+        heading: t("hostCancellation.heading"),
+        message: t("hostCancellation.message", { playerName, momentTitle: moment.title }),
+        refundMessage: hostRefundMessage,
+        manageRegistrationsCta: t("hostCancellation.manageCta"),
+        footer: t("common.footer"),
+      },
+    });
+  });
+
+  await Promise.all([sendPlayerEmail, ...sendHostEmails]);
 }
 
 export async function sendRegistrationEmails(

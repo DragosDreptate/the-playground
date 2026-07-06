@@ -25,7 +25,8 @@ import type {
   MemberRemovedFromCircleEmailData,
   RegistrationRemovedByHostEmailData,
   ApprovalNotificationEmailData,
-  HostPaidCancellationEmailData,
+  HostCancellationEmailData,
+  CancellationConfirmationEmailData,
   OnboardingWelcomeEmailData,
   CoHostPromotedEmailData,
   CoHostDemotedEmailData,
@@ -50,7 +51,8 @@ import { RegistrationReminderEmail } from "./templates/registration-reminder";
 import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-circle";
 import { RegistrationRemovedByHostEmail } from "./templates/registration-removed-by-host";
 import { ApprovalNotificationEmail } from "./templates/approval-notification";
-import { HostPaidCancellationEmail } from "./templates/host-paid-cancellation";
+import { HostCancellationEmail } from "./templates/host-cancellation";
+import { CancellationConfirmationEmail } from "./templates/cancellation-confirmation";
 import { OnboardingWelcomeEmail } from "./templates/onboarding-welcome";
 import { CoHostPromotedEmail } from "./templates/co-host-promoted";
 import { CoHostDemotedEmail } from "./templates/co-host-demoted";
@@ -467,14 +469,25 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void> {
+    async sendHostCancellation(data: HostCancellationEmailData): Promise<void> {
       if (isDemoEmail(data.to)) return;
       const baseUrl = getBaseUrl();
       await send({
         from: getSender(),
         to: data.to,
         subject: data.strings.subject,
-        react: HostPaidCancellationEmail({ ...data, baseUrl }),
+        react: HostCancellationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendCancellationConfirmation(
+      data: CancellationConfirmationEmailData
+    ): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: CancellationConfirmationEmail({ ...data, baseUrl }),
       });
     },
 
