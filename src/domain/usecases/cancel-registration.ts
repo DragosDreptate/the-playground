@@ -1,4 +1,4 @@
-import type { Registration } from "@/domain/models/registration";
+import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
@@ -26,6 +26,9 @@ type CancelRegistrationDeps = {
 type CancelRegistrationResult = {
   registration: Registration;
   promotedRegistration: Registration | null;
+  // Statut AVANT annulation : les notifications en aval en dépendent (un départ
+  // de liste d'attente ne se communique pas comme une désinscription confirmée).
+  previousStatus: RegistrationStatus;
 };
 
 export async function cancelRegistration(
@@ -58,7 +61,8 @@ export async function cancelRegistration(
     }
   }
 
-  const wasRegistered = registration.status === "REGISTERED";
+  const previousStatus = registration.status;
+  const wasRegistered = previousStatus === "REGISTERED";
 
   // Refund if paid event + PaymentService available
   // Refund failure must not block the cancellation
@@ -96,5 +100,5 @@ export async function cancelRegistration(
     }
   }
 
-  return { registration: cancelled, promotedRegistration };
+  return { registration: cancelled, promotedRegistration, previousStatus };
 }

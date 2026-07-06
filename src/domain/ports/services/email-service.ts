@@ -75,17 +75,15 @@ export type HostCancellationEmailData = {
   };
 };
 
-// Confirmation de désinscription au participant qui annule lui-même.
-// `refundMessage` : info de remboursement pour un événement payant, null sinon.
+// Confirmation de désinscription au participant qui annule lui-même (départ de
+// liste d'attente inclus, avec un wording dédié porté par `strings`).
+// `refundMessage` : remboursement constaté pour un événement payant, null sinon.
 export type CancellationConfirmationEmailData = {
   to: string;
-  playerName: string;
   momentTitle: string;
   momentSlug: string;
   momentDateMonth: string;
   momentDateDay: string;
-  circleName: string;
-  circleSlug: string;
   strings: {
     subject: string;
     heading: string;

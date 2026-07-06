@@ -5,6 +5,8 @@ import type { HostCancellationEmailData } from "@/domain/ports/services/email-se
 import {
   ctaButton,
   headingLg as heading,
+  refundSection,
+  refundText,
 } from "./components/email-styles";
 
 type Props = HostCancellationEmailData & {
@@ -45,20 +47,6 @@ const message: React.CSSProperties = {
   color: "#52525b",
   margin: "0 0 20px 0",
   lineHeight: "22px",
-};
-
-const refundSection: React.CSSProperties = {
-  backgroundColor: "#fef3c7",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "24px",
-};
-
-const refundText: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#92400e",
-  margin: "0",
-  lineHeight: "20px",
 };
 
 const ctaSection: React.CSSProperties = {

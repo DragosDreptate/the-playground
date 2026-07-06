@@ -99,13 +99,10 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
       subject: "Inscription annulée : Soirée JS & Pizza",
       element: CancellationConfirmationEmail({
         to: "alice@example.com",
-        playerName: "Alice Martin",
         momentTitle: "Soirée JS & Pizza",
         momentSlug: "soiree-js-pizza",
         momentDateMonth: "MAR",
         momentDateDay: "21",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
         strings: {
           subject: "Inscription annulée : Soirée JS & Pizza",
           heading: "Votre inscription est annulée",
@@ -121,7 +118,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
     {
       id: "host-cancellation",
       label: "Host — Désinscription d'un participant",
-      subject: "Désinscription : Alice Martin — Soirée JS & Pizza",
+      subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
       element: HostCancellationEmail({
         to: "bob@example.com",
         hostName: "Bob Dupont",
@@ -131,9 +128,9 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         circleSlug: "paris-creative-tech",
         amountRefunded: "15,00 €",
         strings: {
-          subject: "Désinscription : Alice Martin — Soirée JS & Pizza",
+          subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
           heading: "Désinscription d'un événement",
-          message: "Alice Martin s'est désinscrit de Soirée JS & Pizza.",
+          message: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza.",
           refundMessage: "Un remboursement de 15,00 € a été effectué automatiquement.",
           manageRegistrationsCta: "Gérer les inscriptions",
           footer: FOOTER,

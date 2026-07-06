@@ -3,7 +3,13 @@ import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import { CalendarBadge } from "./components/calendar-badge";
 import type { CancellationConfirmationEmailData } from "@/domain/ports/services/email-service";
-import { ctaButton, title, headingSm as heading } from "./components/email-styles";
+import {
+  ctaButton,
+  title,
+  headingSm as heading,
+  refundSection,
+  refundText,
+} from "./components/email-styles";
 
 type Props = CancellationConfirmationEmailData & {
   baseUrl: string;
@@ -48,20 +54,6 @@ const message: React.CSSProperties = {
   color: "#52525b",
   margin: "0 0 24px 0",
   lineHeight: "22px",
-};
-
-const refundSection: React.CSSProperties = {
-  backgroundColor: "#fef3c7",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "24px",
-};
-
-const refundText: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#92400e",
-  margin: "0",
-  lineHeight: "20px",
 };
 
 const ctaSection: React.CSSProperties = {

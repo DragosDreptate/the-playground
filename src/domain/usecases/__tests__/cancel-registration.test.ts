@@ -78,6 +78,7 @@ describe("CancelRegistration", () => {
       );
 
       expect(result.registration.status).toBe("CANCELLED");
+      expect(result.previousStatus).toBe("REGISTERED");
       expect(result.promotedRegistration).not.toBeNull();
       expect(result.promotedRegistration!.status).toBe("REGISTERED");
       expect(registrationRepo.update).toHaveBeenCalledTimes(2);
@@ -124,6 +125,7 @@ describe("CancelRegistration", () => {
       );
 
       expect(result.registration.status).toBe("CANCELLED");
+      expect(result.previousStatus).toBe("WAITLISTED");
       expect(result.promotedRegistration).toBeNull();
       expect(registrationRepo.findFirstWaitlisted).not.toHaveBeenCalled();
     });

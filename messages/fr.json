@@ -1226,17 +1226,24 @@
       "manageCta": "Gérer les demandes"
     },
     "hostCancellation": {
-      "subject": "Désinscription : {playerName} — {momentTitle}",
+      "subject": "{playerName} s'est désinscrit(e) de {momentTitle}",
       "heading": "Désinscription d'un événement",
-      "message": "{playerName} s'est désinscrit de {momentTitle}.",
+      "message": "{playerName} s'est désinscrit(e) de {momentTitle}.",
       "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
       "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
       "manageCta": "Gérer les inscriptions"
     },
     "cancellationConfirmation": {
-      "subject": "Inscription annulée : {momentTitle}",
-      "heading": "Votre inscription est annulée",
-      "message": "Votre inscription à {momentTitle} a bien été annulée. Si vous changez d'avis, l'événement reste accessible ci-dessous.",
+      "registered": {
+        "subject": "Inscription annulée : {momentTitle}",
+        "heading": "Votre inscription est annulée",
+        "message": "Votre inscription à {momentTitle} a bien été annulée. Si vous changez d'avis, l'événement reste accessible ci-dessous."
+      },
+      "waitlistLeft": {
+        "subject": "Vous avez quitté la liste d'attente : {momentTitle}",
+        "heading": "Vous avez quitté la liste d'attente",
+        "message": "Vous ne faites plus partie de la liste d'attente de {momentTitle}. Si vous changez d'avis, l'événement reste accessible ci-dessous."
+      },
       "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
       "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
       "ctaLabel": "Voir l'événement"
@@ -1672,7 +1679,7 @@
       "organizer": "En tant qu'organisateur",
       "participant": "En tant que participant",
       "newRegistration": "Nouvelle inscription",
-      "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements",
+      "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements ou s'en désinscrit",
       "newComment": "Nouveau commentaire",
       "newCommentDesc": "Quand quelqu'un commente un événement auquel vous participez",
       "newMomentInCircle": "Nouvel événement",
