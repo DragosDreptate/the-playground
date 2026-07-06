@@ -1,28 +1,37 @@
 import { Button, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
-import type { HostPaidCancellationEmailData } from "@/domain/ports/services/email-service";
+import { CalendarBadge } from "./components/calendar-badge";
+import type { CancellationConfirmationEmailData } from "@/domain/ports/services/email-service";
 import {
   ctaButton,
-  headingLg as heading,
+  title,
+  headingSm as heading,
+  refundSection,
+  refundText,
 } from "./components/email-styles";
 
-type Props = HostPaidCancellationEmailData & {
+type Props = CancellationConfirmationEmailData & {
   baseUrl: string;
 };
 
-export function HostPaidCancellationEmail({
+export function CancellationConfirmationEmail({
+  momentTitle,
   momentSlug,
-  circleSlug,
+  momentDateMonth,
+  momentDateDay,
   baseUrl,
   strings,
 }: Props) {
-  const manageUrl = `${baseUrl}/dashboard/circles/${circleSlug}/moments/${momentSlug}`;
+  const momentUrl = `${baseUrl}/m/${momentSlug}`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
-      <Text style={heading}>{strings.heading}</Text>
+      <CalendarBadge month={momentDateMonth} day={momentDateDay} />
 
+      <Text style={title}>{momentTitle}</Text>
+
+      <Text style={heading}>{strings.heading}</Text>
       <Text style={message}>{strings.message}</Text>
 
       {strings.refundMessage && (
@@ -32,8 +41,8 @@ export function HostPaidCancellationEmail({
       )}
 
       <Section style={ctaSection}>
-        <Button style={ctaButton} href={manageUrl}>
-          {strings.manageRegistrationsCta}
+        <Button style={ctaButton} href={momentUrl}>
+          {strings.ctaLabel}
         </Button>
       </Section>
     </EmailLayout>
@@ -43,24 +52,11 @@ export function HostPaidCancellationEmail({
 const message: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
-  margin: "0 0 20px 0",
+  margin: "0 0 24px 0",
   lineHeight: "22px",
-};
-
-const refundSection: React.CSSProperties = {
-  backgroundColor: "#fef3c7",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "24px",
-};
-
-const refundText: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#92400e",
-  margin: "0",
-  lineHeight: "20px",
 };
 
 const ctaSection: React.CSSProperties = {
   textAlign: "center" as const,
+  marginBottom: "16px",
 };

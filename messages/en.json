@@ -1225,13 +1225,28 @@
       "hostPendingMembershipMessage": "{playerName} wants to join your community \"{circleName}\". This request requires your approval.",
       "manageCta": "Manage requests"
     },
-    "paidCancellation": {
-      "subject": "Cancellation: {playerName} — {momentTitle}",
-      "heading": "Paid event cancellation",
+    "hostCancellation": {
+      "subject": "{playerName} cancelled their registration for {momentTitle}",
+      "heading": "A participant cancelled their registration",
       "message": "{playerName} cancelled their registration for {momentTitle}.",
       "refunded": "A refund of {amount} was processed automatically.",
       "notRefunded": "No refund issued (non-refundable event).",
       "manageCta": "Manage registrations"
+    },
+    "cancellationConfirmation": {
+      "registered": {
+        "subject": "Registration cancelled: {momentTitle}",
+        "heading": "Your registration is cancelled",
+        "message": "Your registration for {momentTitle} has been cancelled. If you change your mind, the event remains accessible below."
+      },
+      "waitlistLeft": {
+        "subject": "You left the waitlist: {momentTitle}",
+        "heading": "You left the waitlist",
+        "message": "You are no longer on the waitlist for {momentTitle}. If you change your mind, the event remains accessible below."
+      },
+      "refunded": "A refund of {amount} was processed automatically.",
+      "notRefunded": "No refund issued (non-refundable event).",
+      "ctaLabel": "View event"
     },
     "hostContactMessage": {
       "subject": "A member sent you a message on The Playground",
@@ -1664,7 +1679,7 @@
       "organizer": "As an organizer",
       "participant": "As a Member",
       "newRegistration": "New registration",
-      "newRegistrationDesc": "When someone registers for one of your events",
+      "newRegistrationDesc": "When someone registers for one of your events or cancels their registration",
       "newComment": "New comment",
       "newCommentDesc": "When someone comments on an event you're attending",
       "newMomentInCircle": "New event",
@@ -1812,7 +1827,7 @@
         "item1": "New registration for one of your events (for organizers)",
         "item2": "New comment on an event",
         "item3": "New event published in a community you belong to",
-        "item4": "Some emails are sent automatically and cannot be disabled: registration confirmation, event reminders, event update or cancellation notifications.",
+        "item4": "Some emails are sent automatically and cannot be disabled: registration confirmation, cancellation confirmation, event reminders, event update or cancellation notifications.",
         "item5": "From comment notification emails, a \"Manage my preferences\" link takes you directly to the settings page, without going through Dashboard."
       },
       "leave": {

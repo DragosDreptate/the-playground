@@ -55,20 +55,41 @@ export type WaitlistPromotionEmailData = {
   };
 };
 
-export type HostPaidCancellationEmailData = {
+// Notification Host de désinscription — tout événement. Pour un événement
+// payant, `refundMessage` porte l'info de remboursement ; null pour un gratuit.
+export type HostCancellationEmailData = {
   to: string;
   hostName: string;
   playerName: string;
   momentTitle: string;
   momentSlug: string;
   circleSlug: string;
-  amountRefunded: string | null; // Pre-formatted: "15,00 EUR" or null if non-refundable
+  amountRefunded: string | null; // Pre-formatted: "15,00 EUR" or null if free / non-refundable
   strings: {
     subject: string;
     heading: string;
     message: string;
     refundMessage: string | null;
     manageRegistrationsCta: string;
+    footer: string;
+  };
+};
+
+// Confirmation de désinscription au participant qui annule lui-même (départ de
+// liste d'attente inclus, avec un wording dédié porté par `strings`).
+// `refundMessage` : remboursement constaté pour un événement payant, null sinon.
+export type CancellationConfirmationEmailData = {
+  to: string;
+  momentTitle: string;
+  momentSlug: string;
+  momentDateMonth: string;
+  momentDateDay: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    refundMessage: string | null;
+    ctaLabel: string;
     footer: string;
   };
 };
@@ -550,7 +571,8 @@ export interface EmailService {
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
-  sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void>;
+  sendHostCancellation(data: HostCancellationEmailData): Promise<void>;
+  sendCancellationConfirmation(data: CancellationConfirmationEmailData): Promise<void>;
   sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
   sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void>;
   sendCoHostDemoted(data: CoHostDemotedEmailData): Promise<void>;

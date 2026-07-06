@@ -19,6 +19,8 @@ import { AdminNewUserEmail } from "@/infrastructure/services/email/templates/adm
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
 import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
+import { CancellationConfirmationEmail } from "@/infrastructure/services/email/templates/cancellation-confirmation";
+import { HostCancellationEmail } from "@/infrastructure/services/email/templates/host-cancellation";
 import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
 import { OnboardingWelcomeEmail } from "@/infrastructure/services/email/templates/onboarding-welcome";
 import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
@@ -86,6 +88,51 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
           dateLabel: "Date",
           locationLabel: "Lieu",
           viewMomentCta: "Voir l'événement",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "cancellation-confirmation",
+      label: "Confirmation de désinscription",
+      subject: "Inscription annulée : Soirée JS & Pizza",
+      element: CancellationConfirmationEmail({
+        to: "alice@example.com",
+        momentTitle: "Soirée JS & Pizza",
+        momentSlug: "soiree-js-pizza",
+        momentDateMonth: "MAR",
+        momentDateDay: "21",
+        strings: {
+          subject: "Inscription annulée : Soirée JS & Pizza",
+          heading: "Votre inscription est annulée",
+          message:
+            "Votre inscription à Soirée JS & Pizza a bien été annulée. Si vous changez d'avis, l'événement reste accessible ci-dessous.",
+          refundMessage: "Un remboursement de 15,00 € a été effectué automatiquement.",
+          ctaLabel: "Voir l'événement",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "host-cancellation",
+      label: "Host — Désinscription d'un participant",
+      subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
+      element: HostCancellationEmail({
+        to: "bob@example.com",
+        hostName: "Bob Dupont",
+        playerName: "Alice Martin",
+        momentTitle: "Soirée JS & Pizza",
+        momentSlug: "soiree-js-pizza",
+        circleSlug: "paris-creative-tech",
+        amountRefunded: "15,00 €",
+        strings: {
+          subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
+          heading: "Désinscription d'un événement",
+          message: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza.",
+          refundMessage: "Un remboursement de 15,00 € a été effectué automatiquement.",
+          manageRegistrationsCta: "Gérer les inscriptions",
           footer: FOOTER,
         },
         baseUrl: BASE_URL,

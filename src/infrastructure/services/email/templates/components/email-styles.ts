@@ -165,3 +165,21 @@ export const unsubscribeLink: React.CSSProperties = {
   color: "#a1a1aa",
   textDecoration: "underline",
 };
+
+// ---------------------------------------------------------------------------
+// Encart remboursement (ambre) — templates cancellation-confirmation,
+// host-cancellation
+// ---------------------------------------------------------------------------
+export const refundSection: React.CSSProperties = {
+  backgroundColor: "#fef3c7",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "24px",
+};
+
+export const refundText: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#92400e",
+  margin: "0",
+  lineHeight: "20px",
+};

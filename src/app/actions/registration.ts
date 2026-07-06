@@ -27,7 +27,7 @@ import {
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
-import type { Registration } from "@/domain/models/registration";
+import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
@@ -112,17 +112,15 @@ export async function cancelRegistrationAction(
       });
     }
 
-    const cancelledReg = result.registration;
-    if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
-      after(async () => {
-        try {
-          await sendHostPaidCancellationEmail(registrationId, userId, resolver);
-        } catch (err) {
-          console.error(err);
-          Sentry.captureException(err);
-        }
-      });
-    }
+    const previousStatus = result.previousStatus;
+    after(async () => {
+      try {
+        await sendCancellationEmails(registrationId, userId, previousStatus, resolver);
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    });
 
     invalidateDashboardCache(userId);
     if (result.promotedRegistration) {
@@ -133,11 +131,24 @@ export async function cancelRegistrationAction(
 
 // --- Email helpers (dispatchés via after() par les actions) ---
 
-async function sendHostPaidCancellationEmail(
+// Désinscription self-service : confirmation au participant (inconditionnelle,
+// email transactionnel) + notification aux organisateurs. Pour un événement
+// payant, les organisateurs sont toujours notifiés (suivi de l'argent) ; pour un
+// gratuit, la notification suit la préférence `notifyNewRegistration`
+// (symétrique de la notification d'inscription). Un départ de liste d'attente
+// n'envoie que la confirmation au participant (wording dédié, aucune place ne
+// s'est libérée pour les organisateurs).
+async function sendCancellationEmails(
   registrationId: string,
   cancellingUserId: string,
+  previousStatus: RegistrationStatus,
   resolver: EmailLocaleResolver
 ): Promise<void> {
+  // Seuls REGISTERED et WAITLISTED ont un wording de désinscription ; les autres
+  // statuts (ex. PENDING_APPROVAL annulé via appel direct) n'envoient rien.
+  const wasWaitlisted = previousStatus === "WAITLISTED";
+  if (previousStatus !== "REGISTERED" && !wasWaitlisted) return;
+
   const registration = await prismaRegistrationRepository.findById(registrationId);
   if (!registration) return;
 
@@ -147,43 +158,99 @@ async function sendHostPaidCancellationEmail(
   ]);
   if (!moment || !player) return;
 
-  const circle = await prismaCircleRepository.findById(moment.circleId);
+  const [circle, hosts] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    wasWaitlisted ? [] : prismaCircleRepository.findOrganizers(moment.circleId),
+  ]);
   if (!circle) return;
 
-  const hosts = await prismaCircleRepository.findOrganizers(circle.id);
-  if (hosts.length === 0) return;
-
+  const isPaid =
+    registration.paymentStatus === "PAID" || registration.paymentStatus === "REFUNDED";
+  // Ne jamais affirmer un remboursement non constaté : `refundable` dit la
+  // politique de l'événement, seul paymentStatus REFUNDED prouve le remboursement.
+  // PAID + remboursable = échec du refund Stripe (avalé par le usecase) → aucun
+  // message plutôt qu'une fausse confirmation.
+  const wasRefunded = registration.paymentStatus === "REFUNDED";
   const playerName = getDisplayName(player.firstName, player.lastName, player.email);
-  const isRefundable = moment.refundable;
+  const amountFor = (locale: string) =>
+    formatPrice(moment.price, moment.currency, locale);
+  const refundMessageFor = (
+    t: Awaited<ReturnType<EmailLocaleResolver["translationsFor"]>>,
+    locale: string,
+    keyPrefix: "cancellationConfirmation" | "hostCancellation"
+  ) =>
+    !isPaid
+      ? null
+      : wasRefunded
+        ? t(`${keyPrefix}.refunded`, { amount: amountFor(locale) })
+        : !moment.refundable
+          ? t(`${keyPrefix}.notRefunded`)
+          : null;
 
-  await Promise.all(
-    hosts.map(async (host) => {
-      const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-      const t = await resolver.translationsFor(host.userId);
-      const hostLocale = resolver.resolveFor(host.userId);
-      const amountFormatted = formatPrice(moment.price, moment.currency, hostLocale);
+  // La notification d'inscription exclut le déclencheur ; même filtre ici. En
+  // pratique un organisateur actif ne peut pas annuler sa propre inscription
+  // (D16), le filtre évite juste de dépendre implicitement de cette règle.
+  const notifiedHosts = hosts.filter((host) => host.userId !== cancellingUserId);
+  const prefsMap =
+    isPaid || notifiedHosts.length === 0
+      ? null
+      : await prismaUserRepository.findNotificationPreferencesByIds(
+          notifiedHosts.map((h) => h.userId)
+        );
 
-      return emailService.sendHostPaidCancellation({
-        to: host.user.email,
-        hostName,
-        playerName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        circleSlug: circle.slug,
-        amountRefunded: isRefundable ? amountFormatted : null,
-        strings: {
-          subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
-          heading: t("paidCancellation.heading"),
-          message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
-          refundMessage: isRefundable
-            ? t("paidCancellation.refunded", { amount: amountFormatted })
-            : t("paidCancellation.notRefunded"),
-          manageRegistrationsCta: t("paidCancellation.manageCta"),
-          footer: t("common.footer"),
-        },
-      });
-    })
-  );
+  // Toutes les lectures DB sont faites : les envois peuvent démarrer ensemble,
+  // aucune promesse ne reste flottante pendant un await susceptible de rejeter.
+  const playerT = await resolver.translationsFor(cancellingUserId);
+  const playerLocale = resolver.resolveFor(cancellingUserId);
+  const playerCtx = buildMomentEmailContext(moment, playerLocale);
+  // Même pattern de préfixe que sendRegistrationEmails (waitlist vs registration).
+  const playerPrefix = wasWaitlisted
+    ? "cancellationConfirmation.waitlistLeft"
+    : "cancellationConfirmation.registered";
+
+  const sendPlayerEmail = emailService.sendCancellationConfirmation({
+    to: player.email,
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    momentDateMonth: playerCtx.momentDateMonth,
+    momentDateDay: playerCtx.momentDateDay,
+    strings: {
+      subject: playerT(`${playerPrefix}.subject`, { momentTitle: moment.title }),
+      heading: playerT(`${playerPrefix}.heading`),
+      message: playerT(`${playerPrefix}.message`, { momentTitle: moment.title }),
+      refundMessage: refundMessageFor(playerT, playerLocale, "cancellationConfirmation"),
+      ctaLabel: playerT("cancellationConfirmation.ctaLabel"),
+      footer: playerT("common.footer"),
+    },
+  });
+
+  const sendHostEmails = notifiedHosts.map(async (host) => {
+    if (prefsMap && !prefsMap.get(host.userId)?.notifyNewRegistration) return;
+
+    const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+    const t = await resolver.translationsFor(host.userId);
+    const hostLocale = resolver.resolveFor(host.userId);
+
+    return emailService.sendHostCancellation({
+      to: host.user.email,
+      hostName,
+      playerName,
+      momentTitle: moment.title,
+      momentSlug: moment.slug,
+      circleSlug: circle.slug,
+      amountRefunded: wasRefunded ? amountFor(hostLocale) : null,
+      strings: {
+        subject: t("hostCancellation.subject", { playerName, momentTitle: moment.title }),
+        heading: t("hostCancellation.heading"),
+        message: t("hostCancellation.message", { playerName, momentTitle: moment.title }),
+        refundMessage: refundMessageFor(t, hostLocale, "hostCancellation"),
+        manageRegistrationsCta: t("hostCancellation.manageCta"),
+        footer: t("common.footer"),
+      },
+    });
+  });
+
+  await Promise.all([sendPlayerEmail, ...sendHostEmails]);
 }
 
 export async function sendRegistrationEmails(
