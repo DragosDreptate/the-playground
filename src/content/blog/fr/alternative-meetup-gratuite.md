@@ -36,7 +36,7 @@ Avant de choisir, posez-vous les bonnes questions :
 
 ### The Playground, la communauté d'abord, conçue en France
 
-The Playground reprend le modèle communautaire de Meetup, une communauté persistante où les membres restent d'un événement à l'autre, mais avec une expérience moderne et une gratuité totale.
+[The Playground](https://the-playground.fr) reprend le modèle communautaire de Meetup, une communauté persistante où les membres restent d'un événement à l'autre, mais avec une expérience moderne et une gratuité totale.
 
 **Le principe** : quand quelqu'un s'inscrit à votre événement, il rejoint automatiquement votre communauté. Après l'événement, il voit les prochains rendez-vous, les autres membres, l'identité de votre groupe. Le lien ne se casse pas.
 
@@ -103,7 +103,7 @@ Ces plateformes offrent ce que les outils événementiels n'ont pas : la **conve
 
 Le choix dépend de ce que vous construisez :
 
-> **Vous construisez une communauté locale qui dure.** Vous voulez que vos participants reviennent d'un événement à l'autre, sans payer de commission, avec vos données en Europe → **The Playground**
+> **Vous construisez une communauté locale qui dure.** Vous voulez que vos participants reviennent d'un événement à l'autre, sans payer de commission, avec vos données en Europe → **[The Playground](https://the-playground.fr)**
 
 > **Vous organisez des événements ponctuels premium.** La qualité de la page d'inscription est déterminante, vous avez besoin de SMS/WhatsApp, la communauté n'est pas votre priorité → **Luma**
 
