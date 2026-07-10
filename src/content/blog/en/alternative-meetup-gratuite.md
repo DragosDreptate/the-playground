@@ -36,7 +36,7 @@ Before choosing, ask yourself the right questions:
 
 ### The Playground, community first, built in Europe
 
-The Playground takes Meetup's community model, a persistent community where members stay from one event to the next, and pairs it with a modern experience and total free pricing.
+[The Playground](https://the-playground.fr) takes Meetup's community model, a persistent community where members stay from one event to the next, and pairs it with a modern experience and total free pricing.
 
 **The principle**: when someone registers for your event, they automatically join your community. After the event, they see the next meetups, the other members, your group's identity. The connection doesn't break.
 
@@ -103,7 +103,7 @@ These platforms offer what event tools don't: **ongoing conversation** between e
 
 The choice depends on what you're building:
 
-> **You're building a lasting local community.** You want your attendees to come back from one event to the next, with no commission, and your data in Europe → **The Playground**
+> **You're building a lasting local community.** You want your attendees to come back from one event to the next, with no commission, and your data in Europe → **[The Playground](https://the-playground.fr)**
 
 > **You organise one-off premium events.** Event page quality is decisive, you need SMS/WhatsApp, community isn't your priority → **Luma**
 
