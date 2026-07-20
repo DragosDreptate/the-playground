@@ -78,14 +78,29 @@ export async function cancelRegistration(
   let promotedRegistration: Registration | null = null;
 
   if (wasRegistered && moment && moment.price === 0) {
-    const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
-      registration.momentId
-    );
-    if (firstWaitlisted) {
-      promotedRegistration = await registrationRepository.update(
-        firstWaitlisted.id,
-        { status: "REGISTERED" }
+    // Ne promouvoir que si une place est RÉELLEMENT libre après cette annulation.
+    // Un organisateur peut s'inscrire au-delà de la capacité (registerOrganizer la
+    // bypasse) : annuler une participation en sur-capacité ne libère alors aucune
+    // place, et promouvoir un waitlisté surbookerait l'événement en lui envoyant un
+    // email « une place s'est libérée » trompeur. La registration courante est déjà
+    // passée CANCELLED ci-dessus, donc ce compte reflète l'état post-annulation.
+    const registeredCount =
+      await registrationRepository.countByMomentIdAndStatus(
+        registration.momentId,
+        "REGISTERED"
       );
+    const hasFreeSpot =
+      moment.capacity === null || registeredCount < moment.capacity;
+    if (hasFreeSpot) {
+      const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
+        registration.momentId
+      );
+      if (firstWaitlisted) {
+        promotedRegistration = await registrationRepository.update(
+          firstWaitlisted.id,
+          { status: "REGISTERED" }
+        );
+      }
     }
   }
 

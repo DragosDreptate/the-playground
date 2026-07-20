@@ -3,6 +3,7 @@ import { isConfirmedParticipation } from "@/domain/models/registration";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
+import { isPersistedOrganizer } from "./is-persisted-organizer";
 import {
   MomentNotFoundError,
   MomentNotOpenForRegistrationError,
@@ -53,8 +54,7 @@ export async function registerOrganizer(
   }
 
   // Seul un organisateur réel (membre persisté) du Circle peut s'inscrire ainsi.
-  const organizers = await circleRepository.findOrganizers(moment.circleId);
-  if (!organizers.some((organizer) => organizer.userId === input.userId)) {
+  if (!(await isPersistedOrganizer(circleRepository, moment.circleId, input.userId))) {
     throw new UnauthorizedMomentActionError();
   }
 

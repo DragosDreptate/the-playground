@@ -27,13 +27,19 @@ Un organisateur (HOST / CO_HOST) actif et **membre réel** du Circle peut s'insc
 
 - `REGISTERED` direct, **sans paiement** (un organisateur ne paie pas sa propre billetterie), **sans contrôle de capacité ni liste d'attente** (il n'attend jamais une place sur son propre événement), **sans validation** (pas de `PENDING_APPROVAL`).
 - **Idempotent** : déjà `REGISTERED` / `CHECKED_IN` → no-op ; tout autre statut existant (`CANCELLED`, `REJECTED`, `WAITLISTED`, `PENDING_APPROVAL`) est forcé à `REGISTERED`.
-- Contrôle d'appartenance via `findOrganizers` (membres persistés) → l'admin en host mode ne peut pas s'inscrire (cohérent avec le point 1).
+- Contrôle d'appartenance via `isPersistedOrganizer` (helper partagé, s'appuie sur `findOrganizers`) → l'admin en host mode ne peut pas s'inscrire (cohérent avec le point 1).
 - Rejette un événement `PAST` / `CANCELLED` (`MomentNotOpenForRegistrationError`).
 - Server action `registerAsOrganizerAction` : **silencieuse** (aucun email, ni confirmation ni notification aux autres organisateurs — anti-avalanche, symétrique du créateur).
+
+> **Capacité assumée** : un organisateur peut s'inscrire même si l'événement est complet (sa présence est légitime, c'est son événement). Le compteur d'inscrits peut alors dépasser la capacité affichée tant qu'il participe — choix documenté, pas un bug. Voir le garde-fou côté annulation ci-dessous.
 
 ### 4. Désinscription d'un organisateur — `cancel-registration.ts`
 
 La règle D16 (`OrganizerCannotCancelRegistrationError`) est **supprimée** : tout participant, organisateur compris, peut annuler sa propre inscription. Se désinscrire d'un événement ne retire ni le rôle ni l'accès de gestion (qui dérivent de la membership). L'erreur et sa clé i18n sont supprimées. Le usecase ne dépend plus de `circleRepository`.
+
+**Promotion de liste d'attente conditionnée à la capacité réelle** : comme un organisateur peut s'inscrire au-delà de la capacité, annuler une participation en sur-capacité ne libère aucune vraie place. Le usecase ne promeut donc un waitlisté **que si** le nombre de `REGISTERED` restants passe strictement sous la capacité (`capacity === null` = illimité → toujours de la place). Sans ce garde-fou, annuler une inscription « en trop » surbookerait l'événement et enverrait au waitlisté un email « une place s'est libérée » trompeur.
+
+**Désinscription orga silencieuse** : le contrôle de participation appelle `cancelOrganizerRegistrationAction` (et non le `cancelRegistrationAction` générique) — aucun email de confirmation au partant ni de notification aux autres organisateurs, symétrique de l'inscription silencieuse. L'email de promotion d'un waitlisté réellement promu, lui, part normalement.
 
 ## UI — page événement (`moment-detail-view.tsx`)
 
@@ -55,11 +61,12 @@ Les événements déjà créés ont des organisateurs inscrits de force (auto-in
 | Fichier | Changement |
 | --- | --- |
 | `src/domain/usecases/register-organizer.ts` | **Nouveau** usecase d'inscription volontaire d'un organisateur |
-| `src/domain/usecases/create-moment.ts` | Inscrit uniquement le créateur (vérifié via `findOrganizers`) |
+| `src/domain/usecases/is-persisted-organizer.ts` | **Nouveau** helper partagé « organisateur persisté » (exclut l'admin host mode) |
+| `src/domain/usecases/create-moment.ts` | Inscrit uniquement le créateur (via `isPersistedOrganizer`) |
 | `src/domain/usecases/promote-to-co-host.ts` | Retrait de l'auto-inscription + des deps `momentRepository` / `registrationRepository` |
-| `src/domain/usecases/cancel-registration.ts` | Suppression de la garde D16 + de la dep `circleRepository` |
+| `src/domain/usecases/cancel-registration.ts` | Suppression de la garde D16 + de la dep `circleRepository` ; promotion waitlist capacity-aware |
 | `src/domain/errors/registration-errors.ts` (+ `index.ts`) | Suppression de `OrganizerCannotCancelRegistrationError` |
-| `src/app/actions/registration.ts` | Nouvelle `registerAsOrganizerAction` (silencieuse) ; `cancelRegistrationAction` sans `circleRepository` |
+| `src/app/actions/registration.ts` | Nouvelles `registerAsOrganizerAction` + `cancelOrganizerRegistrationAction` (silencieuses) ; `cancelRegistrationAction` sans `circleRepository` |
 | `src/app/actions/circle.ts` | `promoteToCoHostAction` sans `momentRepository` / `registrationRepository` |
 | `src/components/moments/organizer-participation-control.tsx` | **Nouveau** contrôle de participation |
 | `src/components/moments/moment-detail-view.tsx` | Organisateur : « Gérer » + bloc participation (plus exclusif) ; nouveau prop `isMemberOrganizer` |

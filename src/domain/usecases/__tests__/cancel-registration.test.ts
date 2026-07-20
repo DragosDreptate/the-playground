@@ -97,6 +97,70 @@ describe("CancelRegistration", () => {
     });
   });
 
+  describe("given an over-capacity cancellation (organizer bypassed capacity)", () => {
+    it("should NOT promote a waitlisted user when no real spot is freed", async () => {
+      // Événement complet (capacité 2) sur-booké par un organisateur (registerOrganizer
+      // bypasse la capacité). Après annulation il reste 2 REGISTERED → aucune place
+      // réelle libérée → pas de promotion (sinon surbooking + email trompeur).
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
+        ),
+        // Post-annulation, il reste 2 REGISTERED (= capacité) : plus de place.
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(2),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(
+          makeRegistration({ id: "wl-1", status: "WAITLISTED" })
+        ),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ capacity: 2, price: 0 })),
+      });
+
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo, momentRepo })
+      );
+
+      expect(result.promotedRegistration).toBeNull();
+      expect(registrationRepo.findFirstWaitlisted).not.toHaveBeenCalled();
+    });
+
+    it("should promote when a real spot IS freed (count drops below capacity)", async () => {
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+        update: vi
+          .fn()
+          .mockResolvedValueOnce(
+            makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
+          )
+          .mockResolvedValueOnce(
+            makeRegistration({ id: "wl-1", status: "REGISTERED" })
+          ),
+        // Post-annulation, il reste 1 REGISTERED (< capacité 2) : une place s'est libérée.
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(1),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(
+          makeRegistration({ id: "wl-1", status: "WAITLISTED" })
+        ),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ capacity: 2, price: 0 })),
+      });
+
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo, momentRepo })
+      );
+
+      expect(result.promotedRegistration).not.toBeNull();
+      expect(result.promotedRegistration!.id).toBe("wl-1");
+    });
+  });
+
   describe("given a WAITLISTED Player cancelling", () => {
     it("should cancel without promoting anyone", async () => {
       const registrationRepo = createMockRegistrationRepository({

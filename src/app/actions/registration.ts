@@ -108,6 +108,52 @@ export async function registerAsOrganizerAction(
   });
 }
 
+/**
+ * Désinscription d'un organisateur de sa propre participation, depuis le contrôle de
+ * participation. **Silencieuse** : aucun email de confirmation au partant ni de
+ * notification aux autres organisateurs (symétrique de `registerAsOrganizerAction`,
+ * anti-avalanche). En revanche, si l'annulation libère réellement une place et promeut
+ * un waitlisté, celui-ci reçoit bien son email de promotion : une vraie place s'est
+ * ouverte pour lui.
+ */
+export async function cancelOrganizerRegistrationAction(
+  registrationId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const userId = session.user.id;
+  return toActionResult(async () => {
+    const result = await cancelRegistration(
+      { registrationId, userId },
+      {
+        registrationRepository: prismaRegistrationRepository,
+        momentRepository: prismaMomentRepository,
+        paymentService,
+      }
+    );
+
+    if (result.promotedRegistration) {
+      const promoted = result.promotedRegistration;
+      // Resolver construit en request context (getLocale), avant `after()`.
+      const resolver = await buildEmailLocaleResolver(userId);
+      after(async () => {
+        try {
+          await sendPromotionEmail(promoted, resolver);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      });
+      invalidateDashboardCache(promoted.userId);
+    }
+
+    invalidateDashboardCache(userId);
+  });
+}
+
 export async function cancelRegistrationAction(
   registrationId: string
 ): Promise<ActionResult> {

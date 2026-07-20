@@ -12,6 +12,7 @@ import {
   PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
+import { isPersistedOrganizer } from "./is-persisted-organizer";
 
 type CreateMomentInput = {
   circleId: string;
@@ -116,11 +117,10 @@ export async function createMoment(
   // Seul le créateur de l'événement est auto-inscrit comme Participant. Les autres
   // organisateurs s'inscrivent volontairement depuis la page événement
   // (registerOrganizer) — voir spec/features/co-host-event-participation.md.
-  // On confirme via findOrganizers que le créateur est un vrai membre organisateur :
-  // un admin en host mode (membership synthétique, non persistée) n'y figure pas et
-  // n'est donc pas inscrit (pas de Registration fantôme pour un non-membre).
-  const organizers = await circleRepository.findOrganizers(input.circleId);
-  if (organizers.some((organizer) => organizer.userId === input.userId)) {
+  // isPersistedOrganizer confirme que le créateur est un vrai membre : un admin en
+  // host mode (membership synthétique) a passé le gate ci-dessus mais n'y figure pas,
+  // donc pas de Registration fantôme pour un non-membre.
+  if (await isPersistedOrganizer(circleRepository, input.circleId, input.userId)) {
     await registrationRepository.create({
       momentId: moment.id,
       userId: input.userId,

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   registerAsOrganizerAction,
-  cancelRegistrationAction,
+  cancelOrganizerRegistrationAction,
 } from "@/app/actions/registration";
 import type { Registration } from "@/domain/models/registration";
 import posthog from "posthog-js";
@@ -69,7 +69,7 @@ export function OrganizerParticipationControl({
     if (!registrationId) return;
     startTransition(async () => {
       setError(null);
-      const result = await cancelRegistrationAction(registrationId);
+      const result = await cancelOrganizerRegistrationAction(registrationId);
       if (result.success) {
         setRegistered(false);
         setRegistrationId(null);
@@ -120,9 +120,9 @@ export function OrganizerParticipationControl({
               <AlertDialogFooter>
                 <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
                 <AlertDialogAction
-                  variant="destructive"
                   disabled={isPending}
                   onClick={handleCancel}
+                  className="bg-destructive text-white hover:bg-destructive/90"
                 >
                   {isPending ? tCommon("loading") : t("public.confirmCancel")}
                 </AlertDialogAction>
