@@ -48,14 +48,6 @@ export class UnauthorizedRegistrationActionError extends DomainError {
   }
 }
 
-export class OrganizerCannotCancelRegistrationError extends DomainError {
-  readonly code = "ORGANIZER_CANNOT_CANCEL";
-
-  constructor() {
-    super("An organizer (Host or Co-Host) cannot cancel their registration for a Moment of their own Community");
-  }
-}
-
 export class RegistrationNotPendingApprovalError extends DomainError {
   readonly code = "REGISTRATION_NOT_PENDING_APPROVAL";
 

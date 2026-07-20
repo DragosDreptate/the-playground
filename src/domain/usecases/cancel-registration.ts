@@ -1,14 +1,11 @@
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
-import { isActiveOrganizer } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
-import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
 import { refundRegistration } from "./refund-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  OrganizerCannotCancelRegistrationError,
 } from "@/domain/errors";
 
 type CancelRegistrationInput = {
@@ -19,7 +16,6 @@ type CancelRegistrationInput = {
 type CancelRegistrationDeps = {
   registrationRepository: RegistrationRepository;
   momentRepository: MomentRepository;
-  circleRepository: CircleRepository;
   paymentService?: PaymentService;
 };
 
@@ -35,7 +31,7 @@ export async function cancelRegistration(
   input: CancelRegistrationInput,
   deps: CancelRegistrationDeps
 ): Promise<CancelRegistrationResult> {
-  const { registrationRepository, momentRepository, circleRepository } = deps;
+  const { registrationRepository, momentRepository } = deps;
 
   const registration = await registrationRepository.findById(
     input.registrationId
@@ -48,18 +44,11 @@ export async function cancelRegistration(
     throw new UnauthorizedRegistrationActionError();
   }
 
-  // D16 : un organisateur actif ne peut pas annuler sa propre inscription
-  // à un événement de sa Communauté.
+  // Un organisateur peut désormais annuler sa propre inscription à un événement de
+  // sa Communauté (découplage rôle / présence — voir
+  // spec/features/co-host-event-participation.md). Se désinscrire d'un événement ne
+  // retire ni le rôle ni l'accès de gestion, qui dérivent de la membership.
   const moment = await momentRepository.findById(registration.momentId);
-  if (moment) {
-    const membership = await circleRepository.findMembership(
-      moment.circleId,
-      input.userId
-    );
-    if (isActiveOrganizer(membership)) {
-      throw new OrganizerCannotCancelRegistrationError();
-    }
-  }
 
   const previousStatus = registration.status;
   const wasRegistered = previousStatus === "REGISTERED";
@@ -89,14 +78,29 @@ export async function cancelRegistration(
   let promotedRegistration: Registration | null = null;
 
   if (wasRegistered && moment && moment.price === 0) {
-    const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
-      registration.momentId
-    );
-    if (firstWaitlisted) {
-      promotedRegistration = await registrationRepository.update(
-        firstWaitlisted.id,
-        { status: "REGISTERED" }
+    // Ne promouvoir que si une place est RÉELLEMENT libre après cette annulation.
+    // Un organisateur peut s'inscrire au-delà de la capacité (registerOrganizer la
+    // bypasse) : annuler une participation en sur-capacité ne libère alors aucune
+    // place, et promouvoir un waitlisté surbookerait l'événement en lui envoyant un
+    // email « une place s'est libérée » trompeur. La registration courante est déjà
+    // passée CANCELLED ci-dessus, donc ce compte reflète l'état post-annulation.
+    const registeredCount =
+      await registrationRepository.countByMomentIdAndStatus(
+        registration.momentId,
+        "REGISTERED"
       );
+    const hasFreeSpot =
+      moment.capacity === null || registeredCount < moment.capacity;
+    if (hasFreeSpot) {
+      const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
+        registration.momentId
+      );
+      if (firstWaitlisted) {
+        promotedRegistration = await registrationRepository.update(
+          firstWaitlisted.id,
+          { status: "REGISTERED" }
+        );
+      }
     }
   }
 

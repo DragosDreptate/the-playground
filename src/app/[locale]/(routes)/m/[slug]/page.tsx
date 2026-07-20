@@ -156,9 +156,13 @@ export default async function PublicMomentPage({
   // Un admin en « host mode » voit les données comme un Organisateur — cohérent avec
   // getMomentParticipantsPageAction (HOST synthétique via resolveCircleRepository).
   // Sinon la page 1 (rendue ici) et les pages suivantes (action) divergeraient pour lui.
-  const isOrganizer =
-    (isAuthenticated && hosts.some((h) => h.userId === session!.user!.id)) ||
-    (await isAdminInHostMode(session));
+  // Organisateur membre réel du Circle (HOST/CO_HOST persisté) : seul lui a un
+  // contrôle de participation (il peut réellement s'inscrire/se désinscrire). Un
+  // admin en host mode voit les données d'organisateur mais n'est pas un membre —
+  // il gère sans participer, donc pas de contrôle de participation pour lui.
+  const isMemberOrganizer =
+    isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
+  const isOrganizer = isMemberOrganizer || (await isAdminInHostMode(session));
 
   // PII (email) + identifiants Stripe réservés à l'Organisateur : tout autre viewer
   // reçoit des inscriptions réduites AVANT sérialisation vers le composant client
@@ -317,6 +321,7 @@ export default async function PublicMomentPage({
         contactAccountTooNew={isSessionAccountNew(session)}
         isAuthenticated={isAuthenticated}
         isOrganizer={isOrganizer}
+        isMemberOrganizer={isMemberOrganizer}
         existingRegistration={existingRegistration}
         signInUrl={signInUrl}
         isFull={isFull}

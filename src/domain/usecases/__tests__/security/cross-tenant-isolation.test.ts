@@ -267,10 +267,6 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment()),
       });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(null),
-      });
-
       // user-attacker (pas user-victim) tente l'annulation
       await expect(
         cancelRegistration(
@@ -278,7 +274,6 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
           {
             registrationRepository: registrationRepo,
             momentRepository: momentRepo,
-            circleRepository: circleRepo,
           }
         )
       ).rejects.toThrow(UnauthorizedRegistrationActionError);
@@ -303,19 +298,12 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-a" })),
       });
-      const circleRepo = createMockCircleRepository({
-        // user-victim est PLAYER, pas HOST
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ userId: "user-victim", role: "PLAYER" })
-        ),
-      });
 
       const result = await cancelRegistration(
         { registrationId: "reg-victim", userId: "user-victim" },
         {
           registrationRepository: registrationRepo,
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
         }
       );
       expect(result.registration.status).toBe("CANCELLED");

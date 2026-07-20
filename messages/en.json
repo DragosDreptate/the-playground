@@ -594,6 +594,14 @@
       "cancel": "Cancel event",
       "cancelling": "Cancelling..."
     },
+    "organizerParticipation": {
+      "label": "Your attendance",
+      "register": "Register",
+      "registered": "Registered",
+      "cancel": "Cancel my registration",
+      "hint": "You're organizing this event. Register if you plan to attend.",
+      "cancelConfirmDescription": "You'll no longer be counted as an attendee. You keep managing the event."
+    },
     "public": {
       "hostedBy": "Hosted by",
       "attachments": {

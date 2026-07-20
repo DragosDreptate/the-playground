@@ -42,7 +42,6 @@ type RegistrationButtonProps = {
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
-  isOrganizer?: boolean;
   calendarData?: CalendarEventData;
   appUrl?: string;
   waitlistPosition?: number;
@@ -61,7 +60,6 @@ export function RegistrationButton({
   existingRegistration,
   signInUrl,
   isFull,
-  isOrganizer = false,
   calendarData,
   appUrl,
   waitlistPosition,
@@ -237,7 +235,6 @@ export function RegistrationButton({
   // Pour REGISTERED, le bouton primary suffit à signaler l'inscription. Pour WAITLISTED,
   // on garde le pill car il porte la position dans la file d'attente.
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
-    if (isOrganizer) return null;
     const isRegistered = localStatus === "REGISTERED";
     return (
       <div className="space-y-3">

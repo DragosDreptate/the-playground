@@ -1,9 +1,6 @@
 import type { CircleMembership } from "@/domain/models/circle";
 import { isActivePrimaryHost } from "@/domain/models/circle";
-import { isConfirmedParticipation } from "@/domain/models/registration";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
-import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
-import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
 import type { EmailService } from "@/domain/ports/services/email-service";
 import {
@@ -21,8 +18,6 @@ type PromoteToCoHostInput = {
 
 type PromoteToCoHostDeps = {
   circleRepository: CircleRepository;
-  momentRepository: MomentRepository;
-  registrationRepository: RegistrationRepository;
   userRepository: UserRepository;
   emailService?: EmailService;
   emailStrings?: {
@@ -51,14 +46,7 @@ export async function promoteToCoHost(
   input: PromoteToCoHostInput,
   deps: PromoteToCoHostDeps
 ): Promise<CircleMembership> {
-  const {
-    circleRepository,
-    momentRepository,
-    registrationRepository,
-    userRepository,
-    emailService,
-    emailStrings,
-  } = deps;
+  const { circleRepository, userRepository, emailService, emailStrings } = deps;
 
   // D3 : seul le HOST principal peut promouvoir (garde strict HOST, pas CO_HOST).
   const [callerMembership, targetMembership] = await Promise.all([
@@ -85,45 +73,10 @@ export async function promoteToCoHost(
     "CO_HOST"
   );
 
-  // Le nouveau co-host est automatiquement inscrit à tous les événements à venir
-  // du Circle (REGISTERED), comme tout organisateur — voir
-  // spec/features/co-host-event-participation.md. Insertion directe sans email.
-  const now = new Date();
-  const moments = await momentRepository.findByCircleId(input.circleId);
-  const upcoming = moments.filter(
-    (moment) =>
-      moment.startsAt > now &&
-      (moment.status === "DRAFT" || moment.status === "PUBLISHED")
-  );
-  // Une seule requête pour les inscriptions existantes du membre sur ces
-  // événements (évite le N+1).
-  const existingByMoment = await registrationRepository.findByMomentIdsAndUser(
-    upcoming.map((moment) => moment.id),
-    input.targetUserId
-  );
-  await Promise.all(
-    upcoming.map((moment) => {
-      const existing = existingByMoment.get(moment.id) ?? null;
-      // Déjà participant (REGISTERED / CHECKED_IN) : idempotent, rien à faire.
-      if (existing && isConfirmedParticipation(existing.status)) {
-        return undefined;
-      }
-      // WAITLISTED / PENDING_APPROVAL / CANCELLED / REJECTED → forcé REGISTERED
-      // (un organisateur n'est ni en liste d'attente ni en attente de validation
-      // d'un événement de son propre Circle).
-      if (existing) {
-        return registrationRepository.update(existing.id, {
-          status: "REGISTERED",
-          cancelledAt: null,
-        });
-      }
-      return registrationRepository.create({
-        momentId: moment.id,
-        userId: input.targetUserId,
-        status: "REGISTERED",
-      });
-    })
-  );
+  // Le nouveau co-host n'est pas auto-inscrit aux événements du Circle : la
+  // participation est volontaire (découplage rôle / présence, voir
+  // spec/features/co-host-event-participation.md). Il s'inscrit depuis la page
+  // événement s'il compte y participer.
 
   // D19 : email de promotion best-effort — un échec ne bloque pas la promotion.
   if (emailService && emailStrings) {

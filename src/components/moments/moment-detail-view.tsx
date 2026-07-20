@@ -7,6 +7,7 @@ import { CancelMomentDialog } from "@/components/moments/cancel-moment-dialog";
 import { HostMessageDialog } from "@/components/moments/host-message-dialog";
 import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
+import { OrganizerParticipationControl } from "@/components/moments/organizer-participation-control";
 import { PendingRegistrationsList } from "@/components/circles/pending-requests-list";
 import { MomentRegistrationsDialog } from "@/components/moments/moment-registrations-dialog";
 import { ParticipantAvatarStack } from "@/components/moments/participant-avatar-stack";
@@ -61,6 +62,12 @@ type CommonProps = {
   comments: CommentWithUser[];
   attachments: MomentAttachment[];
   currentUserId: string | null;
+  /** Inscription du viewer connecté à cet événement (null s'il n'en a pas). Sert au
+   * contrôle de participation, aussi bien en vue host qu'en vue publique. */
+  existingRegistration: Registration | null;
+  /** Organisateur membre réel du Circle : seul lui a un contrôle de participation
+   * (l'admin en host mode gère mais ne participe pas). */
+  isMemberOrganizer: boolean;
   /** Première page des participants REGISTERED pour la modale (server-fetched, avec total). */
   participantsFirstPage: {
     participants: RegistrationWithUser[];
@@ -84,7 +91,6 @@ type PublicViewProps = CommonProps & {
   variant: "public";
   isAuthenticated: boolean;
   isOrganizer: boolean;
-  existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
   calendarData: CalendarEventData;
@@ -233,6 +239,30 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const publicProps = props.variant === "public" ? props : null;
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
   const isAuthenticated = isHostView || publicProps!.isAuthenticated;
+
+  // Rôles des organisateurs (par user.id) : sert à la couronne dans la liste des
+  // inscrits ET à la matrice de retrait d'un inscrit (miroir de removeRegistrationByHost).
+  const organizerRoleByUserId: Record<string, "HOST" | "CO_HOST"> = {};
+  for (const h of hosts) {
+    if (h.role === "HOST" || h.role === "CO_HOST") {
+      organizerRoleByUserId[h.user.id] = h.role;
+    }
+  }
+  // Le viewer peut-il retirer un CO_HOST ? Uniquement s'il est le HOST principal.
+  const viewerIsPrimaryHost =
+    !!props.currentUserId && organizerRoleByUserId[props.currentUserId] === "HOST";
+
+  // Contrôle de participation d'un organisateur, partagé par la vue host (dashboard,
+  // point d'entrée naturel d'un organisateur) et la vue publique. Réservé aux
+  // organisateurs membres réels et aux événements encore ouverts.
+  const participationControl =
+    props.isMemberOrganizer &&
+    (moment.status === "PUBLISHED" || moment.status === "DRAFT") ? (
+      <OrganizerParticipationControl
+        momentId={moment.id}
+        registration={props.existingRegistration}
+      />
+    ) : null;
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
@@ -400,60 +430,68 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           <div className="border-border border-t max-lg:hidden" />
 
           {isHostView ? (
-            moment.status === "DRAFT" ? (
-              <div className="flex gap-2">
-                <PublishMomentButton
+            <div className="space-y-3">
+              {moment.status === "DRAFT" ? (
+                <div className="flex gap-2">
+                  <PublishMomentButton
+                    momentId={moment.id}
+                    circleSlug={props.circleSlug}
+                    momentSlug={props.momentSlug}
+                    className="flex-1"
+                  />
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary flex-1"
+                  >
+                    <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
+                      {tCommon("edit")}
+                    </Link>
+                  </Button>
+                </div>
+              ) : moment.status === "PUBLISHED" ? (
+                <div className="flex gap-2">
+                  <Button asChild size="sm" className="flex-1">
+                    <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
+                      {tCommon("edit")}
+                    </Link>
+                  </Button>
+                  <CancelMomentDialog momentId={moment.id} triggerClassName="flex-1" />
+                </div>
+              ) : moment.status === "CANCELLED" ? (
+                <DeleteMomentDialog
                   momentId={moment.id}
                   circleSlug={props.circleSlug}
-                  momentSlug={props.momentSlug}
-                  className="flex-1"
+                  triggerClassName="w-full"
                 />
+              ) : (
+                /* PAST — enrichir l'archive (l'événement a eu lieu) */
                 <Button
                   asChild
                   size="sm"
                   variant="outline"
-                  className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary flex-1"
+                  className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary w-full"
                 >
                   <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
                     {tCommon("edit")}
                   </Link>
                 </Button>
-              </div>
-            ) : moment.status === "PUBLISHED" ? (
-              <div className="flex gap-2">
-                <Button asChild size="sm" className="flex-1">
-                  <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
-                    {tCommon("edit")}
-                  </Link>
-                </Button>
-                <CancelMomentDialog momentId={moment.id} triggerClassName="flex-1" />
-              </div>
-            ) : moment.status === "CANCELLED" ? (
-              <DeleteMomentDialog
-                momentId={moment.id}
-                circleSlug={props.circleSlug}
-                triggerClassName="w-full"
-              />
-            ) : (
-              /* PAST — enrichir l'archive (l'événement a eu lieu) */
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary w-full"
-              >
-                <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
-                  {tCommon("edit")}
+              )}
+              {/* Un organisateur entre par le dashboard : il doit pouvoir gérer ET
+                  s'inscrire depuis ici. */}
+              {participationControl}
+            </div>
+          ) : props.isOrganizer ? (
+            <div className="space-y-3">
+              <Button asChild size="sm" className="w-full gap-1.5">
+                <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
+                  <ExternalLink className="size-3.5" />
+                  {tCircle("detail.manageMoment")}
                 </Link>
               </Button>
-            )
-          ) : props.isOrganizer ? (
-            <Button asChild size="sm" className="w-full gap-1.5">
-              <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
-                <ExternalLink className="size-3.5" />
-                {tCircle("detail.manageMoment")}
-              </Link>
-            </Button>
+              {participationControl}
+            </div>
           ) : moment.status === "DRAFT" ? (
             <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-4">
               <p className="font-semibold">{t("public.draftTitle")}</p>
@@ -499,7 +537,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               existingRegistration={props.existingRegistration}
               signInUrl={props.signInUrl}
               isFull={props.isFull}
-              isOrganizer={props.isOrganizer}
               calendarData={props.calendarData}
               appUrl={props.appUrl}
               waitlistPosition={props.waitlistPosition}
@@ -612,7 +649,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       initialTotal={participantsFirstPage.total}
                       initialHasMore={participantsFirstPage.hasMore}
                       capacity={moment.capacity}
-                      hostUserIds={moment.createdById ? [moment.createdById] : []}
+                      organizerRoleByUserId={organizerRoleByUserId}
+                      viewerIsPrimaryHost={viewerIsPrimaryHost}
                       waitlistedRegistrations={registrations.filter((r) => r.status === "WAITLISTED")}
                       allRegistrationsForExport={registrations}
                       isHostView={isHostView}

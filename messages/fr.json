@@ -594,6 +594,14 @@
       "cancel": "Annuler l'événement",
       "cancelling": "Annulation..."
     },
+    "organizerParticipation": {
+      "label": "Votre participation",
+      "register": "S'inscrire",
+      "registered": "Inscrit",
+      "cancel": "Annuler mon inscription",
+      "hint": "Vous organisez cet événement. Inscrivez-vous si vous comptez y participer.",
+      "cancelConfirmDescription": "Vous ne serez plus compté parmi les participants. Vous gardez la gestion de l'événement."
+    },
     "public": {
       "hostedBy": "Organisé par",
       "attachments": {

@@ -60,6 +60,10 @@ export default async function MomentDetailPage({
   if (!hasActiveMembership && !hasActiveRegistration) redirectToPublicMoment(moment.slug);
 
   const isOrganizer = isActiveOrganizer(membership);
+  // Organisateur membre réel (présent dans findOrganizers = memberships persistées) :
+  // seul lui a un contrôle de participation. Un admin en host mode a une membership
+  // synthétique (isOrganizer vrai) mais n'apparaît pas dans hosts → gère sans participer.
+  const isMemberOrganizer = hosts.some((h) => h.userId === session.user!.id);
 
   const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
@@ -121,6 +125,7 @@ export default async function MomentDetailPage({
         contactAccountTooNew={isSessionAccountNew(session)}
         isAuthenticated={true}
         isOrganizer={false}
+        isMemberOrganizer={false}
         existingRegistration={existingRegistration}
         signInUrl=""
         isFull={moment.capacity !== null && registeredCount >= moment.capacity}
@@ -163,6 +168,8 @@ export default async function MomentDetailPage({
       comments={comments}
       attachments={attachments}
       currentUserId={session.user.id}
+      existingRegistration={userRegistration}
+      isMemberOrganizer={isMemberOrganizer}
       circleSlug={slug}
       momentSlug={momentSlug}
       publicUrl={publicUrl}

@@ -73,11 +73,6 @@ describe("Registration Lifecycle", () => {
         {
           registrationRepository: cancelRegistrationRepo,
           momentRepository: momentRepo,
-          circleRepository: createMockCircleRepository({
-            findMembership: vi.fn().mockResolvedValue(
-              makeMembership({ role: "PLAYER" })
-            ),
-          }),
         }
       );
       expect(step2.registration.status).toBe("CANCELLED");
@@ -268,18 +263,12 @@ describe("Registration Lifecycle", () => {
         ),
         findFirstWaitlisted: vi.fn().mockResolvedValue(null),
       });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ role: "PLAYER" })
-        ),
-      });
 
       const result = await cancelRegistration(
         { registrationId: "reg-1", userId: "user-2" },
         {
           registrationRepository: registrationRepo,
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
         }
       );
 
