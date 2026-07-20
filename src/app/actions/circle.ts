@@ -26,7 +26,7 @@ import {
   type GetCircleMembersPageResult,
 } from "@/domain/usecases/get-circle-members-page";
 import { exportCircleMembers } from "@/domain/usecases/export-circle-members";
-import { prismaMomentRepository, prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
+import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import type { CircleVisibility, CircleCategory, CircleMembership, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import { isActiveOrganizer } from "@/domain/models/circle";
@@ -646,8 +646,6 @@ export async function promoteToCoHostAction(
       { circleId, hostUserId, targetUserId },
       {
         circleRepository: prismaCircleRepository,
-        momentRepository: prismaMomentRepository,
-        registrationRepository: prismaRegistrationRepository,
         userRepository: prismaUserRepository,
         emailService,
         emailStrings: {

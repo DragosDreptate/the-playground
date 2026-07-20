@@ -39,8 +39,10 @@ type Props = {
   initialHasMore: boolean;
   /** Capacité maximale du Moment (null = illimité → pas d'info places). */
   capacity: number | null;
-  /** user.id des Organisateurs du Circle (HOST + CO_HOST) pour afficher le badge Crown. */
-  hostUserIds: string[];
+  /** Rôle de chaque organisateur du Circle (par user.id) : couronne + matrice de retrait. */
+  organizerRoleByUserId: Record<string, "HOST" | "CO_HOST">;
+  /** Le viewer est-il le HOST principal ? Conditionne le retrait d'un CO_HOST. */
+  viewerIsPrimaryHost: boolean;
   /** Participants en liste d'attente, affichés dans une section dédiée. */
   waitlistedRegistrations: RegistrationWithUser[];
   /** Liste complète REGISTERED + WAITLISTED pour l'export CSV (host only). */
@@ -63,7 +65,8 @@ export function MomentRegistrationsDialog({
   initialTotal,
   initialHasMore,
   capacity,
-  hostUserIds,
+  organizerRoleByUserId,
+  viewerIsPrimaryHost,
   waitlistedRegistrations,
   allRegistrationsForExport,
   isHostView,
@@ -73,7 +76,14 @@ export function MomentRegistrationsDialog({
   triggerClassName,
   children,
 }: Props) {
-  const hostUserIdSet = new Set(hostUserIds);
+  // Un inscrit est retirable par le viewer selon la matrice de removeRegistrationByHost :
+  //  - HOST → jamais ; CO_HOST → seulement par le HOST principal ; sinon (PLAYER) → oui.
+  function canRemoveParticipant(userId: string): boolean {
+    const role = organizerRoleByUserId[userId];
+    if (role === "HOST") return false;
+    if (role === "CO_HOST") return viewerIsPrimaryHost;
+    return true;
+  }
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const anonymousFallback = tCommon("anonymousFallback");
@@ -200,7 +210,8 @@ export function MomentRegistrationsDialog({
                 key={r.id}
                 registration={r}
                 showEmail={isHostView}
-                isHost={hostUserIdSet.has(r.user.id)}
+                isOrganizer={r.user.id in organizerRoleByUserId}
+                canRemove={canRemoveParticipant(r.user.id)}
                 isHostView={isHostView}
                 anonymousFallback={anonymousFallback}
                 onRequestRemove={setRemoveTarget}
@@ -225,7 +236,8 @@ export function MomentRegistrationsDialog({
                     key={r.id}
                     registration={r}
                     showEmail={isHostView}
-                    isHost={hostUserIdSet.has(r.user.id)}
+                    isOrganizer={r.user.id in organizerRoleByUserId}
+                    canRemove={canRemoveParticipant(r.user.id)}
                     isHostView={isHostView}
                     anonymousFallback={anonymousFallback}
                     onRequestRemove={setRemoveTarget}
@@ -258,7 +270,10 @@ export function MomentRegistrationsDialog({
 type ParticipantRowProps = {
   registration: RegistrationWithUser;
   showEmail: boolean;
-  isHost: boolean;
+  /** Inscrit organisateur du Circle (HOST/CO_HOST) → affiche la couronne. */
+  isOrganizer: boolean;
+  /** Le viewer a le droit de retirer cet inscrit (matrice removeRegistrationByHost). */
+  canRemove: boolean;
   isHostView: boolean;
   anonymousFallback: string;
   onRequestRemove: (target: { id: string; name: string; isPaid: boolean }) => void;
@@ -267,7 +282,8 @@ type ParticipantRowProps = {
 function ParticipantRow({
   registration,
   showEmail,
-  isHost,
+  isOrganizer,
+  canRemove,
   isHostView,
   anonymousFallback,
   onRequestRemove,
@@ -277,7 +293,7 @@ function ParticipantRow({
   const { user } = registration;
   const displayName = getPublicDisplayName(user.firstName, user.lastName, anonymousFallback);
   const avatar = <UserAvatar name={displayName} image={user.image} gradient={avatarGradientSeed(user)} size="md" />;
-  const hostBadge = isHost && (
+  const hostBadge = isOrganizer && (
     <span className="group/role relative shrink-0">
       <Badge
         variant="outline"
@@ -321,7 +337,10 @@ function ParticipantRow({
         </div>
       )}
       <SocialLinks user={user} />
-      {isHostView && (
+      {/* Menu de retrait uniquement si le viewer a le droit de retirer cet inscrit :
+          un organisateur non retirable (HOST, ou CO_HOST sans être HOST principal)
+          n'affiche aucun menu — l'option n'est pas proposée si l'action est interdite. */}
+      {isHostView && canRemove && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -329,28 +348,25 @@ function ParticipantRow({
               size="sm"
               className="size-8 shrink-0 p-0"
               aria-label={tMoment("registrations.actionsLabel")}
-              disabled={isHost}
             >
               <MoreVertical className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          {!isHost && (
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive focus:bg-muted"
-                onSelect={() =>
-                  onRequestRemove({
-                    id: registration.id,
-                    name: displayName,
-                    isPaid: registration.paymentStatus === "PAID",
-                  })
-                }
-              >
-                <Trash2 className="size-4" />
-                {tMoment("registrations.removeAction")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          )}
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive focus:bg-muted"
+              onSelect={() =>
+                onRequestRemove({
+                  id: registration.id,
+                  name: displayName,
+                  isPaid: registration.paymentStatus === "PAID",
+                })
+              }
+            >
+              <Trash2 className="size-4" />
+              {tMoment("registrations.removeAction")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
         </DropdownMenu>
       )}
     </li>

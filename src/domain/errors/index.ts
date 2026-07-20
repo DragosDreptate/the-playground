@@ -46,7 +46,6 @@ export {
   AlreadyRegisteredError,
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  OrganizerCannotCancelRegistrationError,
   CannotRemoveHostRegistrationError,
   RegistrationNotPendingApprovalError,
 } from "./registration-errors";

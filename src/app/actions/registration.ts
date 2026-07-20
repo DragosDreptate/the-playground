@@ -13,6 +13,7 @@ import {
 import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
+import { registerOrganizer } from "@/domain/usecases/register-organizer";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { removeRegistrationByHost } from "@/domain/usecases/remove-registration-by-host";
 import { approveMomentRegistration } from "@/domain/usecases/approve-moment-registration";
@@ -77,6 +78,36 @@ export async function joinMomentAction(
   });
 }
 
+/**
+ * Inscription volontaire d'un organisateur (HOST/CO_HOST) à un événement de son
+ * Circle. Silencieuse par choix : aucun email n'est envoyé (ni confirmation, ni
+ * notification aux autres organisateurs), symétrique de l'auto-inscription du
+ * créateur à la création et cohérent avec le principe anti-avalanche.
+ */
+export async function registerAsOrganizerAction(
+  momentId: string
+): Promise<ActionResult<Registration>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const userId = session.user.id;
+  return toActionResult(async () => {
+    const result = await registerOrganizer(
+      { momentId, userId },
+      {
+        momentRepository: prismaMomentRepository,
+        registrationRepository: prismaRegistrationRepository,
+        circleRepository: prismaCircleRepository,
+      }
+    );
+
+    invalidateDashboardCache(userId);
+    return result.registration;
+  });
+}
+
 export async function cancelRegistrationAction(
   registrationId: string
 ): Promise<ActionResult> {
@@ -92,7 +123,6 @@ export async function cancelRegistrationAction(
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
         paymentService,
       }
     );
@@ -187,9 +217,9 @@ async function sendCancellationEmails(
           ? t(`${keyPrefix}.notRefunded`)
           : null;
 
-  // La notification d'inscription exclut le déclencheur ; même filtre ici. En
-  // pratique un organisateur actif ne peut pas annuler sa propre inscription
-  // (D16), le filtre évite juste de dépendre implicitement de cette règle.
+  // La notification d'inscription exclut le déclencheur ; même filtre ici. Un
+  // organisateur peut désormais annuler sa propre participation : le filtre garantit
+  // qu'il n'est pas notifié de son propre départ (les autres organisateurs le sont).
   const notifiedHosts = hosts.filter((host) => host.userId !== cancellingUserId);
   const prefsMap =
     isPaid || notifiedHosts.length === 0

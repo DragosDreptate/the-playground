@@ -63,23 +63,51 @@ describe("CreateMoment", () => {
       expect(result.moment.status).toBe("DRAFT");
     });
 
-    it("should automatically register all active organizers as Participants", async () => {
-      const organizer = (userId: string, role: "HOST" | "CO_HOST") => ({
-        ...makeMembership({ userId, role }),
-        user: {
-          id: userId,
-          firstName: null,
-          lastName: null,
-          email: `${userId}@test.dev`,
-          image: null,
-          publicId: null,
-        },
-      });
+    const organizer = (userId: string, role: "HOST" | "CO_HOST") => ({
+      ...makeMembership({ userId, role }),
+      user: {
+        id: userId,
+        firstName: null,
+        lastName: null,
+        email: `${userId}@test.dev`,
+        image: null,
+        publicId: null,
+      },
+    });
+
+    it("should register ONLY the creator as a Participant (not the other organizers)", async () => {
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(makeMembership()),
         findOrganizers: vi
           .fn()
           .mockResolvedValue([organizer("user-1", "HOST"), organizer("user-2", "CO_HOST")]),
+      });
+      const momentRepo = createMockMomentRepository({
+        create: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1" })),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      // defaultInput.userId === "user-1" (le créateur).
+      await createMoment(defaultInput, {
+        momentRepository: momentRepo,
+        circleRepository: circleRepo,
+        registrationRepository: registrationRepo,
+      });
+
+      expect(registrationRepo.create).toHaveBeenCalledTimes(1);
+      expect(registrationRepo.create).toHaveBeenCalledWith({
+        momentId: "moment-1",
+        userId: "user-1",
+        status: "REGISTERED",
+      });
+    });
+
+    it("should NOT register a creator who is not a real member (admin host mode)", async () => {
+      // findOrganizers ne renvoie que des membres persistés : un admin en host mode
+      // n'y figure pas → aucune Registration fantôme n'est créée pour lui.
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findOrganizers: vi.fn().mockResolvedValue([organizer("someone-else", "HOST")]),
       });
       const momentRepo = createMockMomentRepository({
         create: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1" })),
@@ -92,17 +120,7 @@ describe("CreateMoment", () => {
         registrationRepository: registrationRepo,
       });
 
-      expect(registrationRepo.create).toHaveBeenCalledTimes(2);
-      expect(registrationRepo.create).toHaveBeenCalledWith({
-        momentId: "moment-1",
-        userId: "user-1",
-        status: "REGISTERED",
-      });
-      expect(registrationRepo.create).toHaveBeenCalledWith({
-        momentId: "moment-1",
-        userId: "user-2",
-        status: "REGISTERED",
-      });
+      expect(registrationRepo.create).not.toHaveBeenCalled();
     });
 
     it("should verify HOST membership on the Circle", async () => {

@@ -26,7 +26,6 @@ import {
   UnauthorizedCircleActionError,
   UnauthorizedMomentActionError,
   UnauthorizedRegistrationActionError,
-  OrganizerCannotCancelRegistrationError,
   UnauthorizedCommentDeletionError,
   MomentNotFoundError,
 } from "@/domain/errors";
@@ -361,37 +360,36 @@ describe("Security — RBAC", () => {
           {
             registrationRepository: registrationRepo,
             momentRepository: momentRepo,
-            circleRepository: circleRepo,
           }
         )
       ).rejects.toThrow(UnauthorizedRegistrationActionError);
     });
 
-    it("should throw OrganizerCannotCancelRegistrationError when a HOST tries to cancel their own registration", async () => {
+    it("should allow a HOST to cancel their own registration (rôle découplé de la présence)", async () => {
+      const cancelled = makeRegistration({
+        userId: "host-user",
+        status: "CANCELLED",
+        cancelledAt: new Date(),
+      });
       const registrationRepo = createMockRegistrationRepository({
         findById: vi.fn().mockResolvedValue(
           makeRegistration({ userId: "host-user", status: "REGISTERED" })
         ),
+        update: vi.fn().mockResolvedValue(cancelled),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(null),
       });
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
       });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ userId: "host-user", role: "HOST" })
-        ),
-      });
 
-      await expect(
-        cancelRegistration(
-          { registrationId: "reg-1", userId: "host-user" },
-          {
-            registrationRepository: registrationRepo,
-            momentRepository: momentRepo,
-            circleRepository: circleRepo,
-          }
-        )
-      ).rejects.toThrow(OrganizerCannotCancelRegistrationError);
+      const result = await cancelRegistration(
+        { registrationId: "reg-1", userId: "host-user" },
+        {
+          registrationRepository: registrationRepo,
+          momentRepository: momentRepo,
+        }
+      );
+      expect(result.registration.status).toBe("CANCELLED");
     });
 
     it("should allow a PLAYER to cancel their own registration", async () => {
@@ -410,18 +408,12 @@ describe("Security — RBAC", () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
       });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ userId: "player-user", role: "PLAYER" })
-        ),
-      });
 
       const result = await cancelRegistration(
         { registrationId: "reg-1", userId: "player-user" },
         {
           registrationRepository: registrationRepo,
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
         }
       );
       expect(result.registration.status).toBe("CANCELLED");

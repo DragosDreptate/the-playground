@@ -113,21 +113,20 @@ export async function createMoment(
     ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 
-  // Tous les organisateurs actifs (HOST + CO_HOST) sont automatiquement inscrits
-  // en tant que Participants — voir spec/features/co-host-event-participation.md.
-  // findOrganizers inclut le créateur quand c'est un vrai membre. Un admin en
-  // host mode (membership synthétique, non persistée) n'apparaît volontairement
-  // pas ici : on ne crée pas de Registration fantôme pour un non-membre.
+  // Seul le créateur de l'événement est auto-inscrit comme Participant. Les autres
+  // organisateurs s'inscrivent volontairement depuis la page événement
+  // (registerOrganizer) — voir spec/features/co-host-event-participation.md.
+  // On confirme via findOrganizers que le créateur est un vrai membre organisateur :
+  // un admin en host mode (membership synthétique, non persistée) n'y figure pas et
+  // n'est donc pas inscrit (pas de Registration fantôme pour un non-membre).
   const organizers = await circleRepository.findOrganizers(input.circleId);
-  await Promise.all(
-    organizers.map((organizer) =>
-      registrationRepository.create({
-        momentId: moment.id,
-        userId: organizer.userId,
-        status: "REGISTERED",
-      })
-    )
-  );
+  if (organizers.some((organizer) => organizer.userId === input.userId)) {
+    await registrationRepository.create({
+      momentId: moment.id,
+      userId: input.userId,
+      status: "REGISTERED",
+    });
+  }
 
   return { moment };
 }

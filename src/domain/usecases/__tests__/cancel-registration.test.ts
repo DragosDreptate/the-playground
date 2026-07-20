@@ -3,7 +3,6 @@ import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  OrganizerCannotCancelRegistrationError,
 } from "@/domain/errors";
 import {
   createMockRegistrationRepository,
@@ -14,15 +13,10 @@ import {
   createMockMomentRepository,
   makeMoment,
 } from "./helpers/mock-moment-repository";
-import {
-  createMockCircleRepository,
-  makeMembership,
-} from "./helpers/mock-circle-repository";
 
 function makeDeps(overrides: {
   registrationRepo?: ReturnType<typeof createMockRegistrationRepository>;
   momentRepo?: ReturnType<typeof createMockMomentRepository>;
-  circleRepo?: ReturnType<typeof createMockCircleRepository>;
 } = {}) {
   return {
     registrationRepository:
@@ -31,11 +25,6 @@ function makeDeps(overrides: {
       overrides.momentRepo ??
       createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment()),
-      }),
-    circleRepository:
-      overrides.circleRepo ??
-      createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(null),
       }),
   };
 }
@@ -131,28 +120,27 @@ describe("CancelRegistration", () => {
     });
   });
 
-  describe("given a Host trying to cancel their registration", () => {
-    it("should throw OrganizerCannotCancelRegistrationError", async () => {
+  describe("given an organizer cancelling their own registration", () => {
+    it("should allow it (le rôle est découplé de la présence)", async () => {
       const registrationRepo = createMockRegistrationRepository({
         findById: vi.fn().mockResolvedValue(
           makeRegistration({ status: "REGISTERED" })
         ),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
+        ),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(null),
       });
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
       });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ userId: "user-2", circleId: "circle-1", role: "HOST" })
-        ),
-      });
 
-      await expect(
-        cancelRegistration(
-          defaultInput,
-          makeDeps({ registrationRepo, momentRepo, circleRepo })
-        )
-      ).rejects.toThrow(OrganizerCannotCancelRegistrationError);
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo, momentRepo })
+      );
+
+      expect(result.registration.status).toBe("CANCELLED");
     });
   });
 
@@ -241,36 +229,6 @@ describe("CancelRegistration", () => {
         { status: "REGISTERED" }
       );
       expect(result.promotedRegistration!.id).toBe("reg-waitlisted-1");
-    });
-  });
-
-  describe("given a Player who is also a HOST in another Circle", () => {
-    it("should allow cancellation (HOST check is per-Circle, not global)", async () => {
-      const registrationRepo = createMockRegistrationRepository({
-        findById: vi.fn().mockResolvedValue(
-          makeRegistration({ status: "REGISTERED" })
-        ),
-        update: vi.fn().mockResolvedValue(
-          makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
-        ),
-        findFirstWaitlisted: vi.fn().mockResolvedValue(null),
-      });
-      const momentRepo = createMockMomentRepository({
-        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
-      });
-      // User is PLAYER in this Circle (not HOST)
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(
-          makeMembership({ userId: "user-2", circleId: "circle-1", role: "PLAYER" })
-        ),
-      });
-
-      const result = await cancelRegistration(
-        defaultInput,
-        makeDeps({ registrationRepo, momentRepo, circleRepo })
-      );
-
-      expect(result.registration.status).toBe("CANCELLED");
     });
   });
 

@@ -27,7 +27,6 @@ import { sendMomentHostMessage } from "@/domain/usecases/send-moment-host-messag
 import {
   UnauthorizedCircleActionError,
   UnauthorizedMomentActionError,
-  OrganizerCannotCancelRegistrationError,
   CannotPromotePendingMemberError,
 } from "@/domain/errors";
 
@@ -172,7 +171,7 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
     ).rejects.toThrow(UnauthorizedCircleActionError);
   });
 
-  it("should throw when a CO_HOST tries to cancel their own registration (D16)", async () => {
+  it("should now allow a CO_HOST to cancel their own registration (rôle découplé de la présence)", async () => {
     const registration = makeRegistration({
       userId: CO_HOST_ID,
       momentId: MOMENT_ID,
@@ -181,25 +180,23 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
     const momentRepo = createMockMomentRepository({
       findById: vi.fn().mockResolvedValue(makeMoment({ circleId: CIRCLE_ID })),
     });
-    const circleRepo = createMockCircleRepository({
-      findMembership: vi.fn().mockResolvedValue(
-        makeMembership({ userId: CO_HOST_ID, role: "CO_HOST", status: "ACTIVE" })
-      ),
-    });
     const registrationRepo = createMockRegistrationRepository({
       findById: vi.fn().mockResolvedValue(registration),
+      update: vi.fn().mockResolvedValue(
+        makeRegistration({ ...registration, status: "CANCELLED", cancelledAt: new Date() })
+      ),
+      findFirstWaitlisted: vi.fn().mockResolvedValue(null),
     });
 
-    await expect(
-      cancelRegistration(
-        { registrationId: registration.id, userId: CO_HOST_ID },
-        {
-          registrationRepository: registrationRepo,
-          momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        }
-      )
-    ).rejects.toThrow(OrganizerCannotCancelRegistrationError);
+    const result = await cancelRegistration(
+      { registrationId: registration.id, userId: CO_HOST_ID },
+      {
+        registrationRepository: registrationRepo,
+        momentRepository: momentRepo,
+      }
+    );
+
+    expect(result.registration.status).toBe("CANCELLED");
   });
 
   it("should throw when a CO_HOST tries to promote another PLAYER", async () => {
@@ -214,8 +211,6 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
         { circleId: CIRCLE_ID, hostUserId: CO_HOST_ID, targetUserId: PLAYER_ID },
         {
           circleRepository: circleRepo,
-          momentRepository: createMockMomentRepository(),
-          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         }
       )
@@ -320,8 +315,6 @@ describe("CO_HOST security — D22 (promotion d'un PENDING refusée)", () => {
         { circleId: CIRCLE_ID, hostUserId: HOST_ID, targetUserId: PLAYER_ID },
         {
           circleRepository: circleRepo,
-          momentRepository: createMockMomentRepository(),
-          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         }
       )
