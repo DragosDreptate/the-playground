@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bloc participation organisateur — page événement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #e8457a;
+    --primary-foreground: #ffffff;
+    --background: #f5f5fa;
+    --foreground: #1a1b2e;
+    --card: #ffffff;
+    --muted: #f0eff7;
+    --muted-foreground: #6b6f87;
+    --border: #e3e3ec;
+    --accent: #6ee7d0;
+    --radius: 0.5rem;
+    --success-bg: #e7f8f1;
+    --success-fg: #0f9d6e;
+    --success-border: #b8ecd8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px 64px;
+    line-height: 1.5;
+  }
+  .page { max-width: 860px; margin: 0 auto; }
+  .page-head { margin-bottom: 32px; }
+  .page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .page-head p { color: var(--muted-foreground); font-size: 14px; margin-top: 6px; max-width: 640px; }
+  .rule-note {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--muted-foreground);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+  }
+  .rule-note b { color: var(--foreground); font-weight: 600; }
+
+  .states { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 32px; align-items: flex-start; }
+  .state { flex: 1 1 320px; min-width: 300px; }
+  .state-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .state-label .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--primary); }
+  .state:nth-child(2) .state-label .dot { background: var(--success-fg); }
+
+  /* Sidebar card (réplique du contexte colonne latérale) */
+  .sidebar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(26, 27, 46, 0.04), 0 8px 24px rgba(26, 27, 46, 0.05);
+  }
+  .cover {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover .badge-role {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,0.92);
+    color: var(--foreground);
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .event-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 14px; }
+
+  .meta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .meta-row { display: flex; align-items: center; gap: 12px; }
+  .meta-ico {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(232, 69, 122, 0.10);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .meta-ico svg { width: 18px; height: 18px; }
+  .meta-text .l { font-size: 11px; color: var(--muted-foreground); }
+  .meta-text .v { font-size: 14px; font-weight: 600; }
+
+  .divider { height: 1px; background: var(--border); margin: 4px 0 18px; }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+  }
+  .btn svg { width: 16px; height: 16px; }
+  .btn-primary { background: var(--primary); color: var(--primary-foreground); }
+  .btn-primary:hover { background: #d63a6c; }
+  .btn-outline { background: var(--card); color: var(--foreground); border-color: var(--border); }
+  .btn-outline:hover { border-color: var(--muted-foreground); background: #fafafd; }
+
+  /* Bloc « Ta participation » — secondaire, ne concurrence pas Gérer */
+  .participation {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    background: #fbfbfe;
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .participation-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted-foreground);
+    margin-bottom: 12px;
+  }
+  .pill-registered {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--success-bg);
+    color: var(--success-fg);
+    border: 1px solid var(--success-border);
+    font-size: 13.5px; font-weight: 600;
+    padding: 7px 12px; border-radius: 999px;
+  }
+  .pill-registered svg { width: 15px; height: 15px; }
+  .participation-registered-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .link-cancel {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 12.5px; font-weight: 500;
+    color: var(--muted-foreground);
+    text-decoration: underline; text-underline-offset: 2px;
+    padding: 4px 0;
+  }
+  .link-cancel:hover { color: var(--primary); }
+  .participation-hint { font-size: 11.5px; color: var(--muted-foreground); margin-top: 10px; }
+
+  .caption {
+    margin-top: 14px; font-size: 12.5px; color: var(--muted-foreground);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .caption svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: var(--primary); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-head">
+      <h1>Page événement — bloc participation vu par un organisateur</h1>
+      <p>
+        Après le découplage rôle / présence : l'organisateur (Host ou Co-host) garde son accès de gestion
+        (« Gérer ») et gagne un contrôle de participation <b>optionnel</b>. Il n'est plus inscrit de force
+        et peut se désinscrire.
+      </p>
+      <span class="rule-note">
+        <b>Règle design system :</b> un seul bouton rose (primary) par section → c'est « Gérer ». « S'inscrire » est secondaire (outline).
+      </span>
+    </div>
+
+    <div class="states">
+
+      <!-- ÉTAT 1 : organisateur non inscrit -->
+      <div class="state">
+        <div class="state-label"><span class="dot"></span>Organisateur non inscrit</div>
+        <div class="sidebar">
+          <div class="cover">
+            <span class="badge-role">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.5 8 9 9 5.5-1 9-4 9-9V7z"/></svg>
+              Organisateur
+            </span>
+          </div>
+          <div class="event-title">Apéro produit &amp; IA — édition juillet</div>
+          <div class="meta">
+            <div class="meta-row">
+              <div class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="meta-text"><div class="l">Date</div><div class="v">Jeudi 24 juillet, 19:00</div></div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <div class="meta-text"><div class="l">Lieu</div><div class="v">The Spark, Paris 11e</div></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- Action principale : Gérer (primary) -->
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            Gérer
+          </button>
+
+          <!-- Participation optionnelle : secondaire -->
+          <div class="participation">
+            <div class="participation-label">Ta participation</div>
+            <button class="btn btn-outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              S'inscrire
+            </button>
+            <div class="participation-hint">Tu organises cet événement. Inscris-toi si tu comptes y participer.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉTAT 2 : organisateur inscrit -->
+      <div class="state">
+        <div class="state-label"><span class="dot"></span>Organisateur inscrit (créateur ou co-host)</div>
+        <div class="sidebar">
+          <div class="cover">
+            <span class="badge-role">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.5 8 9 9 5.5-1 9-4 9-9V7z"/></svg>
+              Organisateur
+            </span>
+          </div>
+          <div class="event-title">Apéro produit &amp; IA — édition juillet</div>
+          <div class="meta">
+            <div class="meta-row">
+              <div class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="meta-text"><div class="l">Date</div><div class="v">Jeudi 24 juillet, 19:00</div></div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <div class="meta-text"><div class="l">Lieu</div><div class="v">The Spark, Paris 11e</div></div>
+            </div>
+          </div>
+          <div class="divider"></div>
+
+          <!-- Action principale : Gérer (primary) -->
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            Gérer
+          </button>
+
+          <!-- Participation : état inscrit -->
+          <div class="participation">
+            <div class="participation-label">Ta participation</div>
+            <div class="participation-registered-row">
+              <span class="pill-registered">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Inscrit
+              </span>
+              <button class="link-cancel">Annuler mon inscription</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="caption">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>
+        Le créateur de l'événement arrive dans l'état « inscrit » (auto-inscription à la création).
+        Un co-host qui n'a pas créé l'événement arrive dans l'état « non inscrit » et peut s'inscrire s'il le souhaite.
+        Dans les deux cas, l'inscription d'un organisateur est gratuite et sans liste d'attente.
+      </span>
+    </div>
+  </div>
+</body>
+</html>
