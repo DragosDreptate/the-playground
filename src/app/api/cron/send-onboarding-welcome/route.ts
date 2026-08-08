@@ -17,7 +17,7 @@ import { prismaUserRepository } from "@/infrastructure/repositories";
  * - createdAt <= now - 3h (délai minimum avant envoi)
  * - Exclut les emails @test.playground et @demo.playground
  *
- * Déclenché chaque jour à 6h UTC (≈ 8h Paris été / 7h Paris hiver)
+ * Déclenché chaque jour à 06:05 UTC (≈ 8h Paris été / 7h Paris hiver)
  * via Vercel Cron (vercel.json).
  */
 

@@ -277,7 +277,7 @@ model Moment {
 {
   "crons": [{
     "path": "/api/cron/recalculate-scores",
-    "schedule": "0 3 * * *"
+    "schedule": "5 3 * * *"
   }]
 }
 ```

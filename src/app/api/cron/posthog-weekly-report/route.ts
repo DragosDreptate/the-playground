@@ -21,7 +21,7 @@ import { extractReportKpis } from "../posthog-daily-report/extract-report-kpis";
  * et prend "week" en paramètre pour adapter les libellés (distribution
  * quotidienne, peak "le lun 06/04", fenêtre "7 derniers jours", etc.).
  *
- * Déclenché chaque lundi à 08:07 UTC via Vercel Cron (vercel.json).
+ * Déclenché chaque lundi à 08:25 UTC via Vercel Cron (vercel.json).
  * Vercel Cron invoque les endpoints en GET — on expose aussi POST pour
  * permettre un déclenchement manuel (scripts, curl, tests).
  * Protection : header Authorization: Bearer CRON_SECRET
