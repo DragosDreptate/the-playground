@@ -15,8 +15,9 @@ import { prismaMomentRepository } from "@/infrastructure/repositories";
  *  - chaque page view consommait une connexion pool et du compute
  *  - exécution redondante alors que la transition dépend uniquement du temps
  *
- * Déclenché toutes les 5 minutes via Vercel Cron. Staleness max = 5 min,
- * acceptable UX (bandeau "Terminé", grayscale, catégorisation upcoming/past).
+ * Déclenché toutes les 30 minutes via Vercel Cron, à HH:10 et HH:40 (vercel.json).
+ * Staleness max = 30 min, acceptable UX (bandeau "Terminé", grayscale,
+ * catégorisation upcoming/past).
  *
  * Protection : header Authorization: Bearer CRON_SECRET.
  */

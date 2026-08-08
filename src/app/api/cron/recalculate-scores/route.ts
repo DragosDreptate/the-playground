@@ -13,7 +13,7 @@ import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma
  * si elles passent en publique entre deux exécutions du cron.
  * Elles n'apparaissent jamais sur Explorer (filtre visibility: PUBLIC dans les requêtes Explorer).
  *
- * Déclenché chaque nuit à 3h via Vercel Cron (vercel.json).
+ * Déclenché chaque nuit à 03:05 UTC via Vercel Cron (vercel.json).
  * Vercel Cron invoque les endpoints en GET — on expose aussi POST pour
  * permettre un déclenchement manuel (scripts, curl, tests).
  * Protection : header Authorization: Bearer CRON_SECRET
