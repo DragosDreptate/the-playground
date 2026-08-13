@@ -32,7 +32,11 @@ export {
   AttachmentTypeNotAllowedError,
   AttachmentNotFoundError,
 } from "./moment-attachment-errors";
-export { UserNotFoundError } from "./user-errors";
+export {
+  USER_ERROR_CODES,
+  UserNotFoundError,
+  BioTooLongError,
+} from "./user-errors";
 export {
   CommentNotFoundError,
   UnauthorizedCommentDeletionError,

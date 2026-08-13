@@ -1,7 +1,25 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect, vi } from "vitest";
-import { updateProfile } from "@/domain/usecases/update-profile";
-import { UserNotFoundError } from "@/domain/errors";
+import { updateProfile, BIO_MAX_LENGTH } from "@/domain/usecases/update-profile";
+import { BioTooLongError, UserNotFoundError } from "@/domain/errors";
 import { createMockUserRepository, makeUser } from "./helpers/mock-user-repository";
+
+describe("BIO_MAX_LENGTH", () => {
+  it("should match the width of the User.bio column", () => {
+    // Le plafond applicatif est le SEUL garde-fou avant la colonne : s'il la
+    // dépasse, Prisma remonte un P2000 et l'utilisateur perd tout son profil
+    // (l'incident THE-PLAYGROUND-2E). Les deux valeurs bougent ensemble.
+    const schema = readFileSync(
+      join(process.cwd(), "prisma/schema.prisma"),
+      "utf-8"
+    );
+    const column = schema.match(/^\s*bio\s+String\?\s+@db\.VarChar\((\d+)\)/m);
+
+    expect(column).not.toBeNull();
+    expect(Number(column![1])).toBe(BIO_MAX_LENGTH);
+  });
+});
 
 describe("UpdateProfile", () => {
   const defaultInput = {
@@ -147,6 +165,105 @@ describe("UpdateProfile", () => {
       expect(profileInput).not.toHaveProperty("city");
       expect(profileInput).not.toHaveProperty("website");
       expect(profileInput).not.toHaveProperty("linkedinUrl");
+    });
+  });
+
+  describe("given a bio submitted from an HTML form", () => {
+    async function updateWithBio(bio: string) {
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+        updateProfile: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+      });
+
+      await updateProfile({ ...defaultInput, bio }, { userRepository: repo });
+
+      const [, profileInput] = (
+        repo.updateProfile as ReturnType<typeof vi.fn>
+      ).mock.calls[0];
+      return profileInput.bio as string;
+    }
+
+    it("should normalize CRLF line breaks to LF", async () => {
+      expect(await updateWithBio("Chess Club\r\n\r\nPhuket")).toBe(
+        "Chess Club\n\nPhuket"
+      );
+    });
+
+    it("should accept a bio that fits the cap only once line breaks are normalized", async () => {
+      // Retours à la ligne INTÉRIEURS : la server action trime les extrémités,
+      // seule cette forme atteint le usecase. Le navigateur compte 160, le
+      // formulaire en poste 164 — sans normalisation, la colonne les rejette.
+      const line = "a".repeat(52);
+      const asTypedInTheBrowser = [line, line, line].join("\n\n");
+      const asPostedByTheForm = [line, line, line].join("\r\n\r\n");
+      expect(asTypedInTheBrowser.length).toBe(BIO_MAX_LENGTH);
+      expect(asPostedByTheForm.length).toBe(BIO_MAX_LENGTH + 4);
+
+      const saved = await updateWithBio(asPostedByTheForm);
+
+      expect(saved).toBe(asTypedInTheBrowser);
+      expect(saved.length).toBe(BIO_MAX_LENGTH);
+    });
+
+    it("should reproduce the production incident (Sentry THE-PLAYGROUND-2E)", async () => {
+      const asPostedByTheForm =
+        "Bringing chess players together in Phuket!\r\n\r\nPlay • Learn • Compete • Connect\r\n♟️ All levels welcome — from beginners to experienced players.\r\n📍 Phuket, Thailand";
+
+      const saved = await updateWithBio(asPostedByTheForm);
+
+      expect(saved).not.toContain("\r");
+      expect(Array.from(saved).length).toBeLessThanOrEqual(BIO_MAX_LENGTH);
+    });
+
+    it("should accept a bio at exactly the cap", async () => {
+      const bio = "a".repeat(BIO_MAX_LENGTH);
+
+      expect(await updateWithBio(bio)).toBe(bio);
+    });
+
+    it("should count characters the way Postgres does, not UTF-16 units", async () => {
+      // 160 caractères pour la colonne, 320 unités UTF-16 pour `String.length` :
+      // un décompte naïf rejetterait une bio que la colonne accepte, et ferait
+      // perdre TOUT le profil au passage.
+      const bio = "📍".repeat(BIO_MAX_LENGTH);
+      expect(bio.length).toBe(BIO_MAX_LENGTH * 2);
+      expect(Array.from(bio).length).toBe(BIO_MAX_LENGTH);
+
+      expect(await updateWithBio(bio)).toBe(bio);
+    });
+  });
+
+  describe("given a bio above the cap", () => {
+    it("should throw BioTooLongError without touching the repository", async () => {
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+        updateProfile: vi.fn(),
+      });
+
+      await expect(
+        updateProfile(
+          { ...defaultInput, bio: "a".repeat(BIO_MAX_LENGTH + 1) },
+          { userRepository: repo }
+        )
+      ).rejects.toThrow(BioTooLongError);
+
+      expect(repo.updateProfile).not.toHaveBeenCalled();
+    });
+
+    it("should reject a forged payload without walking through it", async () => {
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+        updateProfile: vi.fn(),
+      });
+
+      await expect(
+        updateProfile(
+          { ...defaultInput, bio: "a".repeat(1_000_000) },
+          { userRepository: repo }
+        )
+      ).rejects.toThrow(BioTooLongError);
+
+      expect(repo.updateProfile).not.toHaveBeenCalled();
     });
   });
 

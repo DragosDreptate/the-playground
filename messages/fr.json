@@ -1657,6 +1657,7 @@
       "lastNamePlaceholder": "Dupont",
       "bio": "Bio",
       "bioPlaceholder": "Décrivez-vous en quelques mots...",
+      "bioTooLong": "Votre bio dépasse {max} caractères. Raccourcissez-la pour enregistrer.",
       "city": "Ville",
       "cityPlaceholder": "Ex : Paris, Lyon, Bordeaux...",
       "links": "Liens",

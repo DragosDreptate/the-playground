@@ -1,5 +1,10 @@
-import { describe, it, expect } from "vitest";
-import { truncate, collapseWhitespace } from "@/lib/text";
+import { describe, it, expect, vi } from "vitest";
+import {
+  truncate,
+  collapseWhitespace,
+  normalizeLineBreaks,
+  exceedsCharacterCap,
+} from "@/lib/text";
 
 describe("truncate", () => {
   it("returns the string unchanged when below the cap", () => {
@@ -42,5 +47,62 @@ describe("collapseWhitespace", () => {
 
   it("returns empty for whitespace-only input", () => {
     expect(collapseWhitespace("   \n\t\r\n  ")).toBe("");
+  });
+});
+
+describe("normalizeLineBreaks", () => {
+  it.each([
+    ["CRLF", "Ligne 1\r\nLigne 2", "Ligne 1\nLigne 2"],
+    ["CR seul (vieux Mac)", "Ligne 1\rLigne 2", "Ligne 1\nLigne 2"],
+    ["LF déjà normalisé", "Ligne 1\nLigne 2", "Ligne 1\nLigne 2"],
+    ["lignes vides consécutives", "a\r\n\r\nb", "a\n\nb"],
+    ["sans retour à la ligne", "une seule ligne", "une seule ligne"],
+    ["chaîne vide", "", ""],
+  ])("%s → LF", (_label, input, expected) => {
+    expect(normalizeLineBreaks(input)).toBe(expected);
+  });
+
+  it("aligns the server-side length on what the browser counts", () => {
+    const asTypedInTheBrowser = "a\nb\nc";
+    const asPostedByTheForm = "a\r\nb\r\nc";
+
+    expect(normalizeLineBreaks(asPostedByTheForm).length).toBe(
+      asTypedInTheBrowser.length
+    );
+  });
+});
+
+describe("exceedsCharacterCap", () => {
+  it.each([
+    ["sous la limite", "abc", 10, false],
+    ["pile à la limite", "abcde", 5, false],
+    ["un caractère de trop", "abcdef", 5, true],
+    ["chaîne vide", "", 5, false],
+  ])("%s", (_label, value, max, expected) => {
+    expect(exceedsCharacterCap(value, max)).toBe(expected);
+  });
+
+  it("counts a non-BMP emoji as one character, like Postgres", () => {
+    const bio = "📍".repeat(160);
+
+    expect(bio.length).toBe(320); // unités UTF-16
+    expect(exceedsCharacterCap(bio, 160)).toBe(false);
+    expect(exceedsCharacterCap(bio + "📍", 160)).toBe(true);
+  });
+
+  it("counts a combining sequence the way Postgres does", () => {
+    // "♟️" = U+265F + U+FE0F : 2 points de code, donc 2 caractères pour la colonne.
+    expect(exceedsCharacterCap("♟️", 2)).toBe(false);
+    expect(exceedsCharacterCap("♟️", 1)).toBe(true);
+  });
+
+  it("rejects an oversized payload without materializing it", () => {
+    const forged = "a".repeat(1_000_000);
+    const spy = vi.spyOn(Array, "from");
+
+    expect(exceedsCharacterCap(forged, 160)).toBe(true);
+    expect(spy).not.toHaveBeenCalled();
+
+    spy.mockRestore();
   });
 });

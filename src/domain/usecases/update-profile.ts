@@ -3,7 +3,16 @@ import type {
   UserRepository,
   UpdateProfileInput,
 } from "@/domain/ports/repositories/user-repository";
-import { UserNotFoundError } from "@/domain/errors";
+import { BioTooLongError, UserNotFoundError } from "@/domain/errors";
+import { exceedsCharacterCap, normalizeLineBreaks } from "@/lib/text";
+
+/**
+ * Longueur maximale de la bio, en caractères au sens de Postgres. Doit rester
+ * alignée sur la largeur de la colonne `User.bio` (`@db.VarChar(160)`) — un
+ * test épingle les deux valeurs l'une à l'autre. Partagée avec le formulaire
+ * pour que le compteur affiché et la validation serveur ne divergent pas.
+ */
+export const BIO_MAX_LENGTH = 160;
 
 type UpdateProfileUseCaseInput = {
   userId: string;
@@ -29,6 +38,16 @@ export async function updateProfile(
 ): Promise<User> {
   const { userRepository } = deps;
 
+  // Les retours à la ligne d'un formulaire HTML arrivent en `\r\n` alors que le
+  // navigateur les a comptés en `\n` : sans normalisation, une bio affichée sous
+  // la limite arrive au-dessus et la colonne la rejette.
+  const bio =
+    typeof input.bio === "string" ? normalizeLineBreaks(input.bio) : input.bio;
+
+  if (bio != null && exceedsCharacterCap(bio, BIO_MAX_LENGTH)) {
+    throw new BioTooLongError(BIO_MAX_LENGTH);
+  }
+
   const user = await userRepository.findById(input.userId);
 
   if (!user) {
@@ -40,7 +59,7 @@ export async function updateProfile(
     lastName: input.lastName,
     ...(input.name !== undefined && { name: input.name }),
     ...(input.image !== undefined && { image: input.image }),
-    ...(input.bio !== undefined && { bio: input.bio }),
+    ...(bio !== undefined && { bio }),
     ...(input.city !== undefined && { city: input.city }),
     ...(input.website !== undefined && { website: input.website }),
     ...(input.linkedinUrl !== undefined && { linkedinUrl: input.linkedinUrl }),
