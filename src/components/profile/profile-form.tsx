@@ -11,8 +11,9 @@ import { XIcon } from "@/components/icons/x-icon";
 import type { User } from "@/domain/models/user";
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
+import { BIO_MAX_LENGTH } from "@/domain/usecases/update-profile";
+import { USER_ERROR_CODES } from "@/domain/errors";
 
-const BIO_MAX_LENGTH = 160;
 const INPUT_BG = "dark:bg-background";
 
 type ProfileFormProps = {
@@ -50,6 +51,10 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
       }
       router.refresh();
       return { saved: true };
+    }
+
+    if (result.code === USER_ERROR_CODES.BioTooLong) {
+      return { error: t("form.bioTooLong", { max: BIO_MAX_LENGTH }) };
     }
 
     return { error: result.error };

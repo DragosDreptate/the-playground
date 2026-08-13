@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { updateProfile } from "@/domain/usecases/update-profile";
-import { UserNotFoundError } from "@/domain/errors";
+import { updateProfile, BIO_MAX_LENGTH } from "@/domain/usecases/update-profile";
+import { BioTooLongError, UserNotFoundError } from "@/domain/errors";
 import { createMockUserRepository, makeUser } from "./helpers/mock-user-repository";
 
 describe("UpdateProfile", () => {
@@ -147,6 +147,66 @@ describe("UpdateProfile", () => {
       expect(profileInput).not.toHaveProperty("city");
       expect(profileInput).not.toHaveProperty("website");
       expect(profileInput).not.toHaveProperty("linkedinUrl");
+    });
+  });
+
+  describe("given a bio submitted from an HTML form", () => {
+    async function updateWithBio(bio: string) {
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+        updateProfile: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+      });
+
+      await updateProfile({ ...defaultInput, bio }, { userRepository: repo });
+
+      const [, profileInput] = (
+        repo.updateProfile as ReturnType<typeof vi.fn>
+      ).mock.calls[0];
+      return profileInput.bio as string;
+    }
+
+    it("should normalize CRLF line breaks to LF", async () => {
+      expect(await updateWithBio("Chess Club\r\n\r\nPhuket")).toBe(
+        "Chess Club\n\nPhuket"
+      );
+    });
+
+    it("should accept a bio that fits the cap only once line breaks are normalized", async () => {
+      // 158 caractères tels que comptés par le navigateur, 162 tels que postés
+      // par le formulaire : sans normalisation, la colonne les rejetterait.
+      const asTypedInTheBrowser = `${"a".repeat(154)}\n\n\n\n`;
+      const asPostedByTheForm = `${"a".repeat(154)}\r\n\r\n\r\n\r\n`;
+      expect(asTypedInTheBrowser.length).toBe(158);
+      expect(asPostedByTheForm.length).toBe(162);
+
+      const saved = await updateWithBio(asPostedByTheForm);
+
+      expect(saved).toBe(asTypedInTheBrowser);
+      expect(saved.length).toBeLessThanOrEqual(BIO_MAX_LENGTH);
+    });
+
+    it("should accept a bio at exactly the cap", async () => {
+      const bio = "a".repeat(BIO_MAX_LENGTH);
+
+      expect(await updateWithBio(bio)).toBe(bio);
+    });
+  });
+
+  describe("given a bio above the cap", () => {
+    it("should throw BioTooLongError without touching the repository", async () => {
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+        updateProfile: vi.fn(),
+      });
+
+      await expect(
+        updateProfile(
+          { ...defaultInput, bio: "a".repeat(BIO_MAX_LENGTH + 1) },
+          { userRepository: repo }
+        )
+      ).rejects.toThrow(BioTooLongError);
+
+      expect(repo.updateProfile).not.toHaveBeenCalled();
     });
   });
 

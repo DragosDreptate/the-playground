@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { truncate, collapseWhitespace } from "@/lib/text";
+import { truncate, collapseWhitespace, normalizeLineBreaks } from "@/lib/text";
 
 describe("truncate", () => {
   it("returns the string unchanged when below the cap", () => {
@@ -42,5 +42,27 @@ describe("collapseWhitespace", () => {
 
   it("returns empty for whitespace-only input", () => {
     expect(collapseWhitespace("   \n\t\r\n  ")).toBe("");
+  });
+});
+
+describe("normalizeLineBreaks", () => {
+  it.each([
+    ["CRLF", "Ligne 1\r\nLigne 2", "Ligne 1\nLigne 2"],
+    ["CR seul (vieux Mac)", "Ligne 1\rLigne 2", "Ligne 1\nLigne 2"],
+    ["LF déjà normalisé", "Ligne 1\nLigne 2", "Ligne 1\nLigne 2"],
+    ["lignes vides consécutives", "a\r\n\r\nb", "a\n\nb"],
+    ["sans retour à la ligne", "une seule ligne", "une seule ligne"],
+    ["chaîne vide", "", ""],
+  ])("%s → LF", (_label, input, expected) => {
+    expect(normalizeLineBreaks(input)).toBe(expected);
+  });
+
+  it("aligns the server-side length on what the browser counts", () => {
+    const asTypedInTheBrowser = "a\nb\nc";
+    const asPostedByTheForm = "a\r\nb\r\nc";
+
+    expect(normalizeLineBreaks(asPostedByTheForm).length).toBe(
+      asTypedInTheBrowser.length
+    );
   });
 });

@@ -20,3 +20,16 @@ export function truncate(str: string, max: number): string {
 export function collapseWhitespace(str: string): string {
   return str.replace(/\s+/g, " ").trim();
 }
+
+/**
+ * Normalise les fins de ligne en `\n`.
+ *
+ * Un `<textarea>` soumis dans un formulaire HTML renvoie ses retours à la ligne
+ * en `\r\n` (normalisation imposée par la spec), alors que la valeur lue en JS
+ * côté client (`.value.length`, `maxLength`) les compte en `\n`. Sans cette
+ * normalisation, un texte affiché à 158 caractères dans le navigateur en fait
+ * 162 à l'arrivée sur le serveur, et une colonne bornée le rejette.
+ */
+export function normalizeLineBreaks(str: string): string {
+  return str.replace(/\r\n?/g, "\n");
+}
