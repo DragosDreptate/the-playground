@@ -13,6 +13,7 @@ import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 import { BIO_MAX_LENGTH } from "@/domain/usecases/update-profile";
 import { USER_ERROR_CODES } from "@/domain/errors";
+import { normalizeLineBreaks } from "@/lib/text";
 
 const INPUT_BG = "dark:bg-background";
 
@@ -32,7 +33,12 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
   const t = useTranslations("Profile");
   const tCommon = useTranslations("Common");
   const router = useRouter();
-  const [bioLength, setBioLength] = useState(user.bio?.length ?? 0);
+  // Les bios enregistrées avant la normalisation contiennent encore des `\r\n`,
+  // que le `<textarea>` ramène à `\n` : compter la valeur brute afficherait
+  // un caractère de trop par retour à la ligne.
+  const [bioLength, setBioLength] = useState(
+    normalizeLineBreaks(user.bio ?? "").length
+  );
 
   async function handleSubmit(
     _prev: FormState,

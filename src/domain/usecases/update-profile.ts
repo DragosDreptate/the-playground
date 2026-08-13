@@ -4,16 +4,13 @@ import type {
   UpdateProfileInput,
 } from "@/domain/ports/repositories/user-repository";
 import { BioTooLongError, UserNotFoundError } from "@/domain/errors";
-import { normalizeLineBreaks } from "@/lib/text";
+import { exceedsCharacterCap, normalizeLineBreaks } from "@/lib/text";
 
 /**
- * Longueur maximale de la bio, alignée sur la colonne `User.bio`
- * (`@db.VarChar(160)`). Partagée avec le formulaire pour que le compteur
- * affiché et la validation serveur ne puissent pas diverger.
- *
- * `String.length` compte en unités UTF-16 là où Postgres compte en caractères :
- * un emoji hors BMP pèse 2 ici et 1 là-bas. La validation est donc toujours au
- * moins aussi stricte que la colonne, jamais l'inverse.
+ * Longueur maximale de la bio, en caractères au sens de Postgres. Doit rester
+ * alignée sur la largeur de la colonne `User.bio` (`@db.VarChar(160)`) — un
+ * test épingle les deux valeurs l'une à l'autre. Partagée avec le formulaire
+ * pour que le compteur affiché et la validation serveur ne divergent pas.
  */
 export const BIO_MAX_LENGTH = 160;
 
@@ -47,7 +44,7 @@ export async function updateProfile(
   const bio =
     typeof input.bio === "string" ? normalizeLineBreaks(input.bio) : input.bio;
 
-  if (bio != null && bio.length > BIO_MAX_LENGTH) {
+  if (bio != null && exceedsCharacterCap(bio, BIO_MAX_LENGTH)) {
     throw new BioTooLongError(BIO_MAX_LENGTH);
   }
 
