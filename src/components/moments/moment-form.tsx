@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import type { Moment, LocationType } from "@/domain/models/moment";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
-import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
+import { combineDateAndTime, extractTime, extractDatePart, snapToSlot } from "@/lib/time-options";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
 import type { CoverImageAttribution } from "@/domain/models/moment";
@@ -62,17 +62,36 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const attachmentsEditorRef = useRef<MomentAttachmentsEditorHandle>(null);
   const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
 
-  // --- Date/time state ---
-  const defaultStart = moment?.startsAt ?? getDefaultStartDate();
-  const defaultEnd = moment?.endsAt ?? getDefaultEndDate(defaultStart);
-
-  const [startDate, setStartDate] = useState<Date | undefined>(defaultStart);
-  const [startTime, setStartTime] = useState(
-    moment?.startsAt ? snapToSlot(extractTime(moment.startsAt)) : snapToSlot(extractTime(defaultStart))
+  // --- Timezone ---
+  // Fuseau de l'événement : celui enregistré à la création, réutilisé tel quel en
+  // édition. On ne le recalcule JAMAIS depuis le navigateur quand l'événement existe
+  // déjà — sans quoi un organisateur éditant depuis un autre fuseau que celui de son
+  // événement l'écraserait silencieusement, sans aucun moyen de le corriger (il n'y
+  // a pas de sélecteur, par choix produit). Voir ADR-0008.
+  const [eventTimezone] = useState(
+    () => moment?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
   );
-  const [endDate, setEndDate] = useState<Date | undefined>(defaultEnd);
+
+  // --- Date/time state ---
+  // Jour ET heure sont lus dans le fuseau de l'événement : afficher le jour du
+  // navigateur à côté de l'heure de l'événement ferait se contredire le formulaire
+  // pour tout créneau proche de minuit. Un événement sans heure de fin garde son
+  // repli « début + 1h », calculé sur l'instant de début et non sur le jour, sinon
+  // l'heure de fin retomberait à 01:00.
+  const referenceStart = moment?.startsAt ?? getDefaultStartDate();
+  const referenceEnd = moment?.endsAt ?? getDefaultEndDate(referenceStart);
+
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    extractDatePart(referenceStart, eventTimezone)
+  );
+  const [startTime, setStartTime] = useState(
+    snapToSlot(extractTime(referenceStart, eventTimezone))
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    extractDatePart(referenceEnd, eventTimezone)
+  );
   const [endTime, setEndTime] = useState(
-    moment?.endsAt ? snapToSlot(extractTime(moment.endsAt)) : snapToSlot(extractTime(defaultEnd))
+    snapToSlot(extractTime(referenceEnd, eventTimezone))
   );
 
   // --- Title / description / location state (needed for radar) ---
@@ -188,8 +207,8 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const circleGradient = getMomentGradient(circleName);
 
   // --- Computed hidden values ---
-  const startsAtValue = startDate ? combineDateAndTime(startDate, startTime) : "";
-  const endsAtValue = endDate ? combineDateAndTime(endDate, endTime) : "";
+  const startsAtValue = startDate ? combineDateAndTime(startDate, startTime, eventTimezone) : "";
+  const endsAtValue = endDate ? combineDateAndTime(endDate, endTime, eventTimezone) : "";
 
   // Mirrors the check in MomentFormDateCard — blocks submit before server round-trip
   const isEndBeforeStart = !!(
@@ -326,6 +345,9 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           {/* Hidden inputs for date/time */}
           <input type="hidden" name="startsAt" value={startsAtValue} />
           <input type="hidden" name="endsAt" value={endsAtValue} />
+          {/* Soumis à la création uniquement : en édition, le champ absent laisse le
+              fuseau enregistré intact côté usecase (undefined = non modifié). */}
+          {!moment && <input type="hidden" name="timezone" value={eventTimezone} />}
 
           {/* Date/time card */}
           <MomentFormDateCard
@@ -337,6 +359,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onStartTimeChange={setStartTime}
             onEndDateChange={setEndDate}
             onEndTimeChange={setEndTime}
+            timezone={eventTimezone}
             disabled={isPast}
           />
 

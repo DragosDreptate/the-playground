@@ -32,6 +32,8 @@ type MomentFormDateCardProps = {
   onStartTimeChange: (time: string) => void;
   onEndDateChange: (date: Date | undefined) => void;
   onEndTimeChange: (time: string) => void;
+  /** Fuseau de l'événement (IANA) : celui enregistré en édition, celui du navigateur à la création. */
+  timezone: string;
   disabled?: boolean;
 };
 
@@ -44,21 +46,22 @@ export function MomentFormDateCard({
   onStartTimeChange,
   onEndDateChange,
   onEndTimeChange,
+  timezone,
   disabled = false,
 }: MomentFormDateCardProps) {
   const t = useTranslations("Moment");
   const locale = useLocale();
   const dateFnsLocale = locale === "fr" ? fr : enUS;
   const timeOptions = useMemo(() => generateTimeOptions(), []);
-  const [timezone, setTimezone] = useState("");
+  const [timezoneLabel, setTimezoneLabel] = useState("");
 
   const isEndBeforeStart = useMemo(() => {
     if (!startDate || !endDate) return false;
-    const start = combineDateAndTime(startDate, startTime);
-    const end = combineDateAndTime(endDate, endTime);
+    const start = combineDateAndTime(startDate, startTime, timezone);
+    const end = combineDateAndTime(endDate, endTime, timezone);
     if (!start || !end) return false;
     return end <= start;
-  }, [startDate, startTime, endDate, endTime]);
+  }, [startDate, startTime, endDate, endTime, timezone]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -89,14 +92,18 @@ export function MomentFormDateCard({
     }
   }, [isStartToday, startTime, filteredStartTimeOptions, onStartTimeChange]);
 
+  // Libellé du fuseau de l'ÉVÉNEMENT, pas de celui du navigateur : en éditant un
+  // événement de Dublin depuis Paris, l'organisateur doit lire « GMT+1 Dublin », qui
+  // est l'heure dans laquelle ses créneaux sont exprimés. Calculé après montage :
+  // l'offset dépend de `new Date()`, non déterministe au rendu serveur.
   useEffect(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const offset = new Date().toLocaleString("en", {
+      timeZone: timezone,
       timeZoneName: "shortOffset",
     });
     const gmtPart = offset.split(" ").pop() ?? "";
-    setTimezone(`${gmtPart} ${tz.split("/").pop()?.replace(/_/g, " ") ?? ""}`);
-  }, []);
+    setTimezoneLabel(`${gmtPart} ${timezone.split("/").pop()?.replace(/_/g, " ") ?? ""}`);
+  }, [timezone]);
 
   function formatDate(date: Date | undefined): string {
     if (!date) return t("form.pickDate");
@@ -125,8 +132,8 @@ export function MomentFormDateCard({
   /** If the new start would push past end, adjusts endTime (+1h) and endDate (if overflow). */
   function adjustEndIfNeeded(newStartDate: Date, newStartTime: string) {
     if (!endDate) return;
-    const startISO = combineDateAndTime(newStartDate, newStartTime);
-    const endISO = combineDateAndTime(endDate, endTime);
+    const startISO = combineDateAndTime(newStartDate, newStartTime, timezone);
+    const endISO = combineDateAndTime(endDate, endTime, timezone);
     if (!startISO || !endISO || endISO > startISO) return;
 
     const { time: newEndTime, overflow } = addOneHour(newStartTime);
@@ -248,10 +255,10 @@ export function MomentFormDateCard({
       )}
 
       {/* Timezone badge */}
-      {!disabled && timezone && (
+      {!disabled && timezoneLabel && (
         <div className="pl-12">
           <Badge variant="secondary" className="text-xs font-normal">
-            {timezone}
+            {timezoneLabel}
           </Badge>
         </div>
       )}

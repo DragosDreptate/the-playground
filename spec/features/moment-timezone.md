@@ -59,15 +59,13 @@ Trois fonctions à faire évoluer, toutes dans `time-options.ts` :
 
 ⚠️ **`extractTime` est le piège le plus coûteux** : à l'édition, un organisateur qui ouvre le formulaire depuis un autre fuseau que celui de l'événement verrait aujourd'hui une heure décalée pré-remplie — et la ré-enregistrerait décalée. Corriger la saisie sans corriger l'extraction transforme un bug d'affichage en **corruption de données**.
 
-### UI
+### UI — aucun sélecteur
 
-`moment-form-date-card.tsx` **affiche déjà** le fuseau du navigateur en lecture seule (lignes 92-99 pour le calcul, 251-254 pour le rendu). Cet emplacement devient un **sélecteur** :
+Décision produit (ADR-0008) : **pas de champ de fuseau dans le formulaire.** Le fuseau du navigateur est le bon dans la quasi-totalité des cas, et un champ de plus irait contre le minimalisme du formulaire de création.
 
-- valeur par défaut : `Intl.DateTimeFormat().resolvedOptions().timeZone` (le fuseau du navigateur, comportement actuel) ;
-- liste des fuseaux via `Intl.supportedValuesOf("timeZone")` ;
-- libellé i18n FR/EN à ajouter dans `messages/fr.json` et `messages/en.json`.
+Le fuseau est donc capté silencieusement, **à la création uniquement**. Le badge existant sous les créneaux continue d'afficher le fuseau retenu, mais il affiche désormais celui de l'**événement** et non celui du navigateur : en éditant un événement de Dublin depuis Paris, l'organisateur lit « GMT+1 Dublin », l'heure dans laquelle ses créneaux sont réellement exprimés.
 
-Cas couvert : un organisateur irlandais en déplacement à Paris crée un événement à Dublin — il choisit `Europe/Dublin`, l'instant stocké est correct.
+Contrepartie assumée : un organisateur qui crée depuis un fuseau qui n'est pas celui de son événement enregistre un fuseau faux, sans moyen de le corriger dans l'app.
 
 ## 3. Affichage web
 
