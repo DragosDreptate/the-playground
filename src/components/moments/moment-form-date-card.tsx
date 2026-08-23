@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { generateTimeOptions, combineDateAndTime } from "@/lib/time-options";
+import { getTimezoneCityLabel } from "@/lib/timezone";
 
 type MomentFormDateCardProps = {
   startDate: Date | undefined;
@@ -102,7 +103,7 @@ export function MomentFormDateCard({
       timeZoneName: "shortOffset",
     });
     const gmtPart = offset.split(" ").pop() ?? "";
-    setTimezoneLabel(`${gmtPart} ${timezone.split("/").pop()?.replace(/_/g, " ") ?? ""}`);
+    setTimezoneLabel(`${gmtPart} ${getTimezoneCityLabel(timezone)}`);
   }, [timezone]);
 
   function formatDate(date: Date | undefined): string {

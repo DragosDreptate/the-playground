@@ -178,10 +178,14 @@ export function formatDateRange(
  * Composantes typographiques utilisées par les og:image (date pill + meta) :
  * mois & jour pour la pill blanche, weekday + heure pour la ligne meta.
  * Tout en uppercase, sans le point final que `Intl` ajoute parfois en FR.
+ *
+ * L'image est générée côté serveur, sans visiteur : elle est rendue dans le fuseau
+ * de l'ÉVÉNEMENT, d'où le paramètre explicite. Voir ADR-0008.
  */
 export function formatOgDateBadge(
   date: Date,
   locale: string,
+  timezone: string,
 ): { month: string; day: string; weekday: string; time: string } {
   const intlLocale = toIntlLocale(locale);
   const stripDot = (s: string) => s.replace(/\.$/, "").toUpperCase();
@@ -189,23 +193,27 @@ export function formatOgDateBadge(
     month: stripDot(
       normalizeShortMonthEn(
         new Intl.DateTimeFormat(intlLocale, {
-          timeZone: TIMEZONE,
+          timeZone: timezone,
           month: "short",
         }).format(date),
         locale,
       ),
     ),
     day: new Intl.DateTimeFormat(intlLocale, {
-      timeZone: TIMEZONE,
+      timeZone: timezone,
       day: "numeric",
     }).format(date),
     weekday: stripDot(
       new Intl.DateTimeFormat(intlLocale, {
-        timeZone: TIMEZONE,
+        timeZone: timezone,
         weekday: "short",
       }).format(date),
     ),
-    time: formatLocalizedTime(date, locale),
+    time: new Intl.DateTimeFormat(intlLocale, {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date),
   };
 }
 

@@ -66,7 +66,11 @@ export default async function OgImage({
 
   // Pas de cover → fallback content-rich : tout dans l'image puisque rien d'autre n'y figure.
   const circle = await prismaCircleRepository.findById(moment.circleId);
-  const { month, day, weekday, time } = formatOgDateBadge(moment.startsAt, locale);
+  const { month, day, weekday, time } = formatOgDateBadge(
+    moment.startsAt,
+    locale,
+    moment.timezone,
+  );
   const location = formatLocationLabel(
     moment.locationType,
     moment.locationName,

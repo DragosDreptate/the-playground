@@ -3,19 +3,21 @@ import { fr } from "date-fns/locale/fr";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import type { MomentForReminder } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationReminderEmailData } from "@/domain/ports/services/email-service";
+import { formatTimezoneMention } from "@/lib/timezone";
 
-const PLATFORM_TIMEZONE = "Europe/Paris";
-
-function formatMomentDate(startsAt: Date): string {
-  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+// Le rappel part par email : aucun visiteur, donc aucun fuseau à qui s'adapter.
+// L'heure est celle de l'événement, et elle porte sa mention. Voir ADR-0008.
+function formatMomentDate(startsAt: Date, timezone: string): string {
+  const time = formatInTimeZone(startsAt, timezone, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  return `${time} (${formatTimezoneMention(timezone, "fr")})`;
 }
 
-function formatMomentDateMonth(startsAt: Date): string {
-  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "MMM", { locale: fr }).toUpperCase();
+function formatMomentDateMonth(startsAt: Date, timezone: string): string {
+  return formatInTimeZone(startsAt, timezone, "MMM", { locale: fr }).toUpperCase();
 }
 
-function formatMomentDateDay(startsAt: Date): string {
-  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "d");
+function formatMomentDateDay(startsAt: Date, timezone: string): string {
+  return formatInTimeZone(startsAt, timezone, "d");
 }
 
 export function formatLocationText(moment: MomentForReminder): string {
@@ -53,9 +55,9 @@ export function buildReminderEmailData(
     playerName: user.name ?? user.email,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate: formatMomentDate(moment.startsAt),
-    momentDateMonth: formatMomentDateMonth(moment.startsAt),
-    momentDateDay: formatMomentDateDay(moment.startsAt),
+    momentDate: formatMomentDate(moment.startsAt, moment.timezone),
+    momentDateMonth: formatMomentDateMonth(moment.startsAt, moment.timezone),
+    momentDateDay: formatMomentDateDay(moment.startsAt, moment.timezone),
     locationText: formatLocationText(moment),
     circleName: moment.circle.name,
     circleSlug: moment.circle.slug,

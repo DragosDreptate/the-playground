@@ -100,6 +100,8 @@ export type MomentForReminder = {
   description: string;
   startsAt: Date;
   endsAt: Date | null;
+  /** Fuseau de l'événement : le rappel est un email, rendu sans visiteur. */
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   videoLink: string | null;

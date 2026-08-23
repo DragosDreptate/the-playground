@@ -18,6 +18,7 @@ function makeMomentForReminder(
     description: "A weekly community meetup.",
     startsAt: new Date("2026-03-16T18:00:00Z"),
     endsAt: new Date("2026-03-16T20:00:00Z"),
+    timezone: "Europe/Paris",
     locationType: "IN_PERSON",
     locationName: "Café Central",
     videoLink: null,
@@ -122,6 +123,24 @@ describe("buildReminderEmailData", () => {
     const data = buildReminderEmailData(moment, user, icsContent);
     expect(data.momentDateMonth).toBeTruthy();
     expect(data.momentDateDay).toBeTruthy();
+  });
+
+  it("should render the reminder in the event timezone, with its mention", () => {
+    // 15:30 UTC = 16:30 à Dublin en août, 17:30 à Paris.
+    const moment = makeMomentForReminder({
+      startsAt: new Date("2026-08-25T15:30:00.000Z"),
+      timezone: "Europe/Dublin",
+    });
+
+    const data = buildReminderEmailData(
+      moment,
+      { email: "player@example.com", name: "Player" },
+      "ICS"
+    );
+
+    expect(data.momentDate).toContain("16:30");
+    expect(data.momentDate).not.toContain("17:30");
+    expect(data.momentDate).toContain("heure de Dublin");
   });
 
   it("should format IN_PERSON location correctly", () => {
