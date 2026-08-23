@@ -4,7 +4,9 @@ import {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
   PaidMomentCannotRequireApprovalError,
+  InvalidTimezoneError,
 } from "@/domain/errors";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 import {
   createMockMomentRepository,
   makeMoment,
@@ -349,5 +351,66 @@ describe("CreateMoment", () => {
 
       expect(result.moment.price).toBe(0);
     });
+  });
+
+  describe("given a timezone on the Moment", () => {
+    function setup() {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository();
+      const registrationRepo = createMockRegistrationRepository();
+      return {
+        circleRepo,
+        momentRepo,
+        deps: {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        },
+      };
+    }
+
+    it("should persist the IANA timezone submitted by the Host", async () => {
+      const { momentRepo, deps } = setup();
+
+      await createMoment({ ...defaultInput, timezone: "Europe/Dublin" }, deps);
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ timezone: "Europe/Dublin" })
+      );
+    });
+
+    it("should fall back to the platform default when no timezone is submitted", async () => {
+      const { momentRepo, deps } = setup();
+
+      await createMoment(defaultInput, deps);
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ timezone: DEFAULT_TIMEZONE })
+      );
+    });
+
+    it("should accept a historical IANA alias that supportedValuesOf omits", async () => {
+      const { momentRepo, deps } = setup();
+
+      await createMoment({ ...defaultInput, timezone: "Asia/Calcutta" }, deps);
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ timezone: "Asia/Calcutta" })
+      );
+    });
+
+    it.each(["Europe/Atlantis", "GMT+1", "", "Paris"])(
+      "should reject %s and never persist the Moment",
+      async (timezone) => {
+        const { momentRepo, deps } = setup();
+
+        await expect(
+          createMoment({ ...defaultInput, timezone }, deps)
+        ).rejects.toThrow(InvalidTimezoneError);
+        expect(momentRepo.create).not.toHaveBeenCalled();
+      }
+    );
   });
 });

@@ -243,6 +243,11 @@ model Moment {
   coverImageAttribution Json?        @db.JsonB
   startsAt              DateTime
   endsAt                DateTime?
+  // Fuseau de l'événement (identifiant IANA, ex. "Europe/Dublin"). Les instants
+  // restent stockés en UTC : ce champ dit dans quel fuseau l'organisateur a saisi
+  // l'heure, et sert aux surfaces rendues sans visiteur (emails, Slack, image OG).
+  // Voir spec/decisions/0008-fuseau-horaire-affichage-visiteur.md
+  timezone              String       @default("Europe/Paris")
   locationType          LocationType
   locationName          String?
   locationAddress       String?

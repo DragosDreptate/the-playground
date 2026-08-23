@@ -1,4 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
+import { isValidTimezone } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -8,6 +9,7 @@ import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   MomentPastDateError,
+  InvalidTimezoneError,
   UnauthorizedMomentActionError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
@@ -25,6 +27,8 @@ type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  /** Identifiant IANA. Ignoré sur un événement PAST (liste blanche `safeInput`). */
+  timezone?: string;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;
@@ -145,6 +149,10 @@ export async function updateMoment(
         });
       }
     }
+  }
+
+  if (safeInput.timezone !== undefined && !isValidTimezone(safeInput.timezone)) {
+    throw new InvalidTimezoneError(safeInput.timezone);
   }
 
   if (safeInput.startsAt !== undefined && safeInput.startsAt < new Date()) {

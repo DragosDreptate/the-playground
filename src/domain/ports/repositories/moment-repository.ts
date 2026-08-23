@@ -13,6 +13,8 @@ export type CreateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
+  /** Identifiant IANA. Omis → `DEFAULT_TIMEZONE` (créations hors UI). */
+  timezone?: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -32,6 +34,7 @@ export type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  timezone?: string;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;

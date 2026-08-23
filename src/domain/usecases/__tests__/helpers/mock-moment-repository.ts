@@ -1,5 +1,6 @@
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { Moment } from "@/domain/models/moment";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 import { vi } from "vitest";
 
 export function createMockMomentRepository(
@@ -39,6 +40,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     coverImageAttribution: null,
     startsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
+    timezone: DEFAULT_TIMEZONE,
     locationType: "IN_PERSON",
     locationName: "Cafe Central",
     locationAddress: "123 Main Street, Paris",
