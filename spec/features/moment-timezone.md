@@ -1,14 +1,14 @@
 # Fuseaux horaires des événements
 
 > **Décision** : [ADR-0008](../decisions/0008-fuseau-horaire-affichage-visiteur.md) — affichage web dans le fuseau du visiteur, fuseau de l'événement stocké pour les surfaces serveur.
-> **Issue** : #475. **Statut** : spec prête, non implémentée.
+> **Issue** : #475. **Statut** : étapes 1 à 4 et 6 livrées (socle, saisie, surfaces serveur, affichage visiteur, E2E). **Reste l'étape 5** : `db:push:prod` + backfill.
 
 ## Comportement cible
 
 | Surface | Fuseau appliqué | Mention du fuseau |
 |---|---|---|
 | Page événement, timeline, cartes, Explorer, widget embed | **visiteur** | non |
-| Formulaire de création / édition | **fuseau de l'événement** (sélectionnable) | oui (le champ lui-même) |
+| Formulaire de création / édition | **fuseau de l'événement** (capté du navigateur à la création, jamais réécrit) | oui (badge sous les créneaux) |
 | Emails (confirmation, rappel 24h, message Organisateur) | **événement** | oui |
 | Notification Slack admin | **événement** | oui |
 | Image OpenGraph (`opengraph-image.tsx`) | **événement** | oui |
@@ -77,7 +77,7 @@ Les surfaces publiques sont en ISR : `m/[slug]` (30s), `circles/[slug]` (60s), `
 
 **Approche retenue : formatage côté client, à granularité fine.**
 
-Un composant client dédié — `<LocalDateTime>` — reçoit l'instant UTC sérialisé et formate au montage. Les composants parents **restent des server components**.
+Des fragments clients dédiés — `src/components/moments/local-date-parts.tsx` — reçoivent l'instant et le fuseau de l'événement, et formatent au montage. Les composants parents **restent des server components**.
 
 C'est le point structurant : 4 des 7 composants d'affichage sont serveur (`moment-detail-view`, `moment-timeline-item`, `moment-card`, `embed-event-card`), 3 sont déjà client (`dashboard-moment-card`, `public-moment-card`, `community-card`). Les convertir en client coûterait du bundle et de l'hydratation inutiles ; isoler la date dans un composant client dédié ne coûte que la date.
 
@@ -129,7 +129,8 @@ Script dans `scripts/` avec dry-run par défaut, sur le modèle des backfills ex
 - **Unitaires** — `time-options` : aller-retour saisie/extraction sur un fuseau ≠ navigateur ; passage à l'heure d'été (les transitions DST sont le nid à bugs) ; `format-date` avec fuseau paramétré.
 - `src/lib/__tests__/format-date.test.ts` **va casser** : il assume aujourd'hui `Europe/Paris`. À reprendre.
 - **Usecases** — `create-moment` / `update-moment` : persistance du fuseau, valeur par défaut, rejet d'un identifiant IANA invalide.
-- **E2E** — créer un événement avec le navigateur Playwright forcé sur un fuseau non-Paris (`contextOptions.timezoneId`), vérifier l'heure affichée. À jouer sur **WebKit autant que Chromium**.
+- **E2E** — `tests/e2e/moment-timezone.spec.ts`, joué sur **Chromium et WebKit** (moteurs lancés explicitement dans le fichier, pour ne pas doubler la durée de toute la suite en CI). Les assertions portent sur l'**écart** entre deux fuseaux, jamais sur une heure en dur : l'instant de l'événement de seed bouge d'un run à l'autre, alors que l'écart Dublin/Paris vaut 60 min en toute saison. Le repli avant hydratation se teste avec `javaScriptEnabled: false`, qui expose exactement le HTML servi.
+- **Point d'ancrage DOM** — les fragments de `local-date-parts.tsx` rendent une balise `<time dateTime data-timezone>`. Sans ce marqueur, le test lit parfois le repli serveur au lieu de l'heure hydratée : WebKit hydrate assez lentement pour perdre la course une fois sur deux. Gain de bord : `<time datetime>` est la balise sémantiquement correcte pour une date.
 - **Non-régression** — le scénario signalé : saisie 16:30 en `Europe/Dublin`, affichage 16:30 depuis Dublin, 17:30 depuis Paris, email « 16:30, heure de Dublin ».
 
 ## 7. Hors périmètre

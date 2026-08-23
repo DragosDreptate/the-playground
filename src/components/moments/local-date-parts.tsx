@@ -46,24 +46,32 @@ function useResolvedTimezone(eventTimezone: string): {
 /** "22:00" */
 export function LocalTime({ startsAt, eventTimezone, locale: _locale }: BaseProps) {
   const { timezone } = useResolvedTimezone(eventTimezone);
-  return <>{formatTime(startsAt, timezone)}</>;
+  return (
+    <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+      {formatTime(startsAt, timezone)}
+    </time>
+  );
 }
 
 /** "25 février 2026 · 20:00" — widget embarqué sur un site externe. */
 export function LocalLongDateTime({ startsAt, eventTimezone, locale }: BaseProps) {
   const { timezone } = useResolvedTimezone(eventTimezone);
   return (
-    <>
+    <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
       {formatLongDate(startsAt, locale, timezone)} ·{" "}
       {formatLocalizedTime(startsAt, locale, timezone)}
-    </>
+    </time>
   );
 }
 
 /** "sam. 25 févr." */
 export function LocalShortDate({ startsAt, eventTimezone, locale }: BaseProps) {
   const { timezone } = useResolvedTimezone(eventTimezone);
-  return <>{formatShortDate(startsAt, locale, timezone)}</>;
+  return (
+    <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+      {formatShortDate(startsAt, locale, timezone)}
+    </time>
+  );
 }
 
 /** "sam. 25 févr. · 22:00 – 23:00" */
@@ -74,7 +82,11 @@ export function LocalDateRange({
   locale,
 }: BaseProps & { endsAt: Date | null }) {
   const { timezone } = useResolvedTimezone(eventTimezone);
-  return <>{formatDateRange(startsAt, endsAt, locale, timezone)}</>;
+  return (
+    <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+      {formatDateRange(startsAt, endsAt, locale, timezone)}
+    </time>
+  );
 }
 
 /** Bloc "Quand" de la page événement — toujours 2 lignes. */
@@ -103,7 +115,11 @@ export function LocalMomentDateTime({
   return (
     <>
       <p className={line1ClassName}>{line1}</p>
-      <p className={isMultiDay ? line2MultiDayClassName : line2ClassName}>{line2}</p>
+      <p className={isMultiDay ? line2MultiDayClassName : line2ClassName}>
+        <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+          {line2}
+        </time>
+      </p>
     </>
   );
 }
@@ -154,7 +170,9 @@ export function LocalTimelineDateColumn({
           isPast ? "text-muted-foreground/60" : "text-muted-foreground"
         }`}
       >
-        {timeStr}
+        <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+          {timeStr}
+        </time>
       </p>
     </div>
   );
