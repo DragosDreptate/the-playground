@@ -53,6 +53,7 @@ import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -436,7 +437,7 @@ export default async function CircleDetailPage({
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
-                  {formatLongDate(circle.createdAt, locale)}
+                  {formatLongDate(circle.createdAt, locale, DEFAULT_TIMEZONE)}
                 </p>
               </div>
             </div>

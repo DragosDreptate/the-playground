@@ -256,7 +256,7 @@ export const prismaCircleRepository: CircleRepository = {
       updatedAt: Date;
       memberCount: number;
       upcomingMomentCount: number;
-      nextMoment: { title: string; startsAt: string } | null;
+      nextMoment: { title: string; startsAt: string; timezone: string } | null;
       topMembers: { id: string; firstName: string | null; lastName: string | null; image: string | null; publicId: string | null }[];
     };
 
@@ -289,7 +289,7 @@ export const prismaCircleRepository: CircleRepository = {
           WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW())
           AS "upcomingMomentCount",
         (SELECT row_to_json(x) FROM (
-          SELECT title, "startsAt"
+          SELECT title, "startsAt", timezone
           FROM moments
           WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW()
           ORDER BY "startsAt" ASC
@@ -333,7 +333,11 @@ export const prismaCircleRepository: CircleRepository = {
       upcomingMomentCount: row.upcomingMomentCount,
       topMembers: (row.topMembers ?? []).map((u) => ({ user: toUserAvatarInfo(u) })),
       nextMoment: row.nextMoment
-        ? { title: row.nextMoment.title, startsAt: new Date(row.nextMoment.startsAt) }
+        ? {
+            title: row.nextMoment.title,
+            startsAt: new Date(row.nextMoment.startsAt),
+            timezone: row.nextMoment.timezone,
+          }
         : null,
     }));
   },
@@ -533,12 +537,12 @@ export const prismaCircleRepository: CircleRepository = {
             },
           },
         },
-        // Un seul Moment chargé — uniquement les 2 champs nécessaires pour nextMoment
+        // Un seul Moment chargé — uniquement les champs nécessaires pour nextMoment
         moments: {
           where: { status: "PUBLISHED", startsAt: { gte: now } },
           orderBy: { startsAt: "asc" },
           take: 1,
-          select: { title: true, startsAt: true },
+          select: { title: true, startsAt: true, timezone: true },
         },
         // 3 premiers membres pour l'avatar stack
         memberships: {

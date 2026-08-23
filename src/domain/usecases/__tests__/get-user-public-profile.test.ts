@@ -48,6 +48,7 @@ describe("GetUserPublicProfile", () => {
           momentSlug: "soiree-js",
           momentTitle: "Soirée JS & Pizza",
           momentDate: new Date("2026-04-01"),
+          momentTimezone: "Europe/Paris",
           circleName: "Tech Paris",
         },
       ];

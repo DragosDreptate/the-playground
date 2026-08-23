@@ -39,6 +39,7 @@ export type HostMomentSummary = {
   coverImage: string | null;
   startsAt: Date;
   endsAt: Date | null;
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;

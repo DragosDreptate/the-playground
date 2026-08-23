@@ -57,7 +57,7 @@ export type SerializedDashboardCircle = Omit<
 > & {
   createdAt: string;
   updatedAt: string;
-  nextMoment: { title: string; startsAt: string } | null;
+  nextMoment: { title: string; startsAt: string; timezone: string } | null;
 };
 
 /** @internal Exporté pour les tests unitaires. */

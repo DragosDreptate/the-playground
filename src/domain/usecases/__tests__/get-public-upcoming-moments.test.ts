@@ -12,6 +12,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
     coverImage: null,
     startsAt: new Date("2026-03-15T18:00:00Z"),
     endsAt: new Date("2026-03-15T20:00:00Z"),
+    timezone: "Europe/Paris",
     locationType: "IN_PERSON",
     locationName: "Café Central",
     locationAddress: null,

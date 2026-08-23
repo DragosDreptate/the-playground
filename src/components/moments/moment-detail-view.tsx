@@ -26,7 +26,7 @@ import { MomentAttachmentsList } from "@/components/moments/moment-attachments-l
 import { AddToCalendarMenu } from "@/components/moments/add-to-calendar-menu";
 import type { CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
-import { formatDateRange, formatMomentDateTime } from "@/lib/format-date";
+import { LocalDateRange, LocalMomentDateTime } from "@/components/moments/local-date-parts";
 import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { ContactOrganizerLink } from "@/components/contact-organizer-link";
@@ -272,7 +272,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const locale = await getLocale();
 
   const gradient = getMomentGradient(moment.title);
-  const momentDateTime = formatMomentDateTime(moment.startsAt, moment.endsAt, locale);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -576,7 +575,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <p className="text-sm">
                 {t("public.eventTookPlace")}{" "}
                 <span className="font-medium">
-                  {formatDateRange(moment.startsAt, moment.endsAt, locale)}
+                  <LocalDateRange
+                    startsAt={moment.startsAt}
+                    endsAt={moment.endsAt}
+                    eventTimezone={moment.timezone}
+                    locale={locale}
+                  />
                 </span>
                 {registeredCount > 0 && (
                   <>
@@ -614,18 +618,15 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 <CalendarIcon className="text-primary size-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold leading-snug">
-                  {momentDateTime.line1}
-                </p>
-                <p
-                  className={
-                    momentDateTime.isMultiDay
-                      ? "text-sm font-semibold leading-snug"
-                      : "text-muted-foreground text-sm"
-                  }
-                >
-                  {momentDateTime.line2}
-                </p>
+                <LocalMomentDateTime
+                  startsAt={moment.startsAt}
+                  endsAt={moment.endsAt}
+                  eventTimezone={moment.timezone}
+                  locale={locale}
+                  line1ClassName="text-sm font-semibold leading-snug"
+                  line2ClassName="text-muted-foreground text-sm"
+                  line2MultiDayClassName="text-sm font-semibold leading-snug"
+                />
               </div>
               {props.calendarData && props.appUrl && moment.status !== "PAST" && moment.status !== "CANCELLED" && (
                 <AddToCalendarMenu data={props.calendarData} appUrl={props.appUrl} />

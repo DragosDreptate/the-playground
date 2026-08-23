@@ -193,6 +193,7 @@ export const prismaMomentRepository: MomentRepository = {
       coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
       endsAt: m.endsAt,
+      timezone: m.timezone,
       locationType: m.locationType,
       locationName: m.locationName,
       locationAddress: m.locationAddress,
@@ -230,6 +231,7 @@ export const prismaMomentRepository: MomentRepository = {
         title: true,
         coverImage: true,
         startsAt: true,
+        timezone: true,
         locationType: true,
         locationName: true,
         locationAddress: true,
@@ -245,6 +247,7 @@ export const prismaMomentRepository: MomentRepository = {
       title: m.title,
       coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
+      timezone: m.timezone,
       locationType: m.locationType,
       locationName: m.locationName,
       locationAddress: m.locationAddress,
@@ -269,6 +272,7 @@ export const prismaMomentRepository: MomentRepository = {
         coverImage: true,
         startsAt: true,
         endsAt: true,
+        timezone: true,
         locationType: true,
         locationName: true,
         locationAddress: true,
@@ -286,6 +290,7 @@ export const prismaMomentRepository: MomentRepository = {
       coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
       endsAt: m.endsAt,
+      timezone: m.timezone,
       locationType: m.locationType,
       locationName: m.locationName,
       locationAddress: m.locationAddress,
@@ -312,6 +317,7 @@ export const prismaMomentRepository: MomentRepository = {
       coverImage: string | null;
       startsAt: Date;
       endsAt: Date | null;
+      timezone: string;
       locationType: string;
       locationName: string | null;
       locationAddress: string | null;
@@ -337,6 +343,7 @@ export const prismaMomentRepository: MomentRepository = {
         m."coverImage",
         m."startsAt",
         m."endsAt",
+        m.timezone,
         m."locationType",
         m."locationName",
         m."locationAddress",
@@ -373,6 +380,7 @@ export const prismaMomentRepository: MomentRepository = {
       title: row.title,
       coverImage: row.coverImage,
       startsAt: row.startsAt,
+      timezone: row.timezone,
       endsAt: row.endsAt,
       locationType: row.locationType as LocationType,
       locationName: row.locationName,
@@ -417,6 +425,7 @@ export const prismaMomentRepository: MomentRepository = {
         coverImage: true,
         startsAt: true,
         endsAt: true,
+        timezone: true,
         locationType: true,
         locationName: true,
         locationAddress: true,
@@ -434,6 +443,7 @@ export const prismaMomentRepository: MomentRepository = {
       coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
       endsAt: m.endsAt,
+      timezone: m.timezone,
       locationType: m.locationType,
       locationName: m.locationName,
       locationAddress: m.locationAddress,
@@ -520,6 +530,7 @@ export const prismaMomentRepository: MomentRepository = {
             slug: true,
             title: true,
             startsAt: true,
+            timezone: true,
             circle: { select: { name: true } },
           },
         },
@@ -531,6 +542,7 @@ export const prismaMomentRepository: MomentRepository = {
       momentSlug: r.moment.slug,
       momentTitle: r.moment.title,
       momentDate: r.moment.startsAt,
+      momentTimezone: r.moment.timezone,
       circleName: r.moment.circle.name,
     }));
   },

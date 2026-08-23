@@ -62,6 +62,7 @@ import { visibleMembersFor } from "@/domain/models/circle";
 import { toUserAvatarInfo } from "@/lib/avatar";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 export const revalidate = 60;
 
@@ -575,7 +576,7 @@ export default async function PublicCirclePage({
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
-                  {formatLongDate(circle.createdAt, locale)}
+                  {formatLongDate(circle.createdAt, locale, DEFAULT_TIMEZONE)}
                 </p>
               </div>
             </div>

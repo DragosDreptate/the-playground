@@ -41,7 +41,7 @@ function toPublicCircle(c: {
   isDemo: boolean;
   explorerScore: number;
   _count: { memberships: number; moments: number };
-  moments: { title: string; startsAt: Date }[];
+  moments: { title: string; startsAt: Date; timezone: string }[];
   memberships: { user: { id: string; firstName: string | null; lastName: string | null; image: string | null; publicId: string | null } }[];
 }): PublicCircle {
   return {
@@ -78,7 +78,7 @@ const circleIncludeForPublic = (now: Date) => ({
     where: { status: "PUBLISHED" as const, startsAt: { gte: now } },
     orderBy: { startsAt: "asc" as const },
     take: 1,
-    select: { title: true, startsAt: true },
+    select: { title: true, startsAt: true, timezone: true },
   },
   memberships: {
     where: { status: "ACTIVE" as const },

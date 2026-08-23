@@ -834,7 +834,7 @@ describe("Security — Cross-Tenant Isolation (IDOR) — getUserDashboardCircles
           memberRole: "PLAYER",
           memberCount: 10,
           upcomingMomentCount: 1,
-          nextMoment: { title: "Prochain événement", startsAt: new Date("2026-04-01T18:00:00Z") },
+          nextMoment: { title: "Prochain événement", startsAt: new Date("2026-04-01T18:00:00Z"), timezone: "Europe/Paris" },
         }),
       ];
 

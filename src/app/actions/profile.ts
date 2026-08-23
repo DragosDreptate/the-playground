@@ -18,6 +18,7 @@ import { notifySlackNewUser, isAdminEmailEnabled } from "@/infrastructure/servic
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 const emailService = createResendEmailService();
 
@@ -123,7 +124,7 @@ async function notifyAdminNewUser(user: User): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const adminUsersUrl = `${appUrl}/admin/users`;
   const userName = getDisplayName(user.firstName, user.lastName, user.email);
-  const registeredAt = formatLongDate(new Date(), "fr");
+  const registeredAt = formatLongDate(new Date(), "fr", DEFAULT_TIMEZONE);
 
   if (isAdminEmailEnabled()) {
     const results = await Promise.allSettled(

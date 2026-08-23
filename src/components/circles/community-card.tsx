@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useVisitorTimezone } from "@/lib/use-visitor-timezone";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarIcon, MapPin, Clock } from "lucide-react";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
@@ -216,7 +217,7 @@ function VerticalCardBody({
   city: string | null;
   memberCount: number;
   topMembers: AttendeeStackProp;
-  nextMoment: { startsAt: Date | string; title: string } | null;
+  nextMoment: { startsAt: Date | string; title: string; timezone: string } | null;
   hideNextMoment?: boolean;
 }) {
   return (
@@ -302,13 +303,16 @@ function MemberStack({
 function NextMomentBlock({
   nextMoment,
 }: {
-  nextMoment: { startsAt: Date | string; title: string } | null;
+  nextMoment: { startsAt: Date | string; title: string; timezone: string } | null;
 }) {
   const t = useTranslations("Explorer");
   const locale = useLocale();
+  const visitorTimezone = useVisitorTimezone();
 
   if (nextMoment) {
     const start = new Date(nextMoment.startsAt);
+    // Fuseau du visiteur dès qu'il est connu, celui de l'événement en attendant.
+    const timezone = visitorTimezone ?? nextMoment.timezone;
     return (
       <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
         <div className="text-muted-foreground flex items-center gap-1.5">
@@ -321,7 +325,7 @@ function NextMomentBlock({
           {nextMoment.title}
         </p>
         <p className="text-muted-foreground text-[0.7rem]">
-          {formatDayMonth(start, locale)} · {formatTime(start)}
+          {formatDayMonth(start, locale, timezone)} · {formatTime(start, timezone)}
         </p>
       </div>
     );

@@ -64,6 +64,7 @@ export type PublicMoment = {
   coverImage: string | null;
   startsAt: Date;
   endsAt: Date | null;
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -87,6 +88,7 @@ export type UpcomingCircleMoment = {
   title: string;
   coverImage: string | null;
   startsAt: Date;
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
