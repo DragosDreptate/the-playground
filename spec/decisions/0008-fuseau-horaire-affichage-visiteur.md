@@ -2,7 +2,7 @@
 
 - **Date** : 2026-08-23
 - **Statut** : Accepté
-- **Références** : issue #475, message utilisateur d'Ewan Duffy (organisateur en Irlande, 23/08/2026)
+- **Références** : issue #475, signalement d'un organisateur basé en Irlande (23/08/2026)
 
 ## Contexte
 
