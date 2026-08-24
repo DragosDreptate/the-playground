@@ -1,7 +1,7 @@
 # Fuseaux horaires des événements
 
 > **Décision** : [ADR-0008](../decisions/0008-fuseau-horaire-affichage-visiteur.md) — affichage web dans le fuseau du visiteur, fuseau de l'événement stocké pour les surfaces serveur.
-> **Issue** : #475. **Statut** : étapes 1 à 4 et 6 livrées (socle, saisie, surfaces serveur, affichage visiteur, E2E). **Reste l'étape 5** : `db:push:prod` + backfill.
+> **Issue** : #475. **Statut** : **toutes les étapes livrées**. Migration production et backfill appliqués le 24/08/2026 (snapshot Neon `pre-push-20260824-092021`). Reste la PR et le déploiement, tous deux à décider explicitement.
 
 ## Comportement cible
 
@@ -122,7 +122,11 @@ Stratégie proposée :
 3. Corriger ceux-là à la main, ou demander confirmation à l'organisateur.
 4. Ne backfiller finement que les événements **à venir** : le passé n'envoie plus ni email ni rappel, l'enjeu y est nul.
 
-Script dans `scripts/` avec dry-run par défaut, sur le modèle des backfills existants (`backfill-public-id.ts`), et variante `:prod`.
+Script dans `scripts/local/` (gitignoré — il nomme des Communautés réelles et le repo est public), dry-run par défaut, idempotent : il ne touche que les événements encore au défaut, donc jamais un fuseau capté après le déploiement.
+
+**Appliqué le 24/08/2026** : recensement sur 88 événements (16 à venir), 4 candidats sans indice français, dont un faux positif (Le Crès, Hérault) et un sans impact (Sahara algérien — Paris et Alger au même offset à la date concernée). Deux événements effectivement repris, ceux du Circle irlandais à l'origine du signalement. Résultat : 86 `Europe/Paris`, 2 `Europe/Dublin`, aucun instant UTC modifié.
+
+**Limite connue du recensement** : il classe par LIEU de l'événement, alors que le champ doit refléter le fuseau de SAISIE. Un organisateur qui saisit depuis un autre fuseau que celui de son événement y échappe — cas identifié, en attente d'arbitrage produit.
 
 ## 6. Tests
 
