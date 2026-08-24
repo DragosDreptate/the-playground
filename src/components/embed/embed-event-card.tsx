@@ -3,7 +3,7 @@ import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle } from "@/domain/models/circle";
 import type { UserAvatarInfo } from "@/domain/models/user";
-import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
+import { LocalLongDateTime } from "@/components/moments/local-date-parts";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { getPublicUserInitials } from "@/lib/display-name";
 import { getAppUrl } from "@/lib/app-url";
@@ -39,7 +39,7 @@ export async function EmbedEventCard({
   const publicCircleUrl = `${appUrl}/${locale}/circles/${circle.slug}`;
   const platformUrl = `${appUrl}?utm_source=embed_widget`;
 
-  const dateLine = `${formatLongDate(moment.startsAt, locale)} · ${formatLocalizedTime(moment.startsAt, locale)}`;
+
   const locationLine =
     moment.locationType === "ONLINE"
       ? t("online")
@@ -119,7 +119,13 @@ export async function EmbedEventCard({
           <div className={`mt-3 space-y-2 text-sm @[400px]:mt-4 @[400px]:text-xs ${palette.date}`}>
             <p className="flex items-center gap-2">
               <Calendar className={`size-4 shrink-0 @[400px]:size-3.5 ${palette.icon}`} aria-hidden="true" />
-              <span>{dateLine}</span>
+              <span>
+                <LocalLongDateTime
+                  startsAt={moment.startsAt}
+                  eventTimezone={moment.timezone}
+                  locale={locale}
+                />
+              </span>
             </p>
             <p className="flex items-center gap-2">
               <MapPin className={`size-4 shrink-0 @[400px]:size-3.5 ${palette.icon}`} aria-hidden="true" />

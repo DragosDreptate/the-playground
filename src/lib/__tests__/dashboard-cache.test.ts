@@ -63,6 +63,7 @@ function makeDashboardCircle(overrides: Partial<DashboardCircle> = {}): Dashboar
     nextMoment: {
       title: "Next event",
       startsAt: new Date("2026-04-20T18:00:00.000Z"),
+      timezone: "Europe/Paris",
     },
     ...overrides,
   };
@@ -76,6 +77,7 @@ function makeHostMoment(overrides: Partial<HostMomentSummary> = {}): HostMomentS
     coverImage: null,
     startsAt: new Date("2026-04-20T18:00:00.000Z"),
     endsAt: new Date("2026-04-20T20:00:00.000Z"),
+    timezone: "Europe/Paris",
     locationType: "IN_PERSON",
     locationName: "Le Wagon",
     locationAddress: null,

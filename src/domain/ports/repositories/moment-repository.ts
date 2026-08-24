@@ -13,6 +13,8 @@ export type CreateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
+  /** Identifiant IANA. Omis → `DEFAULT_TIMEZONE` (créations hors UI). */
+  timezone?: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -32,6 +34,7 @@ export type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  timezone?: string;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;
@@ -61,6 +64,7 @@ export type PublicMoment = {
   coverImage: string | null;
   startsAt: Date;
   endsAt: Date | null;
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -84,6 +88,7 @@ export type UpcomingCircleMoment = {
   title: string;
   coverImage: string | null;
   startsAt: Date;
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -97,6 +102,8 @@ export type MomentForReminder = {
   description: string;
   startsAt: Date;
   endsAt: Date | null;
+  /** Fuseau de l'événement : le rappel est un email, rendu sans visiteur. */
+  timezone: string;
   locationType: LocationType;
   locationName: string | null;
   videoLink: string | null;

@@ -13,6 +13,7 @@ function makeHostMomentSummary(
     coverImage: null,
     startsAt: new Date("2026-01-10T18:00:00Z"),
     endsAt: new Date("2026-01-10T20:00:00Z"),
+    timezone: "Europe/Paris",
     locationType: "IN_PERSON",
     locationName: "Café Central",
     locationAddress: null,

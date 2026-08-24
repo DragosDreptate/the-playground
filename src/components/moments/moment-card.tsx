@@ -7,7 +7,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatShortDate } from "@/lib/format-date";
+import { LocalShortDate } from "@/components/moments/local-date-parts";
 import type { Moment } from "@/domain/models/moment";
 
 type MomentCardProps = {
@@ -46,7 +46,11 @@ export function MomentCard({ moment, circleSlug }: MomentCardProps) {
                 {moment.description}
               </CardDescription>
               <p className="text-muted-foreground mt-2 text-xs">
-                {formatShortDate(moment.startsAt, locale)}
+                <LocalShortDate
+                  startsAt={moment.startsAt}
+                  eventTimezone={moment.timezone}
+                  locale={locale}
+                />
               </p>
             </div>
             <Badge variant={statusVariant[moment.status]} className={statusClassName[moment.status]}>

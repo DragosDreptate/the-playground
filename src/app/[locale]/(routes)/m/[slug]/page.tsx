@@ -78,8 +78,9 @@ export async function generateMetadata({
   // (partage), mais jamais indexée par les crawlers (même pattern que /circles/[slug]).
   const isInPrivateCircle = !isCircleIndexable(circle);
   const t = await getTranslations({ locale, namespace: "Moment" });
-  const date = formatLongDate(moment.startsAt, locale);
-  const time = formatLocalizedTime(moment.startsAt, locale);
+  // Metadata (OG/SEO) : rendue côté serveur, sans visiteur → fuseau de l'événement.
+  const date = formatLongDate(moment.startsAt, locale, moment.timezone);
+  const time = formatLocalizedTime(moment.startsAt, locale, moment.timezone);
   const location =
     moment.locationType === "ONLINE"
       ? t("form.locationOnline")

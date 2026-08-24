@@ -14,6 +14,7 @@ import { buildPostHogPersonUrl } from "@/lib/posthog-url";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { AdminUserDeleteButton } from "./delete-button";
 import { AdminUserAuditPanel } from "./audit-panel";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 const ROLE_I18N_KEY: Record<CircleMemberRole, "host" | "coHost" | "player"> = {
   HOST: "host",
@@ -117,7 +118,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                 ? t("userDetail.auth.never")
                 : t("userDetail.auth.sessionsExpiring", {
                     count: user.auth.activeSessionsCount,
-                    date: formatLongDate(user.auth.latestSessionExpires, locale),
+                    date: formatLongDate(user.auth.latestSessionExpires, locale, DEFAULT_TIMEZONE),
                   })
             }
           />
@@ -128,7 +129,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                 ? t("userDetail.auth.none")
                 : t("userDetail.auth.tokensExpiring", {
                     count: user.auth.pendingMagicLinksCount,
-                    date: formatLongDate(user.auth.latestPendingMagicLinkExpires, locale),
+                    date: formatLongDate(user.auth.latestPendingMagicLinkExpires, locale, DEFAULT_TIMEZONE),
                   })
             }
           />
@@ -235,7 +236,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
 }
 
 function formatDateOrNever(date: Date | null, locale: string, neverLabel: string): string {
-  return date ? formatLongDate(date, locale) : neverLabel;
+  return date ? formatLongDate(date, locale, DEFAULT_TIMEZONE) : neverLabel;
 }
 
 function statusVariant(status: string): "default" | "secondary" | "outline" | "destructive" {

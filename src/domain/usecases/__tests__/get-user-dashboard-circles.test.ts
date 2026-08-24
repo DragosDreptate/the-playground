@@ -31,7 +31,7 @@ describe("GetUserDashboardCircles", () => {
           memberRole: "HOST",
           memberCount: 42,
           upcomingMomentCount: 3,
-          nextMoment: { title: "Weekly standup", startsAt: new Date("2026-03-01") },
+          nextMoment: { title: "Weekly standup", startsAt: new Date("2026-03-01"), timezone: "Europe/Paris" },
         }),
         makeDashboardCircle({
           id: "circle-2",
@@ -39,7 +39,7 @@ describe("GetUserDashboardCircles", () => {
           memberRole: "PLAYER",
           memberCount: 15,
           upcomingMomentCount: 1,
-          nextMoment: { title: "Design review", startsAt: new Date("2026-03-05") },
+          nextMoment: { title: "Design review", startsAt: new Date("2026-03-05"), timezone: "Europe/Paris" },
         }),
       ];
 
@@ -59,7 +59,7 @@ describe("GetUserDashboardCircles", () => {
           id: "circle-1",
           memberCount: 12,
           upcomingMomentCount: 4,
-          nextMoment: { title: "Prochain événement", startsAt: new Date("2026-03-10") },
+          nextMoment: { title: "Prochain événement", startsAt: new Date("2026-03-10"), timezone: "Europe/Paris" },
         }),
       ];
 
@@ -74,6 +74,7 @@ describe("GetUserDashboardCircles", () => {
       expect(result[0].nextMoment).toEqual({
         title: "Prochain événement",
         startsAt: new Date("2026-03-10"),
+        timezone: "Europe/Paris",
       });
     });
   });

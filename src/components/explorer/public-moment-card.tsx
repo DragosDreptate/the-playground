@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatTime, formatWeekdayAndDate, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
+import { formatTime, formatWeekdayAndDate, formatDayMonthShort, isSameDayInTimezone } from "@/lib/format-date";
+import { useVisitorTimezone } from "@/lib/use-visitor-timezone";
 import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
@@ -36,17 +37,24 @@ export function PublicMomentCard({ moment, isLast = false }: Props) {
   const gradient = getMomentGradient(moment.title);
 
   const startsAt = new Date(moment.startsAt);
-  const timeStr = formatTime(startsAt);
-  const { weekday, dateStr: columnDate } = formatWeekdayAndDate(startsAt, locale);
-  const columnDateShort = formatDayMonthShort(startsAt, locale);
-  // « Aujourd'hui » ancré sur Europe/Paris (cohérent avec la carte sœur de la page
-  // Communauté), pas sur le fuseau du navigateur. Calculé côté client après montage :
-  // la page Explorer est mise en cache (ISR), un calcul au render figerait le badge au
-  // snapshot et provoquerait un mismatch d'hydratation au passage de minuit.
+  // Fuseau du visiteur dès qu'il est connu, celui de l'événement en attendant. La page
+  // Explorer est servie en ISR : son HTML est partagé, il ne peut pas porter l'heure
+  // d'un visiteur donné. Voir ADR-0008.
+  const visitorTimezone = useVisitorTimezone();
+  const timezone = visitorTimezone ?? moment.timezone;
+
+  const timeStr = formatTime(startsAt, timezone);
+  const { weekday, dateStr: columnDate } = formatWeekdayAndDate(startsAt, locale, timezone);
+  const columnDateShort = formatDayMonthShort(startsAt, locale, timezone);
+  // « Aujourd'hui » suit le fuseau du VISITEUR (revirement assumé de la correction de
+  // juillet 2026, qui l'ancrait sur Europe/Paris — voir ADR-0008). Toujours calculé
+  // après montage : un calcul au render figerait le badge au snapshot ISR et
+  // provoquerait un mismatch d'hydratation au passage de minuit.
   const [isToday, setIsToday] = useState(false);
   useEffect(() => {
-    setIsToday(isSameDayInParis(startsAt, new Date()));
-  }, [startsAt]);
+    if (!visitorTimezone) return;
+    setIsToday(isSameDayInTimezone(startsAt, new Date(), visitorTimezone));
+  }, [startsAt, visitorTimezone]);
 
   const isOnline = moment.locationType === "ONLINE" || moment.locationType === "HYBRID";
   const locationLabel = isOnline

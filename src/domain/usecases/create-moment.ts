@@ -1,4 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
+import { DEFAULT_TIMEZONE, normalizeTimezone } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -6,6 +7,7 @@ import type { RegistrationRepository } from "@/domain/ports/repositories/registr
 import {
   MomentSlugAlreadyExistsError,
   MomentPastDateError,
+  InvalidTimezoneError,
   UnauthorizedMomentActionError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
@@ -23,6 +25,8 @@ type CreateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
+  /** Identifiant IANA. Omis → `DEFAULT_TIMEZONE`. */
+  timezone?: string;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -81,6 +85,14 @@ export async function createMoment(
     throw new MomentPastDateError();
   }
 
+  const submittedTimezone = input.timezone ?? DEFAULT_TIMEZONE;
+  // On persiste la forme CANONIQUE, pas celle reçue : la casse du navigateur finirait
+  // sinon telle quelle dans les emails (« heure de paris »).
+  const timezone = normalizeTimezone(submittedTimezone);
+  if (!timezone) {
+    throw new InvalidTimezoneError(submittedTimezone);
+  }
+
   let slug = generateSlug(input.title);
 
   if (await momentRepository.slugExists(slug)) {
@@ -102,6 +114,7 @@ export async function createMoment(
     coverImageAttribution: input.coverImageAttribution,
     startsAt: input.startsAt,
     endsAt: input.endsAt,
+    timezone,
     locationType: input.locationType,
     locationName: input.locationName,
     locationAddress: input.locationAddress,

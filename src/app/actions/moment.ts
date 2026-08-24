@@ -86,6 +86,9 @@ export async function createMomentAction(
   const description = formData.get("description") as string;
   const startsAtRaw = formData.get("startsAt") as string;
   const endsAtRaw = formData.get("endsAt") as string | null;
+  // Fuseau du navigateur de l'organisateur, soumis à la création uniquement. Absent
+  // (client sans JS, appel direct) → le usecase applique DEFAULT_TIMEZONE.
+  const timezone = (formData.get("timezone") as string) || undefined;
   const locationType = (formData.get("locationType") as LocationType) ?? "IN_PERSON";
   const locationName = (formData.get("locationName") as string) || null;
   const locationAddress = (formData.get("locationAddress") as string) || null;
@@ -132,6 +135,7 @@ export async function createMomentAction(
         ...coverData,
         startsAt,
         endsAt,
+        timezone,
         locationType,
         locationName,
         locationAddress,

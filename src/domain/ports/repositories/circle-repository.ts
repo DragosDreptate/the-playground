@@ -56,6 +56,7 @@ export type PublicCircle = {
   nextMoment: {
     title: string;
     startsAt: Date;
+    timezone: string;
   } | null;
   isDemo: boolean;
   explorerScore: number;

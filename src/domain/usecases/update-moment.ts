@@ -1,4 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
+import { normalizeTimezone } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -8,6 +9,7 @@ import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   MomentPastDateError,
+  InvalidTimezoneError,
   UnauthorizedMomentActionError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
@@ -25,6 +27,8 @@ type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  /** Identifiant IANA. Ignoré sur un événement PAST (liste blanche `safeInput`). */
+  timezone?: string;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;
@@ -81,7 +85,7 @@ export async function updateMoment(
   // protéger aussi les appels directs qui contourneraient le formulaire.
   // Liste blanche fail-closed : tout NOUVEAU champ de UpdateMomentInput rendu
   // éditable sur un événement passé doit être ajouté ici, sinon il sera ignoré.
-  const safeInput: UpdateMomentInput =
+  let safeInput: UpdateMomentInput =
     existing.status === "PAST"
       ? {
           momentId: input.momentId,
@@ -145,6 +149,14 @@ export async function updateMoment(
         });
       }
     }
+  }
+
+  if (safeInput.timezone !== undefined) {
+    const normalized = normalizeTimezone(safeInput.timezone);
+    if (!normalized) {
+      throw new InvalidTimezoneError(safeInput.timezone);
+    }
+    safeInput = { ...safeInput, timezone: normalized };
   }
 
   if (safeInput.startsAt !== undefined && safeInput.startsAt < new Date()) {

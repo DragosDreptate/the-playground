@@ -17,6 +17,7 @@ export {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
   MomentPastDateError,
+  InvalidTimezoneError,
   MomentAlreadyPublishedError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,

@@ -1,15 +1,16 @@
 /**
  * Date formatting utilities.
  *
- * All dates are formatted in the Europe/Paris timezone via `Intl.DateTimeFormat`,
- * ensuring consistency between server-side rendering (Vercel/UTC) and
- * client-side rendering (browser locale). Using an explicit timezone eliminates
- * SSR hydration mismatches.
+ * Chaque helper reçoit un fuseau **explicite** (identifiant IANA) : il n'y a plus de
+ * fuseau de plateforme codé en dur. Selon la surface, l'appelant passe le fuseau du
+ * VISITEUR (affichage web, via `useVisitorTimezone`) ou celui de l'ÉVÉNEMENT (rendus
+ * serveur sans visiteur : emails, image OG, et repli avant hydratation).
  *
- * For a France-first app, Europe/Paris is the appropriate default.
+ * Le paramètre est requis partout, pour qu'aucune surface ne retombe silencieusement
+ * sur un fuseau par défaut qui serait faux hors de France.
+ *
+ * Voir spec/decisions/0008-fuseau-horaire-affichage-visiteur.md
  */
-
-const TIMEZONE = "Europe/Paris";
 
 type IntlLocaleKey = "fr" | "en" | "ro" | "nl" | "es";
 const INTL_LOCALES: Record<IntlLocaleKey, string> = {
@@ -34,9 +35,9 @@ function normalizeShortMonthEn(formatted: string, locale: string): string {
 }
 
 /** "22:00" (toujours 24h, fuseau Europe/Paris) */
-export function formatTime(date: Date): string {
+export function formatTime(date: Date, timezone: string): string {
   const parts = new Intl.DateTimeFormat("fr-FR", {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -47,19 +48,19 @@ export function formatTime(date: Date): string {
 }
 
 /** Heure formatée selon la locale de l'utilisateur ("22:00" en FR/EN-GB, "10:00 PM" en EN-US) */
-export function formatLocalizedTime(date: Date, locale: string): string {
+export function formatLocalizedTime(date: Date, locale: string, timezone: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
 }
 
 /** "sam. 25 févr." / "Sat 25 Feb" */
-export function formatShortDate(date: Date, locale: string): string {
+export function formatShortDate(date: Date, locale: string, timezone: string): string {
   return normalizeShortMonthEn(
     new Intl.DateTimeFormat(toIntlLocale(locale), {
-      timeZone: TIMEZONE,
+      timeZone: timezone,
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -69,10 +70,10 @@ export function formatShortDate(date: Date, locale: string): string {
 }
 
 /** "25 févr." / "28 Feb" */
-export function formatDayMonth(date: Date, locale: string): string {
+export function formatDayMonth(date: Date, locale: string, timezone: string): string {
   return normalizeShortMonthEn(
     new Intl.DateTimeFormat(toIntlLocale(locale), {
-      timeZone: TIMEZONE,
+      timeZone: timezone,
       day: "numeric",
       month: "short",
     }).format(date),
@@ -86,11 +87,11 @@ export function formatDayMonth(date: Date, locale: string): string {
  * → "sep."). Les mois écrits en toutes lettres (mars, mai, juin, août) restent
  * intacts ; juillet reste "juil." (à "jui." il collisionnerait avec juin).
  */
-export function formatDayMonthShort(date: Date, locale: string): string {
+export function formatDayMonthShort(date: Date, locale: string, timezone: string): string {
   const intlLocale = toIntlLocale(locale);
-  const day = new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, day: "numeric" }).format(date);
+  const day = new Intl.DateTimeFormat(intlLocale, { timeZone: timezone, day: "numeric" }).format(date);
   const month = normalizeShortMonthEn(
-    new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, month: "short" }).format(date),
+    new Intl.DateTimeFormat(intlLocale, { timeZone: timezone, month: "short" }).format(date),
     locale,
   );
   // Mots complets (mars, mai, juin, août, EN « Sep »…) : laissés tels quels, sans point.
@@ -107,20 +108,21 @@ export function formatDayMonthShort(date: Date, locale: string): string {
 export function formatWeekdayAndDate(
   date: Date,
   locale: string,
+  timezone: string,
 ): { weekday: string; dateStr: string } {
   const intlLocale = toIntlLocale(locale);
   const weekday = new Intl.DateTimeFormat(intlLocale, {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     weekday: "short",
   }).format(date);
-  const dateStr = formatDayMonth(date, locale);
+  const dateStr = formatDayMonth(date, locale, timezone);
   return { weekday, dateStr };
 }
 
-/** Retourne true si deux dates tombent le même jour calendaire (fuseau Europe/Paris) */
-export function isSameDayInParis(a: Date, b: Date): boolean {
+/** Retourne true si deux dates tombent le même jour calendaire dans `timezone`. */
+export function isSameDayInTimezone(a: Date, b: Date, timezone: string): boolean {
   const fmt = new Intl.DateTimeFormat("fr-FR", {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -129,18 +131,18 @@ export function isSameDayInParis(a: Date, b: Date): boolean {
 }
 
 /** "mars 2025" / "March 2025" — utilisé pour les dates de type "Membre depuis" */
-export function formatMonthYear(date: Date, locale: string): string {
+export function formatMonthYear(date: Date, locale: string, timezone: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     month: "long",
     year: "numeric",
   }).format(date);
 }
 
 /** "25 février 2026" / "25 February 2026" */
-export function formatLongDate(date: Date, locale: string): string {
+export function formatLongDate(date: Date, locale: string, timezone: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -148,9 +150,9 @@ export function formatLongDate(date: Date, locale: string): string {
 }
 
 /** "mardi 21 avril" / "Tuesday 21 April" */
-export function formatLongDateWithWeekday(date: Date, locale: string): string {
+export function formatLongDateWithWeekday(date: Date, locale: string, timezone: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
+    timeZone: timezone,
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -162,13 +164,14 @@ export function formatDateRange(
   startsAt: Date,
   endsAt: Date | null,
   locale: string,
+  timezone: string,
 ): string {
-  const startDate = formatShortDate(startsAt, locale);
-  const startTime = formatTime(startsAt);
+  const startDate = formatShortDate(startsAt, locale, timezone);
+  const startTime = formatTime(startsAt, timezone);
   if (!endsAt) return `${startDate} · ${startTime}`;
-  const endTime = formatTime(endsAt);
-  if (!isSameDayInParis(startsAt, endsAt)) {
-    const endDate = formatShortDate(endsAt, locale);
+  const endTime = formatTime(endsAt, timezone);
+  if (!isSameDayInTimezone(startsAt, endsAt, timezone)) {
+    const endDate = formatShortDate(endsAt, locale, timezone);
     return `${startDate} – ${endDate} · ${startTime} – ${endTime}`;
   }
   return `${startDate} · ${startTime} – ${endTime}`;
@@ -178,10 +181,14 @@ export function formatDateRange(
  * Composantes typographiques utilisées par les og:image (date pill + meta) :
  * mois & jour pour la pill blanche, weekday + heure pour la ligne meta.
  * Tout en uppercase, sans le point final que `Intl` ajoute parfois en FR.
+ *
+ * L'image est générée côté serveur, sans visiteur : elle est rendue dans le fuseau
+ * de l'ÉVÉNEMENT, d'où le paramètre explicite. Voir ADR-0008.
  */
 export function formatOgDateBadge(
   date: Date,
   locale: string,
+  timezone: string,
 ): { month: string; day: string; weekday: string; time: string } {
   const intlLocale = toIntlLocale(locale);
   const stripDot = (s: string) => s.replace(/\.$/, "").toUpperCase();
@@ -189,23 +196,27 @@ export function formatOgDateBadge(
     month: stripDot(
       normalizeShortMonthEn(
         new Intl.DateTimeFormat(intlLocale, {
-          timeZone: TIMEZONE,
+          timeZone: timezone,
           month: "short",
         }).format(date),
         locale,
       ),
     ),
     day: new Intl.DateTimeFormat(intlLocale, {
-      timeZone: TIMEZONE,
+      timeZone: timezone,
       day: "numeric",
     }).format(date),
     weekday: stripDot(
       new Intl.DateTimeFormat(intlLocale, {
-        timeZone: TIMEZONE,
+        timeZone: timezone,
         weekday: "short",
       }).format(date),
     ),
-    time: formatLocalizedTime(date, locale),
+    time: new Intl.DateTimeFormat(intlLocale, {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date),
   };
 }
 
@@ -223,25 +234,26 @@ export function formatMomentDateTime(
   startsAt: Date,
   endsAt: Date | null,
   locale: string,
+  timezone: string,
 ): { line1: string; line2: string; isMultiDay: boolean } {
-  const startTime = formatLocalizedTime(startsAt, locale);
+  const startTime = formatLocalizedTime(startsAt, locale, timezone);
   if (!endsAt) {
     return {
-      line1: formatLongDateWithWeekday(startsAt, locale),
+      line1: formatLongDateWithWeekday(startsAt, locale, timezone),
       line2: startTime,
       isMultiDay: false,
     };
   }
-  const endTime = formatLocalizedTime(endsAt, locale);
-  if (!isSameDayInParis(startsAt, endsAt)) {
+  const endTime = formatLocalizedTime(endsAt, locale, timezone);
+  if (!isSameDayInTimezone(startsAt, endsAt, timezone)) {
     return {
-      line1: `${formatShortDate(startsAt, locale)} · ${startTime}`,
-      line2: `${formatShortDate(endsAt, locale)} · ${endTime}`,
+      line1: `${formatShortDate(startsAt, locale, timezone)} · ${startTime}`,
+      line2: `${formatShortDate(endsAt, locale, timezone)} · ${endTime}`,
       isMultiDay: true,
     };
   }
   return {
-    line1: formatLongDateWithWeekday(startsAt, locale),
+    line1: formatLongDateWithWeekday(startsAt, locale, timezone),
     line2: `${startTime} – ${endTime}`,
     isMultiDay: false,
   };

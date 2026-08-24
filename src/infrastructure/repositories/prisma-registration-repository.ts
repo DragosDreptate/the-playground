@@ -250,6 +250,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             coverImage: true,
             startsAt: true,
             endsAt: true,
+            timezone: true,
             status: true,
             locationType: true,
             locationName: true,
@@ -269,6 +270,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: r.moment.coverImage ?? null,
         startsAt: r.moment.startsAt,
         endsAt: r.moment.endsAt,
+        timezone: r.moment.timezone,
         status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
@@ -300,6 +302,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             coverImage: true,
             startsAt: true,
             endsAt: true,
+            timezone: true,
             status: true,
             locationType: true,
             locationName: true,
@@ -319,6 +322,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: r.moment.coverImage ?? null,
         startsAt: r.moment.startsAt,
         endsAt: r.moment.endsAt,
+        timezone: r.moment.timezone,
         status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
@@ -353,6 +357,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       mCoverImage: string | null;
       mStartsAt: Date;
       mEndsAt: Date | null;
+      mTimezone: string;
       mLocationType: string;
       mLocationName: string | null;
       mLocationAddress: string | null;
@@ -382,6 +387,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         m."coverImage"          AS "mCoverImage",
         m."startsAt"            AS "mStartsAt",
         m."endsAt"              AS "mEndsAt",
+        m.timezone              AS "mTimezone",
         m."locationType"        AS "mLocationType",
         m."locationName"        AS "mLocationName",
         m."locationAddress"     AS "mLocationAddress",
@@ -434,6 +440,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: row.mCoverImage,
         startsAt: row.mStartsAt,
         endsAt: row.mEndsAt,
+        timezone: row.mTimezone,
         status: row.mStatus as MomentStatus,
         locationType: row.mLocationType as LocationType,
         locationName: row.mLocationName,

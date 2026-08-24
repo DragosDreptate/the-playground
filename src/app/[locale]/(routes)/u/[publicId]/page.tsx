@@ -16,6 +16,7 @@ import { XIcon } from "@/components/icons/x-icon";
 import { CollapsibleList } from "@/components/collapsible-list";
 import { formatLongDate, formatMonthYear } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 export default async function UserPublicProfilePage({
   params,
@@ -51,7 +52,7 @@ export default async function UserPublicProfilePage({
     .join("")
     .toUpperCase();
 
-  const memberSince = formatMonthYear(user.memberSince, locale);
+  const memberSince = formatMonthYear(user.memberSince, locale, DEFAULT_TIMEZONE);
   const hasSocialLinks = !!(
     user.socialLinks.website ||
     user.socialLinks.linkedinUrl ||
@@ -224,7 +225,7 @@ export default async function UserPublicProfilePage({
                   <p className="text-xs text-muted-foreground truncate">{reg.circleName}</p>
                 </div>
                 <p className="text-xs text-muted-foreground shrink-0">
-                  {formatLongDate(reg.momentDate, locale)}
+                  {formatLongDate(reg.momentDate, locale, reg.momentTimezone)}
                 </p>
               </Link>
             ))}

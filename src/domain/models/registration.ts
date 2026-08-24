@@ -102,6 +102,7 @@ export type RegistrationWithMoment = Registration & {
     coverImage: string | null;
     startsAt: Date;
     endsAt: Date | null;
+    timezone: string;
     status: MomentStatus;
     locationType: LocationType;
     locationName: string | null;

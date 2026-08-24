@@ -9,7 +9,8 @@ import { MapPin, Globe, Clock, XCircle, type LucideIcon } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatTime, formatDayMonthShort, isSameDayInTimezone } from "@/lib/format-date";
+import { useVisitorTimezone } from "@/lib/use-visitor-timezone";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
@@ -49,6 +50,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         title: props.moment.title,
         coverImage: props.moment.coverImage,
         startsAt: props.moment.startsAt,
+        timezone: props.moment.timezone,
         status: props.moment.status,
         locationType: props.moment.locationType,
         locationName: props.moment.locationName,
@@ -64,6 +66,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         title: props.registration.moment.title,
         coverImage: props.registration.moment.coverImage,
         startsAt: props.registration.moment.startsAt,
+        timezone: props.registration.moment.timezone,
         status: props.registration.moment.status,
         locationType: props.registration.moment.locationType,
         locationName: props.registration.moment.locationName,
@@ -75,13 +78,19 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         topAttendees: props.registration.moment.topAttendees,
       };
 
-  // « Aujourd'hui » ancré sur Europe/Paris, pas sur le fuseau du navigateur. Calculé
-  // côté client après montage pour éviter tout mismatch d'hydratation si le HTML est
-  // servi après le passage de minuit.
+  // Fuseau du visiteur dès qu'il est connu, celui de l'événement en attendant.
+  const visitorTimezone = useVisitorTimezone();
+  const timezone = visitorTimezone ?? momentData.timezone;
+
+  // « Aujourd'hui » suit le fuseau du VISITEUR (revirement assumé de la correction de
+  // juillet 2026 qui l'ancrait sur Europe/Paris — voir ADR-0008). Toujours calculé
+  // après montage pour éviter tout mismatch d'hydratation si le HTML est servi après
+  // le passage de minuit.
   const [isToday, setIsToday] = useState(false);
   useEffect(() => {
-    setIsToday(isSameDayInParis(momentData.startsAt, new Date()));
-  }, [momentData.startsAt]);
+    if (!visitorTimezone) return;
+    setIsToday(isSameDayInTimezone(momentData.startsAt, new Date(), visitorTimezone));
+  }, [momentData.startsAt, visitorTimezone]);
 
   const isCancelled = momentData.status === "CANCELLED";
   const isOrganizer = !isOrganizerView && (props as ParticipantProps).isOrganizer === true;
@@ -112,9 +121,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
-  const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
-  const dateStrShort = formatDayMonthShort(momentData.startsAt, locale);
-  const timeStr = formatTime(momentData.startsAt);
+  const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale, timezone);
+  const dateStrShort = formatDayMonthShort(momentData.startsAt, locale, timezone);
+  const timeStr = formatTime(momentData.startsAt, timezone);
 
   // Repli sur l'adresse quand aucun lieu nommé n'est saisi, comme la timeline
   // de la page Communauté (moment-timeline-item).

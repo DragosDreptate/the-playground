@@ -122,5 +122,5 @@ export type DashboardCircle = CircleWithRole & {
   memberCount: number;
   upcomingMomentCount: number;
   topMembers: DashboardCircleMember[];
-  nextMoment: { title: string; startsAt: Date } | null;
+  nextMoment: { title: string; startsAt: Date; timezone: string } | null;
 };

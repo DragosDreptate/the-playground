@@ -6,6 +6,7 @@ import {
   PriceLockedError,
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
+  InvalidTimezoneError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -598,6 +599,63 @@ describe("UpdateMoment", () => {
           { momentRepository: momentRepo, circleRepository: circleRepo }
         )
       ).resolves.toBeDefined();
+    });
+  });
+
+  describe("given a timezone change", () => {
+    function setup(existing = makeMoment()) {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      return {
+        momentRepo,
+        deps: { momentRepository: momentRepo, circleRepository: circleRepo },
+      };
+    }
+
+    it("should persist a valid IANA timezone", async () => {
+      const { momentRepo, deps } = setup();
+
+      await updateMoment(
+        { momentId: "moment-1", userId: "user-1", timezone: "Europe/Dublin" },
+        deps
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({ timezone: "Europe/Dublin" })
+      );
+    });
+
+    it("should reject an unknown timezone and never persist", async () => {
+      const { momentRepo, deps } = setup();
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", timezone: "Europe/Atlantis" },
+          deps
+        )
+      ).rejects.toThrow(InvalidTimezoneError);
+      expect(momentRepo.update).not.toHaveBeenCalled();
+    });
+
+    // Le fuseau ne fait pas partie de la liste blanche `safeInput` : un événement
+    // terminé ne change plus d'horaire, et le rejouer fausserait les archives.
+    it("should silently ignore the timezone on a PAST Moment", async () => {
+      const { momentRepo, deps } = setup(makeMoment({ status: "PAST" }));
+
+      await updateMoment(
+        { momentId: "moment-1", userId: "user-1", timezone: "Europe/Dublin" },
+        deps
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.not.objectContaining({ timezone: expect.anything() })
+      );
     });
   });
 });

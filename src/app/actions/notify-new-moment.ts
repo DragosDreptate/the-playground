@@ -3,16 +3,19 @@
 import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
 
-const PLATFORM_TIMEZONE = "Europe/Paris";
 import { prismaCircleRepository, prismaUserRepository } from "@/infrastructure/repositories";
+import { formatTimezoneMention } from "@/lib/timezone";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { Moment } from "@/domain/models/moment";
 import type { NewMomentNotificationStrings } from "@/domain/ports/services/email-service";
 
 const emailService = createResendEmailService();
 
+// Notification serveur (email membres + Slack) : pas de visiteur, donc heure de
+// l'événement avec sa mention. Voir ADR-0008.
 function formatMomentDate(moment: Moment): string {
-  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  const time = formatInTimeZone(moment.startsAt, moment.timezone, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  return `${time} (${formatTimezoneMention(moment.timezone, "fr")})`;
 }
 
 function formatMomentLocation(moment: Moment): string {
@@ -25,11 +28,11 @@ function formatMomentLocation(moment: Moment): string {
 }
 
 function formatMomentDateMonth(moment: Moment): string {
-  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: fr }).toUpperCase();
+  return formatInTimeZone(moment.startsAt, moment.timezone, "MMM", { locale: fr }).toUpperCase();
 }
 
 function formatMomentDateDay(moment: Moment): string {
-  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
+  return formatInTimeZone(moment.startsAt, moment.timezone, "d");
 }
 
 function buildMemberStrings(circleName: string): NewMomentNotificationStrings {

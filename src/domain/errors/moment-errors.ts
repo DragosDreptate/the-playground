@@ -32,6 +32,14 @@ export class MomentPastDateError extends DomainError {
   }
 }
 
+export class InvalidTimezoneError extends DomainError {
+  readonly code = "INVALID_TIMEZONE";
+
+  constructor(timezone: string) {
+    super(`Unknown IANA time zone identifier: ${timezone}`);
+  }
+}
+
 export class MomentAlreadyPublishedError extends DomainError {
   readonly code = "MOMENT_ALREADY_PUBLISHED";
 

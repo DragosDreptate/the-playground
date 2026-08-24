@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatDayMonthShort, formatTime, isSameDayInParis } from "@/lib/format-date";
+import { LocalTime, LocalTimelineDateColumn } from "@/components/moments/local-date-parts";
 import { MapPin, Globe, Clock, XCircle } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, TimelineScaffold, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -63,11 +63,6 @@ export async function MomentTimelineItem({
         : "border-border";
 
   const gradient = getMomentGradient(moment.title);
-  const now = new Date();
-  const isToday = isSameDayInParis(moment.startsAt, now);
-  const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
-  const dateStrShort = formatDayMonthShort(moment.startsAt, locale);
-  const timeStr = formatTime(moment.startsAt);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -102,25 +97,12 @@ export async function MomentTimelineItem({
       isLast={isLast}
       cardPadding="pl-1 sm:pl-4"
       dateColumn={
-        <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
-          {isToday ? (
-            <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
-              <span className="hidden sm:inline">{tCircle("detail.today")}</span>
-            </span>
-          ) : (
-            <>
-              <p className="text-muted-foreground text-xs">{weekday}</p>
-              <p className="text-sm font-medium leading-snug">
-                <span className="sm:hidden">{dateStrShort}</span>
-                <span className="hidden sm:inline">{dateStr}</span>
-              </p>
-            </>
-          )}
-          <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-            {timeStr}
-          </p>
-        </div>
+        <LocalTimelineDateColumn
+          startsAt={moment.startsAt}
+          eventTimezone={moment.timezone}
+          locale={locale}
+          isPast={isPast}
+        />
       }
     >
       <Link
@@ -209,7 +191,11 @@ export async function MomentTimelineItem({
                 >
                   <span className="flex shrink-0 items-center gap-1.5">
                     <IconPill icon={Clock} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
-                    {timeStr}
+                    <LocalTime
+                      startsAt={moment.startsAt}
+                      eventTimezone={moment.timezone}
+                      locale={locale}
+                    />
                   </span>
                   {locationLabel && (
                     <span className="flex min-w-0 items-center gap-1.5">

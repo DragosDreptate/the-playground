@@ -49,6 +49,7 @@ export type PublicMomentRegistration = {
   momentSlug: string;
   momentTitle: string;
   momentDate: Date;
+  momentTimezone: string;
   circleName: string;
 };
 
