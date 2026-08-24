@@ -104,11 +104,35 @@ for (const { name, launcher } of ENGINES) {
       expect(first).toBe(second);
     });
 
+    // On ne compare pas « la première heure » des deux listes : la page Communauté
+    // est partagée par une dizaine d'autres specs, dont plusieurs y créent et
+    // suppriment des événements. Entre deux lectures, `.first()` peut désigner deux
+    // événements différents — c'est ce qui rendait ce test instable en CI, où toute
+    // la suite tourne en parallèle, alors qu'il passait en local isolé.
+    // On vérifie donc que l'heure lue sur la page de l'événement (isolée, stable) se
+    // retrouve dans la timeline, ce qui ne dépend ni de l'ordre ni du nombre.
     test("should shift the Circle timeline too, not only the event page", async () => {
-      const dublin = await readTimeFrom(browser, CIRCLE_URL, "Europe/Dublin");
-      const paris = await readTimeFrom(browser, CIRCLE_URL, "Europe/Paris");
+      for (const timezoneId of ["Europe/Dublin", "Europe/Paris"]) {
+        const expected = await readTimeFrom(browser, MOMENT_URL, timezoneId);
 
-      expect(minutesApart(paris, dublin)).toBe(60);
+        const context = await browser.newContext({ timezoneId });
+        try {
+          const page = await context.newPage();
+          await page.goto(CIRCLE_URL);
+          const hhmm = `${String(Math.floor(expected / 60)).padStart(2, "0")}:${String(
+            expected % 60,
+          ).padStart(2, "0")}`;
+
+          await expect(
+            page
+              .locator(`time[data-timezone="${timezoneId}"]:visible`)
+              .filter({ hasText: hhmm })
+              .first(),
+          ).toBeVisible({ timeout: 30_000 });
+        } finally {
+          await context.close();
+        }
+      }
     });
 
     test("should serve the event's own timezone before hydration", async () => {
