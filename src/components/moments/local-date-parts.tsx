@@ -116,7 +116,13 @@ export function LocalMomentDateTime({
     <>
       <p className={line1ClassName}>{line1}</p>
       <p className={isMultiDay ? line2MultiDayClassName : line2ClassName}>
-        <time dateTime={startsAt.toISOString()} data-timezone={timezone}>
+        {/* Sur un événement multi-jours, la ligne 2 porte la date et l'heure de FIN :
+            l'attribut doit suivre, sinon un lecteur d'écran annonce le début pour un
+            texte qui affiche la fin. */}
+        <time
+          dateTime={(isMultiDay && endsAt ? endsAt : startsAt).toISOString()}
+          data-timezone={timezone}
+        >
           {line2}
         </time>
       </p>

@@ -6,6 +6,7 @@ import {
 } from "@/infrastructure/repositories";
 import type { DashboardCircle } from "@/domain/models/circle";
 import type { HostMomentSummary } from "@/domain/models/moment";
+import { DEFAULT_TIMEZONE } from "@/domain/models/moment";
 
 /**
  * TTL du cache dashboard : 60s.
@@ -79,7 +80,15 @@ export function deserializeDashboardCircle(c: SerializedDashboardCircle): Dashbo
     createdAt: new Date(c.createdAt),
     updatedAt: new Date(c.updatedAt),
     nextMoment: c.nextMoment
-      ? { ...c.nextMoment, startsAt: new Date(c.nextMoment.startsAt) }
+      ? {
+          ...c.nextMoment,
+          startsAt: new Date(c.nextMoment.startsAt),
+          // Les entrées écrites avant l'introduction du champ n'ont pas de fuseau, et
+          // le type ne les décrit pas : sans ce repli, `formatDayMonth` recevrait
+          // `undefined` et retomberait sur le fuseau du process (UTC en production)
+          // pendant toute la durée de vie du cache qui suit un déploiement.
+          timezone: c.nextMoment.timezone ?? DEFAULT_TIMEZONE,
+        }
       : null,
   };
 }
@@ -140,6 +149,9 @@ export function deserializeHostMoment(m: SerializedHostMomentSummary): HostMomen
     ...m,
     startsAt: new Date(m.startsAt),
     endsAt: m.endsAt ? new Date(m.endsAt) : null,
+    // Même repli que pour `nextMoment` : une entrée écrite avant l'introduction du
+    // champ n'a pas de fuseau, et le type ne le laisse pas voir.
+    timezone: m.timezone ?? DEFAULT_TIMEZONE,
   };
 }
 

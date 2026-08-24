@@ -401,6 +401,28 @@ describe("CreateMoment", () => {
       );
     });
 
+    it("should persist the canonical form, not the casing the browser sent", async () => {
+      const { momentRepo, deps } = setup();
+
+      await createMoment({ ...defaultInput, timezone: "europe/dublin" }, deps);
+
+      // Sans canonisation, « heure de dublin » partirait dans tous les emails.
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ timezone: "Europe/Dublin" })
+      );
+    });
+
+    it("should reject a bare UTC offset, which carries no DST rules", async () => {
+      const { momentRepo, deps } = setup();
+
+      // `Intl` accepte « +01:00 », mais ce n'est pas une zone : elle ne sait pas
+      // passer à l'heure d'été, et donnerait « heure de +01:00 » dans un email.
+      await expect(
+        createMoment({ ...defaultInput, timezone: "+01:00" }, deps)
+      ).rejects.toThrow(InvalidTimezoneError);
+      expect(momentRepo.create).not.toHaveBeenCalled();
+    });
+
     it.each(["Europe/Atlantis", "GMT+1", "", "Paris"])(
       "should reject %s and never persist the Moment",
       async (timezone) => {

@@ -16,20 +16,37 @@ export type MomentTopAttendee = { user: UserAvatarInfo };
 export const DEFAULT_TIMEZONE = "Europe/Paris";
 
 /**
- * Valide un identifiant de fuseau IANA.
+ * Normalise un identifiant de fuseau, ou renvoie `null` s'il est inutilisable.
  *
- * On s'appuie sur `Intl.DateTimeFormat`, qui lève une `RangeError` sur un fuseau
- * inconnu, plutôt que sur `Intl.supportedValuesOf("timeZone")` : cette dernière
- * omet les alias historiques encore émis par certains navigateurs (« Asia/Calcutta »,
- * « Europe/Kiev »), qui sont pourtant valides.
+ * On s'appuie sur `Intl.DateTimeFormat` plutôt que sur `Intl.supportedValuesOf`,
+ * qui omet les alias historiques encore émis par certains navigateurs
+ * (« Asia/Calcutta », « Europe/Kiev ») et pourtant parfaitement valides.
+ *
+ * Deux traitements en plus de la validation :
+ *
+ * 1. **Canonisation de la casse** — `Intl` accepte « europe/paris » et renvoie
+ *    « Europe/Paris ». Sans cette étape, la casse d'origine finirait telle quelle
+ *    dans les emails (« heure de paris »).
+ * 2. **Rejet des décalages bruts** — `Intl` accepte aussi « +01:00 », qui n'est pas
+ *    une zone : il ne porte pas les règles d'heure d'été et produirait
+ *    « heure de +01:00 » dans un email. On exige donc une forme `Région/Ville`,
+ *    `UTC` étant le seul identifiant sans barre oblique qu'on accepte.
  */
-export function isValidTimezone(timezone: string): boolean {
+export function normalizeTimezone(timezone: string): string | null {
+  let canonical: string;
   try {
-    new Intl.DateTimeFormat("en", { timeZone: timezone });
-    return true;
+    canonical = new Intl.DateTimeFormat("en", { timeZone: timezone }).resolvedOptions()
+      .timeZone;
   } catch {
-    return false;
+    return null;
   }
+  if (canonical === "UTC") return canonical;
+  return canonical.includes("/") ? canonical : null;
+}
+
+/** Vrai si l'identifiant est un fuseau exploitable. Voir `normalizeTimezone`. */
+export function isValidTimezone(timezone: string): boolean {
+  return normalizeTimezone(timezone) !== null;
 }
 
 export type HostMomentSummary = {

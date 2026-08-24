@@ -1,5 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
-import { DEFAULT_TIMEZONE, isValidTimezone } from "@/domain/models/moment";
+import { DEFAULT_TIMEZONE, normalizeTimezone } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -85,9 +85,12 @@ export async function createMoment(
     throw new MomentPastDateError();
   }
 
-  const timezone = input.timezone ?? DEFAULT_TIMEZONE;
-  if (!isValidTimezone(timezone)) {
-    throw new InvalidTimezoneError(timezone);
+  const submittedTimezone = input.timezone ?? DEFAULT_TIMEZONE;
+  // On persiste la forme CANONIQUE, pas celle reçue : la casse du navigateur finirait
+  // sinon telle quelle dans les emails (« heure de paris »).
+  const timezone = normalizeTimezone(submittedTimezone);
+  if (!timezone) {
+    throw new InvalidTimezoneError(submittedTimezone);
   }
 
   let slug = generateSlug(input.title);

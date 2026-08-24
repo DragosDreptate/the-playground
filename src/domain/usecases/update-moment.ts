@@ -1,5 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
-import { isValidTimezone } from "@/domain/models/moment";
+import { normalizeTimezone } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -85,7 +85,7 @@ export async function updateMoment(
   // protéger aussi les appels directs qui contourneraient le formulaire.
   // Liste blanche fail-closed : tout NOUVEAU champ de UpdateMomentInput rendu
   // éditable sur un événement passé doit être ajouté ici, sinon il sera ignoré.
-  const safeInput: UpdateMomentInput =
+  let safeInput: UpdateMomentInput =
     existing.status === "PAST"
       ? {
           momentId: input.momentId,
@@ -151,8 +151,12 @@ export async function updateMoment(
     }
   }
 
-  if (safeInput.timezone !== undefined && !isValidTimezone(safeInput.timezone)) {
-    throw new InvalidTimezoneError(safeInput.timezone);
+  if (safeInput.timezone !== undefined) {
+    const normalized = normalizeTimezone(safeInput.timezone);
+    if (!normalized) {
+      throw new InvalidTimezoneError(safeInput.timezone);
+    }
+    safeInput = { ...safeInput, timezone: normalized };
   }
 
   if (safeInput.startsAt !== undefined && safeInput.startsAt < new Date()) {

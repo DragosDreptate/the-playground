@@ -21,7 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { generateTimeOptions, combineDateAndTime } from "@/lib/time-options";
+import {
+  generateTimeOptions,
+  combineDateAndTime,
+  extractTime,
+  extractDatePart,
+} from "@/lib/time-options";
 import { getTimezoneCityLabel } from "@/lib/timezone";
 
 type MomentFormDateCardProps = {
@@ -64,24 +69,30 @@ export function MomentFormDateCard({
     return end <= start;
   }, [startDate, startTime, endDate, endTime, timezone]);
 
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
+  // « Aujourd'hui » et « maintenant » sont évalués dans le fuseau de l'ÉVÉNEMENT, le
+  // même que `startDate` et `startTime`. Les comparer à l'heure du navigateur revient
+  // à confronter deux référentiels différents : un organisateur éditant depuis un
+  // autre fuseau verrait son créneau jugé « passé », et l'effet ci-dessous
+  // réécrirait son heure de début à la simple ouverture du formulaire.
+  const today = useMemo(
+    () => extractDatePart(new Date(), timezone),
+    [timezone],
+  );
 
-  const isStartToday =
-    startDate?.toDateString() === new Date().toDateString();
+  // Comparaison par jour civil, pas par instant : le calendrier ne garantit pas que
+  // la Date sélectionnée soit exactement minuit, et l'ancien `toDateString()` était
+  // tolérant sur ce point.
+  const isStartToday = !!startDate && dayOf(startDate) === dayOf(today);
 
   const filteredStartTimeOptions = useMemo(() => {
     if (!isStartToday) return timeOptions;
-    const now = new Date();
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const [nowH, nowM] = extractTime(new Date(), timezone).split(":").map(Number);
+    const nowMinutes = nowH * 60 + nowM;
     return timeOptions.filter(({ value }) => {
       const [h, m] = value.split(":").map(Number);
       return h * 60 + m > nowMinutes;
     });
-  }, [isStartToday, timeOptions]);
+  }, [isStartToday, timeOptions, timezone]);
 
   useEffect(() => {
     if (!isStartToday || filteredStartTimeOptions.length === 0) return;
