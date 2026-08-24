@@ -326,16 +326,26 @@ test.describe("Flux Host — publication directe d'un Moment (mobile)", () => {
 
   test("should NOT show the 'Publier' button on mobile viewport", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
+    // La locale par défaut est masquée dans l'URL : `/fr/...` redirige vers `/...`.
+    // Le temps de cette redirection, l'ancienne et la nouvelle page coexistent dans
+    // le DOM, et une assertion stricte voit alors DEUX fois le même bouton — d'où un
+    // « strict mode violation » qui n'a rien à voir avec le rendu. On attend donc
+    // l'URL finale avant d'asserter.
+    await page.waitForURL(/\/dashboard\/circles\/[^/]+\/moments\/new$/);
 
+    // `.first()` — convention du repo quand un élément peut apparaître en double le
+    // temps d'une transition de page (cf. les 2 <main> de la page Moment, les 2 <h1>
+    // de la page Circle). Sans lui, l'assertion stricte échoue sur la duplication
+    // transitoire décrite ci-dessus, pas sur le rendu qu'on veut vérifier.
     // Le bouton draft (primary) doit rester visible
     await expect(
-      page.locator("button[name='intent'][value='draft']")
+      page.locator("button[name='intent'][value='draft']").first()
     ).toBeVisible();
 
     // Le bouton publish est rendu dans le DOM (React monte le composant) mais
     // Tailwind lui applique `hidden` par défaut → Playwright le voit comme non-visible
     await expect(
-      page.locator("button[name='intent'][value='publish']")
+      page.locator("button[name='intent'][value='publish']").first()
     ).toBeHidden();
   });
 });
