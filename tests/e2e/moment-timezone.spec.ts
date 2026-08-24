@@ -47,7 +47,10 @@ async function readTimeInMinutes(page: Page, timezone: string): Promise<number> 
     .locator(`time[data-timezone="${timezone}"]:visible`)
     .filter({ hasText: /\d{1,2}:\d{2}/ })
     .first();
-  await expect(dated).toBeVisible();
+  // Timeout généreux et explicite : on attend une HYDRATATION, pas un simple rendu.
+  // Sur le build de production d'un runner CI partagé, elle est nettement plus lente
+  // qu'en dev local, et le défaut d'`expect` ne suffit pas.
+  await expect(dated).toBeVisible({ timeout: 30_000 });
   const text = await dated.innerText();
   const match = text.match(/\b(\d{1,2}):(\d{2})\b/);
   expect(match, `aucune heure "HH:MM" dans "${text}"`).not.toBeNull();
