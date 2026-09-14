@@ -505,13 +505,17 @@ export function CoverImagePicker({
               />
 
               {uploadPreview ? (
-                <div className="relative overflow-hidden rounded-xl">
+                <div className="relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-xl">
+                  {/* Aperçu carré : le fichier a déjà été recadré en 1:1 par
+                      resizeImage(), on l'affiche donc dans le même ratio que la
+                      vignette de couverture pour montrer le rendu final. La
+                      largeur est plafonnée pour que le footer du dialog (bouton
+                      « Appliquer ») reste visible sur les écrans peu hauts. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadPreview}
                     alt={t("previewAlt")}
-                    className="w-full rounded-xl object-cover"
-                    style={{ maxHeight: 200 }}
+                    className="size-full object-cover"
                   />
                   <button
                     type="button"
