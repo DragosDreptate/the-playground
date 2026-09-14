@@ -13,7 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import type { CoverImageAttribution } from "@/domain/models/circle";
 import type { UnsplashPhoto } from "@/app/api/unsplash/search/route";
 import { resizeImage } from "@/lib/image-resize";
@@ -505,13 +505,22 @@ export function CoverImagePicker({
               />
 
               {uploadPreview ? (
-                <div className="relative overflow-hidden rounded-xl">
+                <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-xl sm:max-w-[200px]">
+                  {/* Aperçu carré : le fichier a déjà été recadré en 1:1 par
+                      resizeImage(), on l'affiche donc dans le même ratio et sur
+                      le même fond (COVER_IMAGE_BG) que la couverture publiée —
+                      sans ce fond, un PNG transparent s'afficherait ici sur le
+                      fond du dialog et autrement une fois publié.
+                      Le plafond de largeur est réservé au desktop, où le dialog
+                      ne défile pas (sm:overflow-hidden) : un aperçu pleine
+                      largeur y repousserait le bouton « Appliquer » hors écran.
+                      Sur mobile le dialog est plein écran et défile, donc
+                      l'aperçu occupe toute la largeur disponible. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadPreview}
                     alt={t("previewAlt")}
-                    className="w-full rounded-xl object-cover"
-                    style={{ maxHeight: 200 }}
+                    className={`size-full object-cover ${COVER_IMAGE_BG}`}
                   />
                   <button
                     type="button"

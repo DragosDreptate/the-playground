@@ -419,6 +419,25 @@ async function main() {
       },
     });
 
+    // Remise à zéro des adhésions avant de réécrire l'état attendu.
+    //
+    // Les upserts seuls ne suffisent pas : ils rétablissent les adhésions que
+    // le seed connaît, mais laissent intactes celles que les TESTS ont créées
+    // (une demande d'adhésion PENDING sur test-approval-circle, par exemple).
+    // Au run suivant, le Participant a déjà une demande en cours et le CTA
+    // « soumis à validation » ne s'affiche plus : les tests d'approbation
+    // échouent alors de façon déterministe, sans qu'aucune ligne de code
+    // applicatif n'ait changé.
+    //
+    // Le piège est d'autant plus vicieux que la base `dev` sert à la fois de
+    // base de développement locale ET de parent aux branches Neon éphémères
+    // du CI (ci.yml, `parent: dev`) : un simple `pnpm test:e2e` lancé en local
+    // laisse une trace qui casse le CI de tout le monde au run suivant.
+    //
+    // Tout est supprimé puis recréé juste en dessous, ce qui rend l'état final
+    // déterministe quel que soit ce qui précède.
+    await prisma.circleMembership.deleteMany({ where: { circleId: circle.id } });
+
     // Host membership
     await prisma.circleMembership.upsert({
       where: { userId_circleId: { userId: userMap["host"], circleId: circle.id } },
@@ -466,6 +485,15 @@ async function main() {
         },
       });
       console.log(`  📅 ${momentData.status === "PAST" ? "↩" : "→"} ${momentData.title}`);
+
+      // Même remise à zéro que pour les adhésions, et pour la même raison :
+      // les tests d'approbation laissent des inscriptions PENDING_APPROVAL
+      // derrière eux, que les upserts ci-dessous ne rattrapent pas puisqu'ils
+      // ne connaissent que les inscriptions prévues par le seed. Un Participant
+      // déjà inscrit ne voit plus le CTA d'inscription, et le test échoue.
+      // Les trois catégories (normales, payées, liste d'attente) sont toutes
+      // recréées juste en dessous.
+      await prisma.registration.deleteMany({ where: { momentId: moment.id } });
 
       // Registrations
       for (const userKey of momentData.registrations) {
