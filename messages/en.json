@@ -636,6 +636,9 @@
       "cancelRefundableInfo": "You will be refunded automatically within 5 to 10 business days.",
       "cancelNonRefundableWarning": "This event is non-refundable. You will not be refunded.",
       "confirmCancel": "Yes, cancel",
+      "checkoutUnavailableTitle": "Payment is not available yet",
+      "checkoutErrorTitle": "Unable to join",
+      "checkoutErrorDescription": "Your registration could not be completed. Please try again in a moment.",
       "spotsRemaining": "{count} spots remaining",
       "signInToRegister": "Sign in to join",
       "registrantsCount": "{count} joined",
@@ -775,7 +778,9 @@
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Cannot make this event paid: members are already registered.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Paid events cannot require registration approval.",
       "MOMENT_SLUG_EXISTS": "An event with a similar title already exists.",
-      "INTERNAL_ERROR": "An unexpected error occurred."
+      "INTERNAL_ERROR": "An unexpected error occurred.",
+      "STRIPE_CONNECT_NOT_ACTIVE": "The organizer has not finished setting up payments for this event. You will be able to join as soon as that is done. If the event is coming up soon, reach out to them directly.",
+      "UNAUTHORIZED": "Your session has expired. Sign in again to complete your registration."
     }
   },
   "CircleCategory": {

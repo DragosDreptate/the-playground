@@ -636,6 +636,9 @@
       "cancelRefundableInfo": "Vous serez remboursé automatiquement sous 5 à 10 jours.",
       "cancelNonRefundableWarning": "Cet événement n'est pas remboursable. Vous ne serez pas remboursé.",
       "confirmCancel": "Oui, annuler",
+      "checkoutUnavailableTitle": "Paiement indisponible pour le moment",
+      "checkoutErrorTitle": "Inscription impossible",
+      "checkoutErrorDescription": "Votre inscription n'a pas pu aboutir. Réessayez dans un instant.",
       "spotsRemaining": "{count} places restantes",
       "signInToRegister": "Se connecter pour s'inscrire",
       "registrantsCount": "{count} inscrits",
@@ -775,7 +778,9 @@
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des participants sont déjà inscrits.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Les événements payants ne peuvent pas avoir la validation des inscriptions.",
       "MOMENT_SLUG_EXISTS": "Un événement avec un titre similaire existe déjà.",
-      "INTERNAL_ERROR": "Une erreur inattendue est survenue."
+      "INTERNAL_ERROR": "Une erreur inattendue est survenue.",
+      "STRIPE_CONNECT_NOT_ACTIVE": "L'organisateur n'a pas encore terminé l'activation des paiements pour cet événement. L'inscription sera possible dès que ce sera fait. Si l'événement approche, contactez-le directement.",
+      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous pour finaliser votre inscription."
     }
   },
   "CircleCategory": {

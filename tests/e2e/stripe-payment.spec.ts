@@ -43,6 +43,33 @@ test.describe("Événement payant — CTA avec prix", () => {
   });
 });
 
+// ── Échec du paiement — modale d'erreur ──────────────────────────────────────
+
+test.describe("Événement payant — échec du checkout", () => {
+  // PLAYER3 n'est inscrit à aucun événement payant : il voit le CTA. Le seed
+  // pointe sur un compte Stripe factice, donc l'ouverture du paiement échoue
+  // toujours — ce qui est précisément le cas à couvrir : le participant doit
+  // recevoir une modale lisible, jamais le message technique du domaine.
+  test.use({ storageState: AUTH.PLAYER3 });
+
+  test("should surface a readable modal instead of the raw domain error", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    const main = page.locator("main").first();
+    await main.locator("button", { hasText: /S'inscrire.*EUR/i }).click();
+
+    const dialog = page.locator('[role="alertdialog"]');
+    await expect(dialog).toBeVisible({ timeout: 15000 });
+    await expect(
+      dialog.getByText(/Inscription impossible|Paiement indisponible pour le moment/)
+    ).toBeVisible();
+    // Aucune fuite du message technique levé par le domaine
+    await expect(dialog).not.toContainText(/Stripe Connect is not active|circle c[a-z0-9]{20,}/i);
+
+    await dialog.getByRole("button", { name: "Fermer" }).click();
+    await expect(dialog).toBeHidden();
+  });
+});
+
 // ── Non authentifié — pas de prix dans le bouton ─────────────────────────────
 
 test.describe("Événement payant — non authentifié", () => {

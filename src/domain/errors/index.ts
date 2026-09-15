@@ -56,6 +56,7 @@ export {
 } from "./registration-errors";
 export { AdminUnauthorizedError } from "./admin-errors";
 export {
+  STRIPE_ERROR_CODES,
   StripeConnectNotActiveError,
   StripeConnectAlreadyActiveError,
 } from "./stripe-errors";
