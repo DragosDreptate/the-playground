@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import {
   cancelRegistrationAction,
 } from "@/app/actions/registration";
 import { createCheckoutAction } from "@/app/actions/checkout";
+import { STRIPE_ERROR_CODES } from "@/domain/errors";
 import { handleOnboardingRequired } from "@/lib/onboarding";
 import { canAutoJoin } from "@/lib/auto-join";
 import { useAutoJoin } from "@/components/auth/use-auto-join";
@@ -80,10 +81,19 @@ export function RegistrationButton({
   const [error, setError] = useState<string | null>(null);
   // Échec de l'ouverture du paiement : porté par une modale plutôt qu'un encart
   // sous le CTA. On garde le code d'erreur, pas le texte — le message est dérivé
-  // au rendu. Sans ce mapping, le participant lirait l'erreur technique brute
-  // remontée par le domaine.
+  // au rendu via `Moment.errors.<CODE>`, comme dans moment-form. Sans ce mapping,
+  // le participant lirait l'erreur technique brute remontée par le domaine.
   const [checkoutErrorCode, setCheckoutErrorCode] = useState<string | null>(null);
-  const paymentsUnavailable = checkoutErrorCode === "STRIPE_CONNECT_NOT_ACTIVE";
+  const paymentsUnavailable =
+    checkoutErrorCode === STRIPE_ERROR_CODES.ConnectNotActive;
+  // Code émis par l'action elle-même quand la session a expiré côté serveur
+  // (cf. src/app/actions/checkout.ts) : fermer la modale ne débloquerait rien,
+  // la sortie est de se reconnecter.
+  const sessionExpired = checkoutErrorCode === "UNAUTHORIZED";
+  const checkoutErrorKey = `errors.${checkoutErrorCode}`;
+  // Le CTA garde le focus à la fermeture : la modale est ouverte par code, sans
+  // AlertDialogTrigger, et sur WebKit un bouton cliqué n'est pas l'élément actif.
+  const payButtonRef = useRef<HTMLButtonElement>(null);
 
   // Inscription gratuite (le chemin payant passe par Stripe, cf. plus bas).
   // Partagé par le clic et l'auto-inscription post-auth.
@@ -190,6 +200,7 @@ export function RegistrationButton({
     return (
       <>
         <Button
+          ref={payButtonRef}
           className="w-full"
           size="sm"
           disabled={isPending}
@@ -223,7 +234,12 @@ export function RegistrationButton({
             if (!open) setCheckoutErrorCode(null);
           }}
         >
-          <AlertDialogContent>
+          <AlertDialogContent
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              payButtonRef.current?.focus();
+            }}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle>
                 {t(
@@ -233,15 +249,19 @@ export function RegistrationButton({
                 )}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                {t(
-                  paymentsUnavailable
-                    ? "public.checkoutUnavailableDescription"
-                    : "public.checkoutErrorDescription"
-                )}
+                {t.has(checkoutErrorKey)
+                  ? t(checkoutErrorKey)
+                  : t("public.checkoutErrorDescription")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>{tCommon("close")}</AlertDialogCancel>
+              {sessionExpired ? (
+                <AlertDialogAction asChild>
+                  <a href={signInUrl}>{t("public.signInToRegister")}</a>
+                </AlertDialogAction>
+              ) : (
+                <AlertDialogCancel>{tCommon("close")}</AlertDialogCancel>
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
