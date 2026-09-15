@@ -78,6 +78,12 @@ export function RegistrationButton({
     existingRegistration?.id ?? null
   );
   const [error, setError] = useState<string | null>(null);
+  // Échec de l'ouverture du paiement : porté par une modale plutôt qu'un encart
+  // sous le CTA. On garde le code d'erreur, pas le texte — le message est dérivé
+  // au rendu. Sans ce mapping, le participant lirait l'erreur technique brute
+  // remontée par le domaine.
+  const [checkoutErrorCode, setCheckoutErrorCode] = useState<string | null>(null);
+  const paymentsUnavailable = checkoutErrorCode === "STRIPE_CONNECT_NOT_ACTIVE";
 
   // Inscription gratuite (le chemin payant passe par Stripe, cf. plus bas).
   // Partagé par le clic et l'auto-inscription post-auth.
@@ -182,7 +188,7 @@ export function RegistrationButton({
     }
 
     return (
-      <div className="space-y-2">
+      <>
         <Button
           className="w-full"
           size="sm"
@@ -190,7 +196,6 @@ export function RegistrationButton({
           onClick={() => {
             captureRegisterIntent(true);
             startTransition(async () => {
-              setError(null);
               const baseUrl = window.location.origin;
               const result = await createCheckoutAction(
                 momentId,
@@ -200,7 +205,7 @@ export function RegistrationButton({
               if (result.success) {
                 window.location.href = result.data.url;
               } else {
-                setError(result.error);
+                setCheckoutErrorCode(result.code);
               }
             });
           }}
@@ -212,12 +217,35 @@ export function RegistrationButton({
                 currency,
               })}
         </Button>
-        {error && (
-          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-            {error}
-          </div>
-        )}
-      </div>
+        <AlertDialog
+          open={checkoutErrorCode !== null}
+          onOpenChange={(open) => {
+            if (!open) setCheckoutErrorCode(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t(
+                  paymentsUnavailable
+                    ? "public.checkoutUnavailableTitle"
+                    : "public.checkoutErrorTitle"
+                )}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t(
+                  paymentsUnavailable
+                    ? "public.checkoutUnavailableDescription"
+                    : "public.checkoutErrorDescription"
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{tCommon("close")}</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
   }
 
