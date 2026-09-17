@@ -24,6 +24,7 @@ Les heuristiques du prompt prévoyaient pourtant ce cas : `build-prompt.ts:101` 
 | # | Cause | Emplacement | Traité par |
 |---|---|---|---|
 | C2 | Les en-têtes de la requête sont jetés : IP, ASN, géolocalisation, `User-Agent`, `Content-Type`, `Content-Length` | `analyze-issue.ts:103-108` | **P1** |
+| C2bis | **Découvert à l'implémentation** : `events/latest/` ne pose aucun champ `request` à la racine, la requête vit dans `entries[type="request"]`. La lecture se faisait à la racine, donc le prompt annonçait « aucune request HTTP » sur *toute* erreur déclenchée par une requête, orientant le modèle vers un job de fond inexistant. Aucune erreur levée, juste `undefined`. | `analyze-issue.ts:106-107` | **P1** |
 | C3 | La liste blanche de tags omet `browser`, `client_os`, `handled`, `mechanism` | `build-prompt.ts:17-26` | **P1** |
 | C4 | `count` et `userCount` sont reçus du webhook mais jamais transmis à l'analyse | `route.ts:78-87` | **P1** |
 | C6 | Le prompt interdit de rester vague, sans jamais autoriser l'abstention | `build-prompt.ts:85` | **P4** |
@@ -105,8 +106,9 @@ Contenu attendu, de l'ordre de cinq lignes :
 
 - `/` et `/[locale]` : landing marketing, aucune Server Action métier.
 - `/m/[slug]` : page événement, inscription et commentaires.
-- `/c/[slug]` : page Communauté, adhésion.
+- `/circles/[slug]` : page Communauté, adhésion.
 - `/dashboard/*` : espace organisateur, création et édition.
+- `/explorer`, `/auth/*` : consultation et connexion.
 - `/api/cron/*` : jobs planifiés, aucun utilisateur derrière.
 
 ### Garde-fou contre l'obsolescence
