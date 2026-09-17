@@ -86,11 +86,24 @@ function formatHeaders(headers: Record<string, string>): string {
   return pairs.length === 0 ? "(aucun en-tête disponible)" : pairs.join(", ");
 }
 
-function formatCounts(context: EventContext): string {
-  if (context.eventCount === undefined && context.userCount === undefined) {
-    return "(compteurs indisponibles)";
+/**
+ * Volumétrie, affichée UNIQUEMENT quand elle porte une information.
+ *
+ * Un signal constant n'est pas un signal : l'analyse tourne à la création de
+ * l'issue, donc `eventCount` vaut 1 sur toute alerte réelle, et `userCount`
+ * vaut 0 partout faute de `Sentry.setUser` dans le projet. Les afficher
+ * quand même fournissait au modèle un argument permanent en faveur de
+ * « bruit / aucun impact », y compris sur des pannes qui bloquaient du monde.
+ */
+function formatCounts(context: EventContext): string | null {
+  const parts: string[] = [];
+  if (context.eventCount !== undefined && context.eventCount > 1) {
+    parts.push(`${context.eventCount} occurrences déjà enregistrées`);
   }
-  return `${context.eventCount ?? "?"} occurrence(s), ${context.userCount ?? "?"} utilisateur(s) identifié(s) touché(s)`;
+  if (context.userCount !== undefined && context.userCount > 0) {
+    parts.push(`${context.userCount} utilisateur(s) identifié(s) touché(s)`);
+  }
+  return parts.length === 0 ? null : parts.join(", ");
 }
 
 function formatRouteMap(): string {
@@ -98,9 +111,14 @@ function formatRouteMap(): string {
 }
 
 export function buildAnalysisPrompt(issue: IssueForPrompt, context: EventContext): string {
+  // Le repli ne CONCLUT pas : beaucoup d'événements serveur (erreurs d'auth
+  // notamment) arrivent sans entrée `request` alors qu'un visiteur était bien
+  // en train d'agir. Annoncer « probablement un cron » orientait le diagnostic
+  // vers un job de fond inexistant.
   const requestLine = context.requestUrl
     ? `${context.requestMethod ?? "?"} ${context.requestUrl}`
-    : "(aucune request HTTP — probablement un job background, cron ou server action)";
+    : "(l'événement ne porte pas d'entrée requête — cela ne prouve PAS qu'aucun utilisateur n'agissait)";
+  const counts = formatCounts(context);
 
   return `Analyse cette erreur Sentry d'une application Next.js (The Playground - plateforme de communautés/événements).
 
@@ -116,8 +134,7 @@ Platform: ${issue.platform}
 Metadata: type=${issue.metadata.type}, filename=${issue.metadata.filename}, function=${issue.metadata.function}
 Tags pertinents: ${formatTags(context.tags)}
 Request: ${requestLine}
-En-têtes de la requête: ${formatHeaders(context.requestHeaders)}
-Volumétrie: ${formatCounts(context)}
+En-têtes de la requête: ${formatHeaders(context.requestHeaders)}${counts ? `\nVolumétrie: ${counts}` : ""}
 
 Stacktrace et contexte:
 ${context.stacktrace || "(aucune stacktrace disponible)"}
@@ -150,10 +167,12 @@ Signatures de scan ou de bruit, à reconnaître :
 - Chemin qui n'existe pas chez nous : \`.php\`, \`/wp-admin\`, \`/wp-login\`, \`/.env\`, \`/.git\`, \`/phpmyadmin\`. L'app n'a AUCUN fichier PHP : une telle requête est un scan, sans exception.
 - \`x-vercel-ip-as-number\` d'un hébergeur ou d'un cloud plutôt que d'un FAI résidentiel, surtout avec un User-Agent de navigateur grand public (falsifié).
 - Corps \`multipart/form-data\` volumineux (\`content-type\` + \`content-length\`) sur une route de page sans formulaire.
-- Rafale : plusieurs occurrences en quelques secondes pour 0 utilisateur identifié.
+- Plusieurs occurrences rapprochées depuis la même origine.
 - Script tiers (PostHog, GA, Stripe.js), extension de navigateur, erreur pendant \`pagehide\` / \`unload\`.
 
 Si un motif est reconnu : \`urgency: "noise"\`, \`userImpact.level: "none"\`, \`confidence: "certain"\`, et NOMME le motif dans \`trigger\` (ex. « scan automatisé depuis un hébergeur, chemin /index.php inexistant »).
+
+🚫 N'attribue JAMAIS à une route une fonctionnalité que la carte des zones ne lui donne pas : écrire « l'inscription à la newsletter échoue » sur une page qui n'a pas de formulaire fabrique une panne qui n'existe pas.
 
 ## Heuristiques pour le TRIGGER
 
@@ -195,7 +214,8 @@ Checklist :
 2. Pendant pagehide/unload/visibilitychange/beforeunload ? → level = none
 3. Handled (try/catch, mechanism.handled=true) ? → level ≤ silent dans la plupart des cas, SAUF si l'utilisateur voit une page 500 ou un message d'erreur
 4. Crash visuel prouvé par la stack ou le contexte ? → degraded ou blocking
-5. 0 utilisateur identifié touché ? → c'est un signal SECONDAIRE contre "blocking" : une action importante bloquée suppose en général quelqu'un derrière.
+
+⚠️ L'absence de ligne « Volumétrie » ne signifie RIEN : ce projet n'attache pas d'identité aux erreurs, et l'analyse tourne dès la première occurrence. Ne JAMAIS en déduire que personne n'est touché.
 
 Description (\`userImpact.description\`) :
 - Commence par le rôle : "Un participant...", "Un organisateur...", "Un visiteur anonyme...", "Aucun utilisateur..."

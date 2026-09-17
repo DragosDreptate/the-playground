@@ -3,6 +3,7 @@ import { after } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { analyzeSentryIssue } from "@/infrastructure/services/sentry/analyze-issue";
+import { toFiniteCount } from "@/infrastructure/services/sentry/event-context";
 
 function verifySignature(body: string, signature: string, secret: string): boolean {
   const hmac = createHmac("sha256", secret);
@@ -37,13 +38,6 @@ type SentryIssueWebhook = {
     };
   };
 };
-
-/** Le payload vient d'un tiers : une valeur absente ou illisible reste absente. */
-function toFiniteNumber(value: string | number | undefined): number | undefined {
-  if (value === undefined) return undefined;
-  const n = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(n) ? n : undefined;
-}
 
 export async function POST(request: NextRequest) {
   const secret = process.env.SENTRY_WEBHOOK_SECRET;
@@ -91,10 +85,10 @@ export async function POST(request: NextRequest) {
         platform: issue.platform,
         projectSlug: issue.project?.slug ?? "",
         metadata: issue.metadata ?? {},
-        // Sentry renvoie `count` en string. `userCount: 0` sur une erreur
-        // censée bloquer quelqu'un est un signal, faible mais réel.
-        eventCount: toFiniteNumber(issue.count),
-        userCount: toFiniteNumber(issue.userCount),
+        // Sentry renvoie `count` en string. Ces compteurs ne sont transmis au
+        // modèle que s'ils portent une information (cf. formatCounts).
+        eventCount: toFiniteCount(issue.count),
+        userCount: toFiniteCount(issue.userCount),
       });
     } catch (err) {
       Sentry.captureException(err);

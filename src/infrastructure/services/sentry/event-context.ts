@@ -15,6 +15,14 @@ export type SentryEventFrame = {
 };
 
 export type SentryRequest = {
+  /**
+   * Chemin SANS la query string : Sentry range celle-ci dans un champ `query`
+   * distinct. C'est ce qui rend l'URL sûre à transmettre au modèle.
+   *
+   * 🚨 Ne JAMAIS ajouter `query` ici sans filtrage : sur le callback du magic
+   * link, il porte l'email du visiteur en clair (le `token`, lui, est déjà
+   * masqué par le scrubbing de Sentry).
+   */
   url?: string;
   method?: string;
   /** L'API Sentry renvoie un TABLEAU de paires, pas un objet. */
@@ -74,6 +82,22 @@ export function emptyEventContext(): EventContext {
 }
 
 /**
+ * Normalise un compteur du payload webhook (tiers). Une valeur absente ou
+ * illisible RESTE absente.
+ *
+ * ⚠️ `null` et `""` doivent rester absents : `Number(null)` et `Number("")`
+ * valent 0 et passent `Number.isFinite`. Une donnée manquante deviendrait
+ * « 0 utilisateur touché », c'est-à-dire un argument fabriqué en faveur du
+ * classement en bruit.
+ */
+export function toFiniteCount(value: string | number | null | undefined): number | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "string" && value.trim() === "") return undefined;
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+/**
  * En-têtes transmis au modèle. LISTE BLANCHE stricte, jamais une liste noire :
  * une liste noire laisserait passer tout en-tête futur.
  *
@@ -126,7 +150,10 @@ export function extractEventContext(event: SentryEvent): EventContext {
 
   for (const entry of event.entries ?? []) {
     if (entry.type !== "exception") continue;
-    for (const val of entry.data.values ?? []) {
+    // `data?.` et pas seulement `?? []` : une entrée sans clé `data` lèverait
+    // un TypeError, et `extractEventContext` tourne hors try/catch — l'alerte
+    // serait perdue en silence.
+    for (const val of entry.data?.values ?? []) {
       lines.push(`${val.type}: ${val.value}`);
       lines.push(`Handled: ${val.mechanism?.handled ?? "unknown"}`);
       const frames = val.stacktrace?.frames ?? [];

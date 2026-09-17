@@ -12,12 +12,19 @@ const CONFIDENCES: Confidence[] = ["certain", "probable", "incertain"];
 
 /**
  * Confiance retenue quand le modèle omet le champ ou renvoie une valeur
- * inconnue. Volontairement TOLÉRANT : la validation est binaire, et rejeter
- * l'analyse entière pour un seul champ absent la remplacerait par un fallback
- * « Déclencheur non identifié », ce qui détruirait un diagnostic par ailleurs
- * correct.
+ * inconnue.
+ *
+ * TOLÉRANT sur la forme : on garde l'analyse plutôt que de la remplacer par un
+ * fallback « Déclencheur non identifié », ce qui détruirait un diagnostic par
+ * ailleurs correct.
+ *
+ * Mais PRUDENT sur le fond : `incertain`, et surtout pas `probable`. Une
+ * réponse qui ne se prononce pas ne prouve pas sa propre fiabilité, et
+ * `probable` est précisément la valeur qui laisse passer `critical`/`high`
+ * intacts — le plafond de D1 se contournerait alors par la simple ABSENCE du
+ * champ (modèle qui dérive du schéma, réponse tronquée à `max_tokens`).
  */
-const DEFAULT_CONFIDENCE: Confidence = "probable";
+const DEFAULT_CONFIDENCE: Confidence = "incertain";
 
 const URGENCY_RANK: Record<Urgency, number> = {
   noise: 0,
@@ -37,6 +44,31 @@ const URGENCY_RANK: Record<Urgency, number> = {
 export function capUrgencyForConfidence(urgency: Urgency, confidence: Confidence): Urgency {
   if (confidence !== "incertain") return urgency;
   return URGENCY_RANK[urgency] > URGENCY_RANK.medium ? "medium" : urgency;
+}
+
+const USER_IMPACT_RANK: Record<UserImpactLevel, number> = {
+  none: 0,
+  silent: 1,
+  degraded: 2,
+  blocking: 3,
+};
+
+/**
+ * Pendant de `capUrgencyForConfidence` sur l'impact utilisateur.
+ *
+ * Sans lui, une analyse incertaine affichait un en-tête jaune « MOYENNE » et,
+ * juste en dessous, le bandeau rouge « UTILISATEUR BLOQUÉ » — contradictoire,
+ * et toujours aussi alarmant. Or c'est ce bandeau, plus que l'urgence, qui
+ * faisait lire une alerte comme une urgence (cf. THE-PLAYGROUND-2P).
+ *
+ * Ne remonte jamais un niveau : un impact annoncé nul le reste.
+ */
+export function capUserImpactForConfidence(
+  level: UserImpactLevel,
+  confidence: Confidence
+): UserImpactLevel {
+  if (confidence !== "incertain") return level;
+  return USER_IMPACT_RANK[level] > USER_IMPACT_RANK.degraded ? "degraded" : level;
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -81,7 +113,10 @@ export function parseAnalysisResult(value: unknown): AnalysisResult | null {
     confidence,
     trigger: v.trigger,
     functionalConsequence: v.functionalConsequence,
-    userImpact,
+    userImpact: {
+      ...userImpact,
+      level: capUserImpactForConfidence(userImpact.level, confidence),
+    },
     technical: v.technical,
   };
 }

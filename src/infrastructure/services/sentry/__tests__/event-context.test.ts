@@ -2,7 +2,7 @@ import { existsSync } from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
 
-import { extractEventContext, type SentryEvent } from "../event-context";
+import { extractEventContext, toFiniteCount, type SentryEvent } from "../event-context";
 import { ROUTE_MAP, buildAnalysisPrompt } from "../build-prompt";
 
 /**
@@ -133,6 +133,17 @@ describe("extractEventContext", () => {
     expect(ctx.stacktrace).toBe("");
   });
 
+  it("survit à une entrée d'exception sans clé `data`", () => {
+    // Tourne hors try/catch : un TypeError ici ferait perdre l'alerte entière.
+    const ctx = extractEventContext({
+      eventID: "x",
+      title: "t",
+      tags: [],
+      entries: [{ type: "exception" } as never, { type: "exception", data: {} }],
+    });
+    expect(ctx.stacktrace).toBe("");
+  });
+
   it("ignore une forme d'en-têtes inattendue sans planter", () => {
     const ctx = extractEventContext({
       ...SCAN_EVENT,
@@ -140,6 +151,23 @@ describe("extractEventContext", () => {
       entries: [{ type: "request", data: { headers: { "user-agent": "curl" } as never } }],
     });
     expect(ctx.requestHeaders).toEqual({});
+  });
+});
+
+describe("toFiniteCount", () => {
+  it("lit les compteurs que Sentry envoie en chaîne", () => {
+    expect(toFiniteCount("8")).toBe(8);
+    expect(toFiniteCount(0)).toBe(0);
+  });
+
+  it("garde absent ce qui est absent, au lieu de fabriquer un zéro", () => {
+    // Le piège : Number(null) et Number("") valent 0 et passent isFinite.
+    // Un « 0 utilisateur touché » inventé est un argument en faveur du bruit.
+    expect(toFiniteCount(null)).toBeUndefined();
+    expect(toFiniteCount("")).toBeUndefined();
+    expect(toFiniteCount("   ")).toBeUndefined();
+    expect(toFiniteCount(undefined)).toBeUndefined();
+    expect(toFiniteCount("beaucoup")).toBeUndefined();
   });
 });
 
@@ -160,7 +188,10 @@ describe("buildAnalysisPrompt", () => {
     // Le faisceau « scanner » : réseau d'origine, corps multipart, volumétrie.
     expect(prompt).toContain("55286");
     expect(prompt).toContain("multipart/form-data");
-    expect(prompt).toContain("8 occurrence(s), 0 utilisateur(s)");
+    expect(prompt).toContain("8 occurrences déjà enregistrées");
+    // « 0 utilisateur » est une non-information ici (le projet n'attache
+    // aucune identité aux erreurs) : ne pas la présenter comme un signal.
+    expect(prompt).not.toContain("0 utilisateur");
     // Les tags de client, absents de la liste blanche d'origine.
     expect(prompt).toContain("browser=Chrome 152.0.0");
     expect(prompt).toContain("handled=no");
@@ -170,7 +201,7 @@ describe("buildAnalysisPrompt", () => {
     expect(prompt).toContain("Failed to find Server Action");
   });
 
-  it("indique franchement l'absence de contexte plutôt que de laisser un trou", () => {
+  it("indique l'absence de contexte sans en tirer de conclusion", () => {
     const prompt = buildAnalysisPrompt(
       {
         issueShortId: "X-1",
@@ -183,7 +214,31 @@ describe("buildAnalysisPrompt", () => {
       { stacktrace: "", tags: {}, requestHeaders: {} }
     );
     expect(prompt).toContain("(aucun en-tête disponible)");
-    expect(prompt).toContain("(compteurs indisponibles)");
+    // Le repli ne doit plus affirmer un job de fond : beaucoup d'erreurs
+    // serveur d'auth n'ont pas d'entrée requête alors qu'un visiteur agissait.
+    expect(prompt).not.toContain("probablement un job background");
+    expect(prompt).toContain("ne prouve PAS qu'aucun utilisateur n'agissait");
+  });
+
+  it("n'affiche aucune volumétrie quand les compteurs ne portent rien", () => {
+    // 1 occurrence et 0 utilisateur sont les valeurs CONSTANTES du chemin réel
+    // (analyse à la création de l'issue, pas de Sentry.setUser) : les afficher
+    // fournirait un argument permanent en faveur de « bruit ».
+    const prompt = buildAnalysisPrompt(
+      {
+        issueShortId: "X-2",
+        issueTitle: "Panne",
+        culprit: "/[locale]/page",
+        level: "error",
+        platform: "node",
+        metadata: {},
+      },
+      { stacktrace: "", tags: {}, requestHeaders: {}, eventCount: 1, userCount: 0 }
+    );
+    // La LIGNE de données disparaît ; le mot subsiste dans la consigne qui
+    // interdit de déduire quoi que ce soit de son absence.
+    expect(prompt).not.toContain("Volumétrie:");
+    expect(prompt).not.toContain("0 utilisateur");
   });
 });
 
