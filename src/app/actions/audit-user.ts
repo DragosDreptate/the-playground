@@ -26,7 +26,7 @@ export type AuditUserResult =
 /**
  * Audit de compte à la demande (mode bouton admin). Admin-only, lecture seule :
  * collecte le dossier, le fait juger par Claude, renvoie le rapport + les cibles
- * de blocage, et le pousse sur #admin. Le blocage reste une action SÉPARÉE
+ * de blocage, et le pousse sur #the-playground-admin. Le blocage reste une action SÉPARÉE
  * (blockSignInAction).
  */
 export async function auditUserAction(

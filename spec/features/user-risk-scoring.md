@@ -141,7 +141,7 @@ Lecture seule : le blocage reste une action séparée explicite (`pnpm block` ou
 
 ### RGPD / PII
 
-Le rapport contient de la PII. En CLI il reste local ; côté admin il est affiché à l'admin (déjà autorisé) et poussé sur **#admin** (`SLACK_ADMIN_WEBHOOK_URL`, privé), **non persisté**. Jamais committé (`spec/security/` gitignored).
+Le rapport contient de la PII. En CLI il reste local ; côté admin il est affiché à l'admin (déjà autorisé) et poussé sur **#the-playground-admin** (`SLACK_ADMIN_WEBHOOK_URL`, privé), **non persisté**. Jamais committé (`spec/security/` gitignored).
 
 ## Architecture (hexagonale)
 
@@ -172,7 +172,7 @@ Canal : **email admin ET Slack** (décision actée).
 ## Découpage en phases
 
 - **Phase 1 — scoring compte** *(reporté — issue #536 fermée le 2026-06-27, l'audit manuel suffit pour l'instant)* : moteur `assessUserRisk` + grille gradée + champs `User` + notif email/Slack enrichie + **section « Risque » sur la fiche admin**. 100% code, aucun blocage. Tests unitaires (avcin/shawnallen → LOW, spammeurs → HIGH).
-- **Phase 2 — skill `/audit-user`** *(fait)* : collecte + prompt + sortie structurée. **CLI** (local) puis **bouton admin → UI + #admin**, avec actions de blocage (compte/domaine). PR #573.
+- **Phase 2 — skill `/audit-user`** *(fait)* : collecte + prompt + sortie structurée. **CLI** (local) puis **bouton admin → UI + #the-playground-admin**, avec actions de blocage (compte/domaine). PR #573.
 
 ## Points ouverts (à trancher avant implémentation)
 

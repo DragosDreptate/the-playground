@@ -3,8 +3,10 @@ import type { AuditReport, AuditVerdictLean } from "../audit/types";
 import type { QuotaTier } from "@/lib/resend-quota";
 
 const ADMIN_WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
-// Canal dédié aux erreurs Sentry (#sentry). Si non configuré, les notifs Sentry
-// retombent sur le webhook admin (#admin) — fallback pour ne rien perdre.
+// Canal dédié aux erreurs Sentry (#the-playground-sentry). Si non configuré, les
+// notifs Sentry retombent sur le webhook admin (#the-playground-admin) —
+// fallback pour ne rien perdre. Les noms ne servent qu'à la lecture : la
+// destination est portée par l'URL du webhook, qui survit à un renommage.
 const SENTRY_WEBHOOK_URL = process.env.SLACK_SENTRY_WEBHOOK_URL;
 
 export function isAdminEmailEnabled(): boolean {
@@ -278,9 +280,9 @@ export async function notifySlackSentryIssue(params: {
   const { issue, analysis, sentryUrl } = params;
   const urgencyLabel = URGENCY_META[analysis.urgency].label;
   const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
-  // Les erreurs Sentry vont dans #sentry. Fallback sur #admin si le webhook
-  // dédié n'est pas configuré (|| et non ?? : une variable d'env vide "" doit
-  // aussi retomber sur le webhook admin).
+  // Les erreurs Sentry vont dans #the-playground-sentry. Fallback sur
+  // #the-playground-admin si le webhook dédié n'est pas configuré (|| et non
+  // ?? : une variable d'env vide "" doit aussi retomber sur le webhook admin).
   await sendSlack(
     {
       text: `🚨 [Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle}`,
@@ -309,7 +311,7 @@ const AUDIT_VERDICT_META: Record<
   likely_spam: { emoji: "🔴", label: "Plutôt spam" },
 };
 
-/** Pousse un rapport d'audit de compte (`/audit-user`) sur #admin. */
+/** Pousse un rapport d'audit de compte (`/audit-user`) sur #the-playground-admin. */
 export async function notifySlackAuditReport(params: {
   report: AuditReport;
   email: string;
