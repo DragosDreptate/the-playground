@@ -1,4 +1,9 @@
-import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "../sentry/analysis-meta";
+import {
+  CONFIDENCE_META,
+  URGENCY_META,
+  USER_IMPACT_META,
+  type AnalysisResult,
+} from "../sentry/analysis-meta";
 import type { AuditReport, AuditVerdictLean } from "../audit/types";
 import type { QuotaTier } from "@/lib/resend-quota";
 
@@ -278,6 +283,7 @@ export async function notifySlackSentryIssue(params: {
   const { issue, analysis, sentryUrl } = params;
   const urgencyLabel = URGENCY_META[analysis.urgency].label;
   const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
+  const confidenceLabel = CONFIDENCE_META[analysis.confidence].label;
   // Les erreurs Sentry vont dans #sentry. Fallback sur #admin si le webhook
   // dédié n'est pas configuré (|| et non ?? : une variable d'env vide "" doit
   // aussi retomber sur le webhook admin).
@@ -287,6 +293,7 @@ export async function notifySlackSentryIssue(params: {
       blocks: [
         { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${urgencyLabel}`, emoji: true } },
         { type: "section", text: { type: "mrkdwn", text: `*${issue.issueShortId}*\n${issue.issueTitle}` } },
+        { type: "context", elements: [{ type: "mrkdwn", text: `_${confidenceLabel}_` }] },
         { type: "divider" },
         { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${analysis.trigger}` } },
         { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${analysis.functionalConsequence}` } },

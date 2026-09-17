@@ -1,6 +1,16 @@
 export type Urgency = "critical" | "high" | "medium" | "low" | "noise";
 export type UserImpactLevel = "none" | "silent" | "degraded" | "blocking";
 
+/**
+ * Degré de certitude du diagnostic produit par le modèle.
+ *
+ * Existe parce que le prompt interdisait de rester vague : privé du droit de
+ * s'abstenir, le modèle comblait les trous par de la spéculation, et la
+ * spéculation sortait formatée comme un diagnostic (cf. THE-PLAYGROUND-2P,
+ * un scan de vulnérabilités annoncé en « UTILISATEUR BLOQUÉ »).
+ */
+export type Confidence = "certain" | "probable" | "incertain";
+
 export type UserImpact = {
   level: UserImpactLevel;
   description: string;
@@ -8,6 +18,7 @@ export type UserImpact = {
 
 export type AnalysisResult = {
   urgency: Urgency;
+  confidence: Confidence;
   trigger: string;
   functionalConsequence: string;
   userImpact: UserImpact;
@@ -20,6 +31,12 @@ export const URGENCY_META: Record<Urgency, { label: string; color: string }> = {
   medium: { label: "MOYENNE", color: "#ca8a04" },
   low: { label: "BASSE", color: "#2563eb" },
   noise: { label: "BRUIT", color: "#71717a" },
+};
+
+export const CONFIDENCE_META: Record<Confidence, { label: string }> = {
+  certain: { label: "Diagnostic sûr" },
+  probable: { label: "Diagnostic probable" },
+  incertain: { label: "Diagnostic incertain — urgence plafonnée" },
 };
 
 export const USER_IMPACT_META: Record<

@@ -1,3 +1,5 @@
+import type { EventContext } from "./event-context";
+
 type IssueForPrompt = {
   issueShortId: string;
   issueTitle: string;
@@ -5,13 +7,6 @@ type IssueForPrompt = {
   level: string;
   platform: string;
   metadata: { type?: string; value?: string; filename?: string; function?: string };
-};
-
-type ContextForPrompt = {
-  stacktrace: string;
-  tags: Record<string, string>;
-  requestUrl?: string;
-  requestMethod?: string;
 };
 
 const TAG_KEYS_OF_INTEREST = [
@@ -23,6 +18,62 @@ const TAG_KEYS_OF_INTEREST = [
   "route",
   "server_action",
   "runtime",
+  // Client et nature de la capture : la checklist d'impact s'en sert déjà,
+  // sans jamais avoir reçu l'information.
+  "browser",
+  "client_os",
+  "handled",
+  "mechanism",
+];
+
+/**
+ * Carte des zones de l'app, pour que le modèle repère une conclusion
+ * impossible (« inscription cassée » sur une landing qui n'a aucun formulaire).
+ *
+ * GROSSIÈRE PAR CONCEPTION, au niveau des zones et jamais des noms de Server
+ * Actions : une carte trop fine devient fausse au premier refactoring, et une
+ * carte fausse ment avec autant d'aplomb que l'absence de carte.
+ *
+ * `source` n'est pas affiché au modèle : il sert au test qui vérifie que
+ * chaque route citée existe encore, seul mécanisme qui empêche cette carte de
+ * mentir en silence.
+ */
+export const ROUTE_MAP: { pattern: string; source: string; description: string }[] = [
+  {
+    pattern: "/ et /[locale]",
+    source: "src/app/[locale]/page.tsx",
+    description: "landing marketing publique, AUCUNE Server Action métier",
+  },
+  {
+    pattern: "/m/[slug]",
+    source: "src/app/[locale]/(routes)/m/[slug]",
+    description: "page événement : inscription, commentaires, check-in",
+  },
+  {
+    pattern: "/circles/[slug]",
+    source: "src/app/[locale]/(routes)/circles/[slug]",
+    description: "page Communauté : adhésion, consultation",
+  },
+  {
+    pattern: "/dashboard/*",
+    source: "src/app/[locale]/(routes)/dashboard",
+    description: "espace organisateur : création et édition d'événements et de Communautés",
+  },
+  {
+    pattern: "/explorer",
+    source: "src/app/[locale]/(routes)/explorer",
+    description: "page Découvrir, consultation seule",
+  },
+  {
+    pattern: "/auth/*",
+    source: "src/app/[locale]/auth",
+    description: "connexion par magic link",
+  },
+  {
+    pattern: "/api/cron/*",
+    source: "src/app/api/cron",
+    description: "jobs planifiés, aucun utilisateur derrière",
+  },
 ];
 
 function formatTags(tags: Record<string, string>): string {
@@ -30,7 +81,23 @@ function formatTags(tags: Record<string, string>): string {
   return pairs.length === 0 ? "(aucun tag utile)" : pairs.join(", ");
 }
 
-export function buildAnalysisPrompt(issue: IssueForPrompt, context: ContextForPrompt): string {
+function formatHeaders(headers: Record<string, string>): string {
+  const pairs = Object.entries(headers).map(([k, v]) => `${k}=${v}`);
+  return pairs.length === 0 ? "(aucun en-tête disponible)" : pairs.join(", ");
+}
+
+function formatCounts(context: EventContext): string {
+  if (context.eventCount === undefined && context.userCount === undefined) {
+    return "(compteurs indisponibles)";
+  }
+  return `${context.eventCount ?? "?"} occurrence(s), ${context.userCount ?? "?"} utilisateur(s) identifié(s) touché(s)`;
+}
+
+function formatRouteMap(): string {
+  return ROUTE_MAP.map((r) => `- \`${r.pattern}\` : ${r.description}`).join("\n");
+}
+
+export function buildAnalysisPrompt(issue: IssueForPrompt, context: EventContext): string {
   const requestLine = context.requestUrl
     ? `${context.requestMethod ?? "?"} ${context.requestUrl}`
     : "(aucune request HTTP — probablement un job background, cron ou server action)";
@@ -49,14 +116,23 @@ Platform: ${issue.platform}
 Metadata: type=${issue.metadata.type}, filename=${issue.metadata.filename}, function=${issue.metadata.function}
 Tags pertinents: ${formatTags(context.tags)}
 Request: ${requestLine}
+En-têtes de la requête: ${formatHeaders(context.requestHeaders)}
+Volumétrie: ${formatCounts(context)}
 
 Stacktrace et contexte:
 ${context.stacktrace || "(aucune stacktrace disponible)"}
+
+## Carte des zones de l'app
+
+${formatRouteMap()}
+
+Sers-t'en pour écarter l'impossible : une conséquence annoncée sur une zone qui ne porte pas cette fonctionnalité est forcément fausse.
 
 ## Réponds UNIQUEMENT avec un JSON valide
 
 {
   "urgency": "critical|high|medium|low|noise",
+  "confidence": "certain|probable|incertain",
   "trigger": "Phrase courte (1-2) qui répond à : qu'est-ce qui a provoqué cette erreur ? Précise le contexte d'activité (page, action utilisateur, cron, webhook, job). Langage métier, pas technique.",
   "functionalConsequence": "Phrase courte (1-2) qui répond à : qu'est-ce qui est cassé côté produit ? En termes métier (inscription, paiement, création d'événement, rappel, check-in, commentaire, affichage). PAS de jargon DB/framework.",
   "userImpact": {
@@ -65,6 +141,19 @@ ${context.stacktrace || "(aucune stacktrace disponible)"}
   },
   "technical": "Bloc condensé (3 phrases max) réservé aux devs : cause probable + fichier/fonction à investiguer + piste de correction. Peut contenir du jargon."
 }
+
+## Motifs de BRUIT connus (à vérifier EN PREMIER)
+
+Mécanisme Next.js à connaître : **tout POST sur une route de page App Router est interprété comme un appel de Server Action**. Sans identifiant d'action valide dans le corps, Next lève \`Failed to find Server Action\`. Un POST arbitraire envoyé par un scanner produit donc exactement cette erreur, **sans qu'aucun code applicatif ne soit atteint**.
+
+Signatures de scan ou de bruit, à reconnaître :
+- Chemin qui n'existe pas chez nous : \`.php\`, \`/wp-admin\`, \`/wp-login\`, \`/.env\`, \`/.git\`, \`/phpmyadmin\`. L'app n'a AUCUN fichier PHP : une telle requête est un scan, sans exception.
+- \`x-vercel-ip-as-number\` d'un hébergeur ou d'un cloud plutôt que d'un FAI résidentiel, surtout avec un User-Agent de navigateur grand public (falsifié).
+- Corps \`multipart/form-data\` volumineux (\`content-type\` + \`content-length\`) sur une route de page sans formulaire.
+- Rafale : plusieurs occurrences en quelques secondes pour 0 utilisateur identifié.
+- Script tiers (PostHog, GA, Stripe.js), extension de navigateur, erreur pendant \`pagehide\` / \`unload\`.
+
+Si un motif est reconnu : \`urgency: "noise"\`, \`userImpact.level: "none"\`, \`confidence: "certain"\`, et NOMME le motif dans \`trigger\` (ex. « scan automatisé depuis un hébergeur, chemin /index.php inexistant »).
 
 ## Heuristiques pour le TRIGGER
 
@@ -75,14 +164,12 @@ Ordre de priorité :
    - \`/api/webhook/*\` ou \`/api/*/webhook\` → "Un webhook <service> reçu par la plateforme"
    - \`/api/*\` → "Un appel API depuis le frontend"
    - \`/m/[slug]\` → "Un visiteur/participant consulte une page événement"
-   - \`/c/[slug]\` → "Un visiteur consulte une page Communauté"
+   - \`/circles/[slug]\` → "Un visiteur consulte une page Communauté"
    - \`/dashboard/*\` → "Un organisateur utilise son dashboard"
    - \`/explorer\` → "Un visiteur parcourt la page Découvrir"
    - Autre → cite le chemin
 3. Si la stack contient une server action nommée (\`createMoment\`, \`registerToMoment\`, etc.) → "Un utilisateur a lancé l'action <nom> (<ce que ça fait en clair>)"
 4. Sinon, regarder les noms de fichiers inApp pour déduire le contexte (email/, stripe/, auth/...)
-
-Ne JAMAIS dire "Une erreur s'est produite". Sois spécifique.
 
 ## Heuristiques pour la FUNCTIONAL CONSEQUENCE
 
@@ -108,6 +195,7 @@ Checklist :
 2. Pendant pagehide/unload/visibilitychange/beforeunload ? → level = none
 3. Handled (try/catch, mechanism.handled=true) ? → level ≤ silent dans la plupart des cas, SAUF si l'utilisateur voit une page 500 ou un message d'erreur
 4. Crash visuel prouvé par la stack ou le contexte ? → degraded ou blocking
+5. 0 utilisateur identifié touché ? → c'est un signal SECONDAIRE contre "blocking" : une action importante bloquée suppose en général quelqu'un derrière.
 
 Description (\`userImpact.description\`) :
 - Commence par le rôle : "Un participant...", "Un organisateur...", "Un visiteur anonyme...", "Aucun utilisateur..."
@@ -122,7 +210,21 @@ Description (\`userImpact.description\`) :
 - "low" = cosmétique, edge case rare
 - "noise" = extension navigateur, bot, erreur non-actionnable
 
+## Heuristiques pour CONFIDENCE
+
+- "certain" = les données identifient le déclencheur (tag \`cron\`, server action nommée dans la stack, motif de bruit reconnu ci-dessus).
+- "probable" = faisceau cohérent, mais pas de preuve directe.
+- "incertain" = les données ne permettent pas de conclure.
+
+Si "incertain", \`trigger\` et \`functionalConsequence\` doivent NOMMER ce qui manque pour trancher (ex. « origine indéterminée : aucune stacktrace applicative ni en-tête de requête »). Une urgence haute ne sera de toute façon pas retenue sur un diagnostic incertain.
+
 ## Règle d'or
+
+Reste PRÉCIS quand les données permettent de conclure : ne dis jamais "Une erreur s'est produite" si un tag, une URL ou une stack désigne le déclencheur.
+
+Quand elles ne le permettent PAS, dis-le franchement et passe en \`confidence: "incertain"\`. Une incertitude assumée vaut mieux qu'une hypothèse présentée comme un fait : c'est ce qui décide si on réveille quelqu'un pour rien.
+
+INTERDIT dans tous les cas : énumérer des hypothèses alternatives pour donner le change ("inscription, création d'événement, ou autre interaction clé"). Une liste de possibilités est l'aveu d'une devinette — dans ce cas, choisis \`incertain\` et nomme la donnée manquante.
 
 Si tu hésites à mettre du jargon, demande-toi : est-ce qu'un organisateur non-tech comprendrait ? Si non → reformule. Les seules sections où le jargon est permis sont \`technical\` et le culprit implicite.`;
 }

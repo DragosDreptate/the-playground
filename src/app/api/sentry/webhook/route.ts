@@ -38,6 +38,13 @@ type SentryIssueWebhook = {
   };
 };
 
+/** Le payload vient d'un tiers : une valeur absente ou illisible reste absente. */
+function toFiniteNumber(value: string | number | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 export async function POST(request: NextRequest) {
   const secret = process.env.SENTRY_WEBHOOK_SECRET;
   if (!secret) {
@@ -84,6 +91,10 @@ export async function POST(request: NextRequest) {
         platform: issue.platform,
         projectSlug: issue.project?.slug ?? "",
         metadata: issue.metadata ?? {},
+        // Sentry renvoie `count` en string. `userCount: 0` sur une erreur
+        // censée bloquer quelqu'un est un signal, faible mais réel.
+        eventCount: toFiniteNumber(issue.count),
+        userCount: toFiniteNumber(issue.userCount),
       });
     } catch (err) {
       Sentry.captureException(err);

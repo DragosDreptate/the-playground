@@ -8,7 +8,12 @@ import {
   infoLabel,
   infoValue,
 } from "../email/templates/components/email-styles";
-import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "./analysis-meta";
+import {
+  CONFIDENCE_META,
+  URGENCY_META,
+  USER_IMPACT_META,
+  type AnalysisResult,
+} from "./analysis-meta";
 import type { IssueInput } from "./analyze-issue";
 
 type Props = {
@@ -54,6 +59,7 @@ export function SentryIssueAnalysisEmail({ issue, analysis, sentryUrl }: Props) 
 
       <Text style={heading}>{issue.issueShortId}</Text>
       <Text style={titleStyle}>{issue.issueTitle}</Text>
+      <Text style={confidenceStyle}>{CONFIDENCE_META[analysis.confidence].label}</Text>
 
       <InfoRow label="Déclencheur" body={analysis.trigger} />
       <InfoRow label="Conséquence fonctionnelle" body={analysis.functionalConsequence} />
@@ -93,9 +99,17 @@ const urgencyBadge: React.CSSProperties = {
 const titleStyle: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
-  margin: "0 0 20px 0",
+  margin: "0 0 8px 0",
   lineHeight: "20px",
   wordBreak: "break-word",
+};
+
+const confidenceStyle: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#71717a",
+  fontStyle: "italic",
+  margin: "0 0 20px 0",
+  lineHeight: "18px",
 };
 
 const bodyText: React.CSSProperties = {
