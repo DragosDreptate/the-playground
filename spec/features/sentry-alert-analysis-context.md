@@ -202,11 +202,26 @@ Une version enrichie a été écrite puis **retirée** (option A3) : elle hiéra
 
 **Point annexe clos** : les réponses du modèle frôlaient `max_tokens` (877 sur 900) avec le prompt enrichi, avec une troncature observée. Le retour à la version minimale les ramène à ~330 tokens, la marge est rétablie sans toucher au réglage.
 
+### Seconde revue, sur les correctifs (17/09/2026)
+
+9 défauts distincts, tous dans le périmètre des correctifs. **8 corrigés, 1 refusé.**
+
+Deux d'entre eux portaient sur le même mécanisme et ont changé la conception : **un plafond qui réécrit le verdict du modèle ment forcément quelque part.** Rabaisser `userImpact.level` de `blocking` à `degraded` sans toucher à la description produisait un badge « EXPÉRIENCE DÉGRADÉE » au-dessus de la phrase « l'utilisateur reste bloqué ». La contradiction d'origine n'était pas supprimée, seulement déplacée d'un cran.
+
+**Décision D4** : l'incertitude est désormais portée par l'**affichage**, pas par une réécriture. `resolveImpactDisplay` (`analysis-meta.ts`) rend « ❓ IMPACT INCERTAIN » quand la confiance est incertaine, et la réponse du modèle reste intacte. Le plafond d'urgence de D1, lui, est conservé : il agit sur une échelle que nous produisons, pas sur une phrase que le modèle a écrite. Corollaire appliqué au libellé de confiance : il décrit un **état** (« Diagnostic incertain ») et non une conséquence (« urgence plafonnée »), qui était fausse chaque fois que rien n'était plafonné, un verdict `noise` ne pouvant pas descendre.
+
+Également corrigés : normalisation de `confidence` avant comparaison (une majuscule renvoyée par le modèle plafonnait sinon **toutes** les alertes, effet de bord du passage à `incertain` par défaut), défense de `event.tags` alignée sur celle des en-têtes, retrait de la signature de bruit « plusieurs occurrences » devenue invérifiable faute de compteur transmis, consigne « dans le doute préfère none/silent » qui contredisait l'avertissement voisin, et `data` rendu optionnel dans le type pour que les gardes ne soient pas supprimables de bonne foi.
+
+⚠️ **Correction d'une affirmation propagée par erreur** : la première revue affirmait que l'analyse tournait hors `try/catch` et que l'alerte était « perdue en silence ». C'est faux, `route.ts` enveloppe bien l'appel dans le `after()` et remonte l'erreur à Sentry. Ce qui reste vrai est qu'aucune alerte de repli ne part. L'affirmation avait été reprise sans vérification dans un commentaire et un message de commit.
+
+**Refusé** : factoriser les deux fonctions de plafonnement en un helper générique. Deux fonctions de trois lignes restent plus lisibles, et le risque invoqué (n'en modifier qu'une) est couvert par les tests.
+
 ## 10. Décisions tranchées
 
 - **D1 — retenue** (17/09/2026) : l'urgence est plafonnée à `medium` quand la confiance est `incertain`. Détail et risque assumé en section 6.3.
 - **D2 — hors périmètre** (17/09/2026) : la fiche sous-traitant Anthropic n'est pas corrigée dans ce lot. L'écart préexiste à cette spec ; il est consigné en section 11 pour être traité séparément.
 - **D3 — option A3 retenue** (17/09/2026) : face au finding F2, le prompt garde sa version minimale plutôt que la version enrichie, qui déplaçait l'erreur au lieu de la corriger. Détail et pistes en section 9 bis.
+- **D4 — l'incertitude s'affiche, elle ne réécrit pas** (17/09/2026) : le plafond d'impact utilisateur est supprimé au profit d'un état d'affichage dédié. Le plafond d'urgence de D1 reste, car il porte sur une échelle que nous produisons et non sur une phrase écrite par le modèle. Détail en section 9 bis.
 
 ## 11. Hors périmètre, à traiter séparément
 
