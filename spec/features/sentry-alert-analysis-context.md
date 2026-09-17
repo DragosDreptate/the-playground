@@ -216,12 +216,42 @@ Deux d'entre eux portaient sur le même mécanisme et ont changé la conception 
 
 **Refusé** : factoriser les deux fonctions de plafonnement en un helper générique. Deux fonctions de trois lignes restent plus lisibles, et le risque invoqué (n'en modifier qu'une) est couvert par les tests.
 
+### Sortie de boucle — troisième revue et retrait de P4 (17/09/2026)
+
+Trois passes de revue, 29 findings. Ils ne se répartissaient pas au hasard :
+
+| Mécanisme | Passe 1 | Passe 2 | Passe 3 | Total |
+|---|---|---|---|---|
+| Champ `confidence` et son plafond | F3, F5 | G1, G2, G3 | H2, H3 | **7** |
+| Consignes d'impact du prompt | F1, F2, F9 | G5, G6 | H1, H4, H5 | **8** |
+| Robustesse des données tierces | F7, F8 | G4, G8 | H7 | 5 |
+| Code pur | — | G7 | H6, H8, H9, H10 | 6 |
+
+**Le code converge, le prompt non.** Les findings sur du code pur sont corrigés une fois et ne reviennent pas. Ceux qui portent sur des consignes en langue naturelle adressées à un modèle probabiliste reviennent à chaque passe sous une forme nouvelle : il n'existe pas de définition exécutable de « correct » pour un prompt, donc pas de critère d'arrêt. Le gisement est inépuisable par construction.
+
+**Test d'ablation, sur l'événement réel de `2P`**, pour savoir quoi garder :
+
+| Prompt | Verdict |
+|---|---|
+| P1 + P2 + P3 | `noise` / aucun impact ✅ |
+| Sans catalogue de bruit (P1 + P3) | `high` / utilisateur bloqué ❌ |
+| Données seules (P1) | `high` / bloqué, « possiblement une inscription, création d'événement… » ❌ |
+
+La dernière ligne reproduit mot pour mot l'alerte à l'origine du chantier. **Transmettre les données ne suffisait donc pas** : c'est le catalogue de motifs de bruit (P2) qui produit le bon classement, et la carte des routes (P3) qui supprime l'énumération spéculative. Les deux sont conservés.
+
+**Décision D5** : le champ `confidence` et tout ce qui en découle (plafond d'urgence de D1, état d'affichage de D4, libellé de confiance) sont **retirés**. C'était le seul bloc dont l'utilité n'a jamais été démontrée, et le seul à **réécrire** un verdict plutôt qu'à informer. D1 et D4 sont donc caduques. L'email et Slack reviennent à l'identique d'`origin/main`.
+
+Également traités dans cette passe : retour à la consigne d'origine « dans le doute, préfère none/silent » (H1, H4, H5 tombent ensemble), normalisation de `urgency` et `userImpact.level` avant comparaison (H3, défaut antérieur au chantier), typage de `tags` et `entries` aligné sur `data` (H7), couverture de la ligne Volumétrie rétablie (H8), tests réécrits à la convention `describe`/`given`/`should` (H10). H6 et H9 sont devenus sans objet avec le retrait de P4.
+
+**Aucune nouvelle revue n'est prévue sur ce périmètre.** Une quatrième passe trouverait encore des findings de prompt, par construction, sans que cela signale une dégradation.
+
 ## 10. Décisions tranchées
 
-- **D1 — retenue** (17/09/2026) : l'urgence est plafonnée à `medium` quand la confiance est `incertain`. Détail et risque assumé en section 6.3.
+- ~~**D1 — plafond d'urgence**~~ *(caduque, retirée par D5)* (17/09/2026).
 - **D2 — hors périmètre** (17/09/2026) : la fiche sous-traitant Anthropic n'est pas corrigée dans ce lot. L'écart préexiste à cette spec ; il est consigné en section 11 pour être traité séparément.
 - **D3 — option A3 retenue** (17/09/2026) : face au finding F2, le prompt garde sa version minimale plutôt que la version enrichie, qui déplaçait l'erreur au lieu de la corriger. Détail et pistes en section 9 bis.
-- **D4 — l'incertitude s'affiche, elle ne réécrit pas** (17/09/2026) : le plafond d'impact utilisateur est supprimé au profit d'un état d'affichage dédié. Le plafond d'urgence de D1 reste, car il porte sur une échelle que nous produisons et non sur une phrase écrite par le modèle. Détail en section 9 bis.
+- **D5 — retrait du champ `confidence`** (17/09/2026) : rend D1 et D4 caduques. Le mécanisme concentrait 7 des 29 findings et réécrivait le verdict du modèle. Détail et test d'ablation en section 9 bis.
+- ~~**D4 — l'incertitude s'affiche, elle ne réécrit pas**~~ *(caduque, remplacée par D5)* (17/09/2026) : le plafond d'impact utilisateur est supprimé au profit d'un état d'affichage dédié. Le plafond d'urgence de D1 reste, car il porte sur une échelle que nous produisons et non sur une phrase écrite par le modèle. Détail en section 9 bis.
 
 ## 11. Hors périmètre, à traiter séparément
 
