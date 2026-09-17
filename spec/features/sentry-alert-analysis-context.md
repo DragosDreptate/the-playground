@@ -184,10 +184,29 @@ Aucun test E2E : la chaîne n'a pas de surface utilisateur.
 
 Rejouer l'événement `2P` de bout en bout et lire l'alerte produite, au lieu de se fier aux seuls tests unitaires. Le payload du webhook est reconstituable et l'événement est toujours consultable via l'API Sentry. **Attendu : `urgency: noise`, `userImpact.level: none`, et un `trigger` qui nomme le scan.** Tant que cette vérification n'est pas faite, le lot n'est pas terminé, puisque le défaut d'origine portait sur le résultat final, pas sur les fonctions prises une à une.
 
+## 9 bis. Suites de la revue de code (17/09/2026)
+
+Revue haute intensité sur `origin/main...feat/sentry-alert-analysis-context` : 34 candidats, 10 findings retenus. Sort de chacun.
+
+**Corrigés** : signaux dégénérés retirés du prompt (F1, F6), plafond D1 non contournable par omission de `confidence` (F3), plafond étendu à `userImpact.level` (F5), `null`/`""` non convertis en zéro (F7), entrée d'exception malformée sans crash (F8), repli « aucune requête » reformulé en constat neutre (F9).
+
+**F2, non corrigé, assumé.** L'erreur `Failed to find Server Action` a deux causes : un scan, et un déploiement récent qui casse les formulaires des onglets restés ouverts. Le prompt la classe en bruit dans les deux cas.
+
+Une version enrichie a été écrite puis **retirée** (option A3) : elle hiérarchisait les signatures en fortes et faibles et décrivait les deux causes. Validée contre le modèle, elle a produit l'erreur inverse, le scan réel de `2P` remontant en urgence haute avec un formulaire inventé sur la landing, malgré une consigne explicite l'interdisant. Trois reformulations n'ont pas stabilisé le comportement.
+
+**Cause structurelle** : le discriminant de ce cas est l'origine réseau, et distinguer un hébergeur d'un fournisseur d'accès à partir d'un numéro d'AS demande une table de correspondance que le modèle n'a pas. Aucune formulation ne compense une donnée absente. Les deux pistes ouvertes, si le sujet revient : calculer les signaux déterministes côté code (chemin inexistant, route sans Server Action via `ROUTE_MAP`) et les affirmer comme des faits, ou monter cette analyse sur un modèle plus capable.
+
+**F4, hors périmètre.** L'appel à l'API Anthropic est hors du `try` (`analyze-issue.ts:89`) : un 429 ou un 529 fait perdre l'alerte entière, sans email ni Slack, alors que `fallbackResult` existe pour ça. Défaut **préexistant**, à traiter dans son propre chantier.
+
+**F10, réfuté par vérification.** La revue signalait une fuite de token de magic link et d'email vers Anthropic via l'URL de requête. Vérifié sur l'événement réel de `THE-PLAYGROUND-1A` : Sentry range la query string dans un champ `query` **séparé**, que le code ne transmet pas, et le token y est de toute façon `[Filtered]`. L'email, lui, y figure en clair : d'où le garde-fou documentaire posé sur `SentryRequest.url`.
+
+**Point annexe clos** : les réponses du modèle frôlaient `max_tokens` (877 sur 900) avec le prompt enrichi, avec une troncature observée. Le retour à la version minimale les ramène à ~330 tokens, la marge est rétablie sans toucher au réglage.
+
 ## 10. Décisions tranchées
 
 - **D1 — retenue** (17/09/2026) : l'urgence est plafonnée à `medium` quand la confiance est `incertain`. Détail et risque assumé en section 6.3.
 - **D2 — hors périmètre** (17/09/2026) : la fiche sous-traitant Anthropic n'est pas corrigée dans ce lot. L'écart préexiste à cette spec ; il est consigné en section 11 pour être traité séparément.
+- **D3 — option A3 retenue** (17/09/2026) : face au finding F2, le prompt garde sa version minimale plutôt que la version enrichie, qui déplaçait l'erreur au lieu de la corriger. Détail et pistes en section 9 bis.
 
 ## 11. Hors périmètre, à traiter séparément
 
