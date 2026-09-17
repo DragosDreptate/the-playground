@@ -62,8 +62,6 @@ const FALLBACK_USER_IMPACT: UserImpact = {
 function fallbackResult(issue: IssueInput, rawText?: string): AnalysisResult {
   return {
     urgency: "medium",
-    // Un fallback est par nature un aveu d'ignorance : il le dit.
-    confidence: "incertain",
     trigger: "Déclencheur non identifié — vérifier les tags Sentry (cron, url, action)",
     functionalConsequence: "Conséquence fonctionnelle non identifiée — inspecter le handler concerné",
     userImpact: FALLBACK_USER_IMPACT,

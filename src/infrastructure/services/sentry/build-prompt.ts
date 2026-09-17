@@ -149,7 +149,6 @@ Sers-t'en pour écarter l'impossible : une conséquence annoncée sur une zone q
 
 {
   "urgency": "critical|high|medium|low|noise",
-  "confidence": "certain|probable|incertain",
   "trigger": "Phrase courte (1-2) qui répond à : qu'est-ce qui a provoqué cette erreur ? Précise le contexte d'activité (page, action utilisateur, cron, webhook, job). Langage métier, pas technique.",
   "functionalConsequence": "Phrase courte (1-2) qui répond à : qu'est-ce qui est cassé côté produit ? En termes métier (inscription, paiement, création d'événement, rappel, check-in, commentaire, affichage). PAS de jargon DB/framework.",
   "userImpact": {
@@ -169,7 +168,7 @@ Signatures de scan ou de bruit, à reconnaître :
 - Corps \`multipart/form-data\` volumineux (\`content-type\` + \`content-length\`) sur une route de page sans formulaire.
 - Script tiers (PostHog, GA, Stripe.js), extension de navigateur, erreur pendant \`pagehide\` / \`unload\`.
 
-Si un motif est reconnu : \`urgency: "noise"\`, \`userImpact.level: "none"\`, \`confidence: "certain"\`, et NOMME le motif dans \`trigger\` (ex. « scan automatisé depuis un hébergeur, chemin /index.php inexistant »).
+Si un motif est reconnu : \`urgency: "noise"\`, \`userImpact.level: "none"\`, et NOMME le motif dans \`trigger\` (ex. « scan automatisé depuis un hébergeur, chemin /index.php inexistant »).
 
 🚫 N'attribue JAMAIS à une route une fonctionnalité que la carte des zones ne lui donne pas : écrire « l'inscription à la newsletter échoue » sur une page qui n'a pas de formulaire fabrique une panne qui n'existe pas.
 
@@ -219,7 +218,7 @@ Checklist :
 Description (\`userImpact.description\`) :
 - Commence par le rôle : "Un participant...", "Un organisateur...", "Un visiteur anonyme...", "Aucun utilisateur..."
 - Décrit CE QU'IL VOIT OU NE VOIT PAS : "verra un écran 500", "ne recevra pas son email de rappel", "ne pourra pas cliquer sur Publier", "reste sur la page blanche quelques secondes puis réessaye"
-- "none"/"silent" exigent une PREUVE POSITIVE d'absence d'impact (script tiers, \`pagehide\`, cron sans conséquence visible, motif de bruit reconnu). L'absence d'information n'est pas une preuve : dans ce cas, choisis le niveau que la stack et la route rendent plausible, et passe en \`confidence: "incertain"\`.
+- Dans le doute, préfère "none"/"silent" et dis-le franchement ("aucun utilisateur affecté directement pour ce run")
 
 ## Heuristiques pour URGENCY
 
@@ -229,21 +228,13 @@ Description (\`userImpact.description\`) :
 - "low" = cosmétique, edge case rare
 - "noise" = extension navigateur, bot, erreur non-actionnable
 
-## Heuristiques pour CONFIDENCE
-
-- "certain" = les données identifient le déclencheur (tag \`cron\`, server action nommée dans la stack, motif de bruit reconnu ci-dessus).
-- "probable" = faisceau cohérent, mais pas de preuve directe.
-- "incertain" = les données ne permettent pas de conclure.
-
-Si "incertain", \`trigger\` et \`functionalConsequence\` doivent NOMMER ce qui manque pour trancher (ex. « origine indéterminée : aucune stacktrace applicative ni en-tête de requête »). Une urgence haute ne sera de toute façon pas retenue sur un diagnostic incertain.
-
 ## Règle d'or
 
 Reste PRÉCIS quand les données permettent de conclure : ne dis jamais "Une erreur s'est produite" si un tag, une URL ou une stack désigne le déclencheur.
 
-Quand elles ne le permettent PAS, dis-le franchement et passe en \`confidence: "incertain"\`. Une incertitude assumée vaut mieux qu'une hypothèse présentée comme un fait : c'est ce qui décide si on réveille quelqu'un pour rien.
+Quand elles ne le permettent PAS, dis-le franchement et nomme la donnée qui manque (ex. « origine indéterminée : aucune stacktrace applicative ni en-tête de requête »). Une incertitude assumée vaut mieux qu'une hypothèse présentée comme un fait : c'est ce qui décide si on réveille quelqu'un pour rien.
 
-INTERDIT dans tous les cas : énumérer des hypothèses alternatives pour donner le change ("inscription, création d'événement, ou autre interaction clé"). Une liste de possibilités est l'aveu d'une devinette — dans ce cas, choisis \`incertain\` et nomme la donnée manquante.
+INTERDIT dans tous les cas : énumérer des hypothèses alternatives pour donner le change ("inscription, création d'événement, ou autre interaction clé"). Une liste de possibilités est l'aveu d'une devinette — dans ce cas, dis que tu ne peux pas trancher et nomme la donnée manquante.
 
 Si tu hésites à mettre du jargon, demande-toi : est-ce qu'un organisateur non-tech comprendrait ? Si non → reformule. Les seules sections où le jargon est permis sont \`technical\` et le culprit implicite.`;
 }

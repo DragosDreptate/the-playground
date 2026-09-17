@@ -32,10 +32,12 @@ export type SentryRequest = {
 export type SentryEvent = {
   eventID: string;
   title: string;
-  tags: { key: string; value: string }[];
+  /** Optionnels et nullables comme `data` ci-dessous, pour que les gardes du
+   * code ne passent pas pour du code mort aux yeux du compilateur. */
+  tags?: ({ key?: string; value?: string } | null)[];
   /** Absent de `events/latest/`, qui range la requête dans `entries`. */
   request?: SentryRequest;
-  entries: {
+  entries?: {
     type: string;
     /**
      * Selon `type` : les exceptions portent `values`, la requête ses champs
