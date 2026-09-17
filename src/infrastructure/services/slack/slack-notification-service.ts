@@ -1,7 +1,7 @@
 import {
   CONFIDENCE_META,
   URGENCY_META,
-  USER_IMPACT_META,
+  resolveImpactDisplay,
   type AnalysisResult,
 } from "../sentry/analysis-meta";
 import type { AuditReport, AuditVerdictLean } from "../audit/types";
@@ -282,7 +282,7 @@ export async function notifySlackSentryIssue(params: {
 }): Promise<void> {
   const { issue, analysis, sentryUrl } = params;
   const urgencyLabel = URGENCY_META[analysis.urgency].label;
-  const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
+  const impactMeta = resolveImpactDisplay(analysis.userImpact.level, analysis.confidence);
   const confidenceLabel = CONFIDENCE_META[analysis.confidence].label;
   // Les erreurs Sentry vont dans #sentry. Fallback sur #admin si le webhook
   // dédié n'est pas configuré (|| et non ?? : une variable d'env vide "" doit

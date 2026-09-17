@@ -11,7 +11,7 @@ import {
 import {
   CONFIDENCE_META,
   URGENCY_META,
-  USER_IMPACT_META,
+  resolveImpactDisplay,
   type AnalysisResult,
 } from "./analysis-meta";
 import type { IssueInput } from "./analyze-issue";
@@ -46,7 +46,7 @@ function InfoRow({ label, body, accentColor, labelBold }: InfoRowProps) {
 
 export function SentryIssueAnalysisEmail({ issue, analysis, sentryUrl }: Props) {
   const urgencyMeta = URGENCY_META[analysis.urgency];
-  const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
+  const impactMeta = resolveImpactDisplay(analysis.userImpact.level, analysis.confidence);
 
   return (
     <EmailLayout

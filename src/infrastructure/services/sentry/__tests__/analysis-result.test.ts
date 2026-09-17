@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  capUrgencyForConfidence,
-  capUserImpactForConfidence,
-  parseAnalysisResult,
-} from "../analysis-result";
+import { capUrgencyForConfidence, parseAnalysisResult } from "../analysis-result";
+import { resolveImpactDisplay } from "../analysis-meta";
 
 const VALID_RESPONSE = {
   urgency: "high",
@@ -32,19 +29,24 @@ describe("capUrgencyForConfidence", () => {
   });
 });
 
-describe("capUserImpactForConfidence", () => {
-  it("abaisse « utilisateur bloqué » à « dégradé » sur un diagnostic incertain", () => {
-    expect(capUserImpactForConfidence("blocking", "incertain")).toBe("degraded");
+describe("resolveImpactDisplay", () => {
+  it("affiche l'incertitude au lieu de rabaisser le niveau annoncé", () => {
+    // Rabaisser « bloquant » en « dégradé » tout en gardant la description
+    // d'origine produisait un badge et une phrase contradictoires.
+    const display = resolveImpactDisplay("blocking", "incertain");
+    expect(display.label).toBe("IMPACT INCERTAIN");
+    expect(display.emoji).not.toBe("🔴");
   });
 
-  it("ne remonte jamais un impact annoncé nul ou silencieux", () => {
-    expect(capUserImpactForConfidence("none", "incertain")).toBe("none");
-    expect(capUserImpactForConfidence("silent", "incertain")).toBe("silent");
+  it("neutralise aussi un impact annoncé nul quand le diagnostic est incertain", () => {
+    // Le bandeau vert « AUCUN IMPACT » est une affirmation : il ne doit pas
+    // accompagner un diagnostic que le modèle ne garantit pas.
+    expect(resolveImpactDisplay("none", "incertain").label).toBe("IMPACT INCERTAIN");
   });
 
-  it("laisse intact un impact bloquant si le diagnostic est sûr", () => {
-    expect(capUserImpactForConfidence("blocking", "certain")).toBe("blocking");
-    expect(capUserImpactForConfidence("blocking", "probable")).toBe("blocking");
+  it("laisse l'affichage d'origine dès que le diagnostic est assumé", () => {
+    expect(resolveImpactDisplay("blocking", "certain").label).toBe("UTILISATEUR BLOQUÉ");
+    expect(resolveImpactDisplay("none", "probable").label).toBe("AUCUN IMPACT UTILISATEUR");
   });
 });
 
@@ -59,12 +61,24 @@ describe("parseAnalysisResult", () => {
     expect(parsed?.confidence).toBe("incertain");
   });
 
-  it("plafonne aussi l'impact utilisateur, pour que les deux moitiés du message s'accordent", () => {
-    // Sans ça : en-tête jaune « MOYENNE » et bandeau rouge « UTILISATEUR
-    // BLOQUÉ » dans le même message.
+  it("ne réécrit jamais l'impact annoncé par le modèle", () => {
+    // L'incertitude est portée par l'AFFICHAGE (resolveImpactDisplay), pas en
+    // falsifiant la réponse : sinon le badge contredit sa propre description.
     const parsed = parseAnalysisResult({ ...VALID_RESPONSE, confidence: "incertain" });
-    expect(parsed?.userImpact.level).toBe("degraded");
-    expect(parsed?.userImpact.description).toBe(VALID_RESPONSE.userImpact.description);
+    expect(parsed?.userImpact).toEqual(VALID_RESPONSE.userImpact);
+  });
+
+  it("accepte les variantes de casse et d'espaces du modèle", () => {
+    // Sans normalisation, « Certain » retombait sur le défaut `incertain` et
+    // plafonnait TOUTES les alertes, y compris celles déclarées sûres.
+    expect(parseAnalysisResult({ ...VALID_RESPONSE, confidence: "Certain" })?.confidence).toBe(
+      "certain"
+    );
+    expect(parseAnalysisResult({ ...VALID_RESPONSE, confidence: " INCERTAIN " })?.confidence).toBe(
+      "incertain"
+    );
+    // Et l'urgence n'est alors PAS plafonnée à tort.
+    expect(parseAnalysisResult({ ...VALID_RESPONSE, confidence: "Certain" })?.urgency).toBe("high");
   });
 
   it("conserve l'analyse mais la traite comme incertaine si confidence manque", () => {
@@ -77,7 +91,6 @@ describe("parseAnalysisResult", () => {
     // l'ABSENCE du champ.
     expect(parsed?.confidence).toBe("incertain");
     expect(parsed?.urgency).toBe("medium");
-    expect(parsed?.userImpact.level).toBe("degraded");
   });
 
   it("traite une valeur de confidence inconnue comme incertaine", () => {

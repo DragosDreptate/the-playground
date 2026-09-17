@@ -134,14 +134,36 @@ describe("extractEventContext", () => {
   });
 
   it("survit à une entrée d'exception sans clé `data`", () => {
-    // Tourne hors try/catch : un TypeError ici ferait perdre l'alerte entière.
+    // Un TypeError ici abandonnerait l'analyse : ni email ni Slack.
+    // `data` est optionnel dans le type, donc le cas se construit sans cast.
     const ctx = extractEventContext({
       eventID: "x",
       title: "t",
       tags: [],
-      entries: [{ type: "exception" } as never, { type: "exception", data: {} }],
+      entries: [{ type: "exception" }, { type: "exception", data: {} }],
     });
     expect(ctx.stacktrace).toBe("");
+  });
+
+  it("survit à des tags malformés", () => {
+    // Même exigence que pour les en-têtes : la forme vient d'une API tierce.
+    const ctx = extractEventContext({
+      eventID: "x",
+      title: "t",
+      tags: [{ key: "url", value: "https://the-playground.fr/" }, null, { key: "x" }] as never,
+      entries: [],
+    });
+    expect(ctx.tags).toEqual({ url: "https://the-playground.fr/" });
+  });
+
+  it("survit à des tags renvoyés sous une forme non itérable", () => {
+    const ctx = extractEventContext({
+      eventID: "x",
+      title: "t",
+      tags: { url: "https://the-playground.fr/" } as never,
+      entries: [],
+    });
+    expect(ctx.tags).toEqual({});
   });
 
   it("ignore une forme d'en-têtes inattendue sans planter", () => {
@@ -182,15 +204,17 @@ describe("buildAnalysisPrompt", () => {
         platform: "node",
         metadata: { type: "Error" },
       },
-      { ...extractEventContext(SCAN_EVENT), eventCount: 8, userCount: 0 }
+      // Valeurs du chemin RÉEL : l'analyse tourne à la création de l'issue,
+      // donc 1 occurrence, et 0 utilisateur faute de Sentry.setUser.
+      { ...extractEventContext(SCAN_EVENT), eventCount: 1, userCount: 0 }
     );
 
-    // Le faisceau « scanner » : réseau d'origine, corps multipart, volumétrie.
+    // Le faisceau « scanner » : réseau d'origine et corps multipart.
     expect(prompt).toContain("55286");
     expect(prompt).toContain("multipart/form-data");
-    expect(prompt).toContain("8 occurrences déjà enregistrées");
-    // « 0 utilisateur » est une non-information ici (le projet n'attache
-    // aucune identité aux erreurs) : ne pas la présenter comme un signal.
+    // Ces deux compteurs sont constants en production : les présenter comme
+    // des signaux fournirait un argument permanent en faveur de « bruit ».
+    expect(prompt).not.toContain("Volumétrie:");
     expect(prompt).not.toContain("0 utilisateur");
     // Les tags de client, absents de la liste blanche d'origine.
     expect(prompt).toContain("browser=Chrome 152.0.0");

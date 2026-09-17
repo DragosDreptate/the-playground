@@ -33,18 +33,47 @@ export const URGENCY_META: Record<Urgency, { label: string; color: string }> = {
   noise: { label: "BRUIT", color: "#71717a" },
 };
 
+/**
+ * Libellés décrivant un ÉTAT, jamais une conséquence.
+ *
+ * « urgence plafonnée » a été retiré : le plafond ne s'applique pas toujours
+ * (rien à rabaisser sous `noise`), et l'annoncer quand même laissait croire
+ * qu'on avait masqué quelque chose.
+ */
 export const CONFIDENCE_META: Record<Confidence, { label: string }> = {
   certain: { label: "Diagnostic sûr" },
   probable: { label: "Diagnostic probable" },
-  incertain: { label: "Diagnostic incertain — urgence plafonnée" },
+  incertain: { label: "Diagnostic incertain" },
 };
 
-export const USER_IMPACT_META: Record<
-  UserImpactLevel,
-  { label: string; color: string; emoji: string }
-> = {
+export type ImpactDisplay = { label: string; color: string; emoji: string };
+
+export const USER_IMPACT_META: Record<UserImpactLevel, ImpactDisplay> = {
   none: { label: "AUCUN IMPACT UTILISATEUR", color: "#16a34a", emoji: "🟢" },
   silent: { label: "IMPACT SILENCIEUX", color: "#71717a", emoji: "⚪" },
   degraded: { label: "EXPÉRIENCE DÉGRADÉE", color: "#ea580c", emoji: "🟠" },
   blocking: { label: "UTILISATEUR BLOQUÉ", color: "#dc2626", emoji: "🔴" },
 };
+
+const UNCERTAIN_IMPACT: ImpactDisplay = {
+  label: "IMPACT INCERTAIN",
+  color: "#ca8a04",
+  emoji: "❓",
+};
+
+/**
+ * Bandeau d'impact affiché dans l'email et sur Slack.
+ *
+ * Un diagnostic incertain n'est PAS rabaissé d'un cran : réécrire le niveau
+ * tout en gardant la description du modèle produisait un badge et une phrase
+ * qui se contredisaient (« EXPÉRIENCE DÉGRADÉE » au-dessus de « l'utilisateur
+ * reste bloqué »). On affiche donc l'incertitude pour ce qu'elle est, et la
+ * description d'origine reste intacte : le message ne dit jamais plus que ce
+ * que le modèle a dit.
+ */
+export function resolveImpactDisplay(
+  level: UserImpactLevel,
+  confidence: Confidence
+): ImpactDisplay {
+  return confidence === "incertain" ? UNCERTAIN_IMPACT : USER_IMPACT_META[level];
+}

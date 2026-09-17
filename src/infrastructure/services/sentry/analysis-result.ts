@@ -46,30 +46,16 @@ export function capUrgencyForConfidence(urgency: Urgency, confidence: Confidence
   return URGENCY_RANK[urgency] > URGENCY_RANK.medium ? "medium" : urgency;
 }
 
-const USER_IMPACT_RANK: Record<UserImpactLevel, number> = {
-  none: 0,
-  silent: 1,
-  degraded: 2,
-  blocking: 3,
-};
-
 /**
- * Pendant de `capUrgencyForConfidence` sur l'impact utilisateur.
+ * L'impact utilisateur n'est PAS rabaissé quand le diagnostic est incertain.
  *
- * Sans lui, une analyse incertaine affichait un en-tête jaune « MOYENNE » et,
- * juste en dessous, le bandeau rouge « UTILISATEUR BLOQUÉ » — contradictoire,
- * et toujours aussi alarmant. Or c'est ce bandeau, plus que l'urgence, qui
- * faisait lire une alerte comme une urgence (cf. THE-PLAYGROUND-2P).
- *
- * Ne remonte jamais un niveau : un impact annoncé nul le reste.
+ * Une première version le faisait, par symétrie avec l'urgence. Mais rabaisser
+ * le niveau sans toucher à la description produisait un badge « EXPÉRIENCE
+ * DÉGRADÉE » au-dessus d'une phrase disant l'utilisateur bloqué : la
+ * contradiction n'était pas supprimée, seulement déplacée. C'est désormais
+ * l'AFFICHAGE qui porte l'incertitude, via `resolveImpactDisplay`
+ * (`analysis-meta.ts`), sans réécrire ce que le modèle a répondu.
  */
-export function capUserImpactForConfidence(
-  level: UserImpactLevel,
-  confidence: Confidence
-): UserImpactLevel {
-  if (confidence !== "incertain") return level;
-  return USER_IMPACT_RANK[level] > USER_IMPACT_RANK.degraded ? "degraded" : level;
-}
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -83,8 +69,20 @@ function parseUserImpact(value: unknown): UserImpact | null {
   return { level: v.level as UserImpactLevel, description: v.description };
 }
 
+/**
+ * Normalise AVANT de comparer : un modèle écrit « Certain » ou « certain »
+ * d'une réponse à l'autre, et rien dans le prompt ne l'en empêche.
+ *
+ * Sans ce `trim`/`toLowerCase`, une simple majuscule ferait retomber sur
+ * `incertain` et plafonnerait TOUTES les alertes, y compris celles que le
+ * modèle déclarait sûres.
+ */
 function parseConfidence(value: unknown): Confidence {
-  return CONFIDENCES.includes(value as Confidence) ? (value as Confidence) : DEFAULT_CONFIDENCE;
+  if (typeof value !== "string") return DEFAULT_CONFIDENCE;
+  const normalized = value.trim().toLowerCase();
+  return CONFIDENCES.includes(normalized as Confidence)
+    ? (normalized as Confidence)
+    : DEFAULT_CONFIDENCE;
 }
 
 /**
@@ -113,10 +111,7 @@ export function parseAnalysisResult(value: unknown): AnalysisResult | null {
     confidence,
     trigger: v.trigger,
     functionalConsequence: v.functionalConsequence,
-    userImpact: {
-      ...userImpact,
-      level: capUserImpactForConfidence(userImpact.level, confidence),
-    },
+    userImpact,
     technical: v.technical,
   };
 }

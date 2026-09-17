@@ -167,7 +167,6 @@ Signatures de scan ou de bruit, à reconnaître :
 - Chemin qui n'existe pas chez nous : \`.php\`, \`/wp-admin\`, \`/wp-login\`, \`/.env\`, \`/.git\`, \`/phpmyadmin\`. L'app n'a AUCUN fichier PHP : une telle requête est un scan, sans exception.
 - \`x-vercel-ip-as-number\` d'un hébergeur ou d'un cloud plutôt que d'un FAI résidentiel, surtout avec un User-Agent de navigateur grand public (falsifié).
 - Corps \`multipart/form-data\` volumineux (\`content-type\` + \`content-length\`) sur une route de page sans formulaire.
-- Plusieurs occurrences rapprochées depuis la même origine.
 - Script tiers (PostHog, GA, Stripe.js), extension de navigateur, erreur pendant \`pagehide\` / \`unload\`.
 
 Si un motif est reconnu : \`urgency: "noise"\`, \`userImpact.level: "none"\`, \`confidence: "certain"\`, et NOMME le motif dans \`trigger\` (ex. « scan automatisé depuis un hébergeur, chemin /index.php inexistant »).
@@ -220,7 +219,7 @@ Checklist :
 Description (\`userImpact.description\`) :
 - Commence par le rôle : "Un participant...", "Un organisateur...", "Un visiteur anonyme...", "Aucun utilisateur..."
 - Décrit CE QU'IL VOIT OU NE VOIT PAS : "verra un écran 500", "ne recevra pas son email de rappel", "ne pourra pas cliquer sur Publier", "reste sur la page blanche quelques secondes puis réessaye"
-- Dans le doute, préfère "none"/"silent" et dis-le franchement ("aucun utilisateur affecté directement pour ce run")
+- "none"/"silent" exigent une PREUVE POSITIVE d'absence d'impact (script tiers, \`pagehide\`, cron sans conséquence visible, motif de bruit reconnu). L'absence d'information n'est pas une preuve : dans ce cas, choisis le niveau que la stack et la route rendent plausible, et passe en \`confidence: "incertain"\`.
 
 ## Heuristiques pour URGENCY
 

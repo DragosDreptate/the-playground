@@ -37,8 +37,13 @@ export type SentryEvent = {
   request?: SentryRequest;
   entries: {
     type: string;
-    /** Selon `type` : les exceptions portent `values`, la requête ses champs HTTP. */
-    data: {
+    /**
+     * Selon `type` : les exceptions portent `values`, la requête ses champs
+     * HTTP. OPTIONNEL à dessein : la forme vient d'une API tierce, et déclarer
+     * `data` obligatoire rendrait les gardes du code « inutiles » aux yeux du
+     * compilateur, donc supprimables de bonne foi par un futur nettoyage.
+     */
+    data?: {
       values?: {
         type: string;
         value: string;
@@ -151,8 +156,9 @@ export function extractEventContext(event: SentryEvent): EventContext {
   for (const entry of event.entries ?? []) {
     if (entry.type !== "exception") continue;
     // `data?.` et pas seulement `?? []` : une entrée sans clé `data` lèverait
-    // un TypeError, et `extractEventContext` tourne hors try/catch — l'alerte
-    // serait perdue en silence.
+    // un TypeError. L'appelant l'attrape bien (`route.ts`, dans le `after()`)
+    // et la remonte à Sentry, mais l'analyse est alors abandonnée : ni email
+    // ni Slack pour l'issue d'origine.
     for (const val of entry.data?.values ?? []) {
       lines.push(`${val.type}: ${val.value}`);
       lines.push(`Handled: ${val.mechanism?.handled ?? "unknown"}`);
@@ -165,9 +171,14 @@ export function extractEventContext(event: SentryEvent): EventContext {
     }
   }
 
+  // Même défense que pour les en-têtes : `tags` peut arriver non itérable, ou
+  // contenir un élément nul. Un TypeError ici abandonnerait toute l'analyse.
   const tags: Record<string, string> = {};
-  for (const t of event.tags ?? []) {
-    tags[t.key] = t.value;
+  if (Array.isArray(event.tags)) {
+    for (const t of event.tags) {
+      if (typeof t?.key !== "string" || typeof t?.value !== "string") continue;
+      tags[t.key] = t.value;
+    }
   }
 
   const request = findRequest(event);
