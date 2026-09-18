@@ -40,6 +40,23 @@ function realUserWhere(): Prisma.UserWhereInput {
   };
 }
 
+/**
+ * Même exclusion, pour les requêtes SQL brutes des statistiques.
+ *
+ * `Prisma.raw` est indispensable : ces requêtes sont des tagged templates, où
+ * une chaîne interpolée deviendrait un paramètre lié (`AND $2`) et produirait
+ * du SQL invalide. Aucun risque d'injection, les suffixes sont des constantes.
+ *
+ * Existe parce que ces fragments recopiaient les domaines en dur : les
+ * compteurs comptaient donc les comptes E2E comme de vrais utilisateurs, en
+ * contradiction avec `realUserWhere` juste au-dessus.
+ */
+function notSyntheticSql(column: string): Prisma.Sql {
+  return Prisma.raw(
+    SYNTHETIC_EMAIL_SUFFIXES.map((suffix) => `${column} NOT LIKE '%${suffix}'`).join(" AND ")
+  );
+}
+
 function realCircleWhere(): Prisma.CircleWhereInput {
   return {
     memberships: { some: { role: "HOST", user: realUserWhere() } },
@@ -342,8 +359,7 @@ export const prismaAdminRepository: AdminRepository = {
         SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
         FROM users
         WHERE "createdAt" >= ${since}
-          AND email NOT LIKE '%@demo.playground'
-          AND email NOT LIKE '%@test.playground'
+          AND ${notSyntheticSql("email")}
         GROUP BY DATE_TRUNC('day', "createdAt")
         ORDER BY date ASC
       `,
@@ -353,8 +369,7 @@ export const prismaAdminRepository: AdminRepository = {
         JOIN users u ON u.id = r."userId"
         WHERE r.status != 'CANCELLED'
           AND r."registeredAt" >= ${since}
-          AND u.email NOT LIKE '%@demo.playground'
-          AND u.email NOT LIKE '%@test.playground'
+          AND ${notSyntheticSql("u.email")}
         GROUP BY DATE_TRUNC('day', r."registeredAt")
         ORDER BY date ASC
       `,
@@ -364,8 +379,7 @@ export const prismaAdminRepository: AdminRepository = {
         WHERE m."createdAt" >= ${since}
           AND m."createdById" IN (
             SELECT id FROM users
-            WHERE email NOT LIKE '%@demo.playground'
-              AND email NOT LIKE '%@test.playground'
+            WHERE ${notSyntheticSql("email")}
           )
         GROUP BY DATE_TRUNC('day', m."createdAt")
         ORDER BY date ASC
@@ -386,8 +400,7 @@ export const prismaAdminRepository: AdminRepository = {
         FROM registrations r
         JOIN users u ON u.id = r."userId"
         WHERE r.status != 'CANCELLED'
-          AND u.email NOT LIKE '%@demo.playground'
-          AND u.email NOT LIKE '%@test.playground'
+          AND ${notSyntheticSql("u.email")}
       `,
       prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*)::bigint AS count FROM (
@@ -395,8 +408,7 @@ export const prismaAdminRepository: AdminRepository = {
           FROM registrations r
           JOIN users u ON u.id = r."userId"
           WHERE r.status != 'CANCELLED'
-            AND u.email NOT LIKE '%@demo.playground'
-            AND u.email NOT LIKE '%@test.playground'
+            AND ${notSyntheticSql("u.email")}
           GROUP BY r."userId"
           HAVING COUNT(DISTINCT r."momentId") >= 2
         ) sub
@@ -1034,8 +1046,7 @@ export const prismaAdminRepository: AdminRepository = {
         JOIN registrations r ON r."userId" = u.id
         LEFT JOIN circle_memberships cm ON cm."userId" = u.id
         WHERE r.status != 'CANCELLED'
-          AND u.email NOT LIKE '%@demo.playground'
-          AND u.email NOT LIKE '%@test.playground'
+          AND ${notSyntheticSql("u.email")}
         GROUP BY u.id
         ${havingClause}
         ${orderByClause}
@@ -1047,8 +1058,7 @@ export const prismaAdminRepository: AdminRepository = {
           FROM users u
           JOIN registrations r ON r."userId" = u.id
           WHERE r.status != 'CANCELLED'
-            AND u.email NOT LIKE '%@demo.playground'
-            AND u.email NOT LIKE '%@test.playground'
+            AND ${notSyntheticSql("u.email")}
           GROUP BY u.id
           ${havingClause}
         ) sub

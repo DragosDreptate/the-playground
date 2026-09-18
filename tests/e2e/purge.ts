@@ -13,11 +13,19 @@ import type { PrismaClient } from "@prisma/client";
 
 import { evaluatePurgeFromEnv } from "./purge-guard";
 
-type PurgeOutcome = { purged: true; tables: number } | { purged: false; reason: string };
+type PurgeOutcome =
+  | { purged: true; tables: number }
+  | { purged: false; reason: string; intended: boolean };
 
 export async function purgeDatabase(prisma: PrismaClient): Promise<PurgeOutcome> {
   const decision = evaluatePurgeFromEnv();
-  if (!decision.allowed) return { purged: false, reason: decision.reason };
+  if (!decision.allowed) {
+    return {
+      purged: false,
+      reason: decision.reason ?? "refusée",
+      intended: decision.intended,
+    };
+  }
 
   // Liste lue dans le catalogue plutôt que maintenue à la main : une table
   // ajoutée au schéma et oubliée ici laisserait des données derrière elle,
@@ -27,7 +35,9 @@ export async function purgeDatabase(prisma: PrismaClient): Promise<PurgeOutcome>
     SELECT tablename FROM pg_tables
     WHERE schemaname = 'public' AND tablename NOT LIKE '\\_prisma%'
   `;
-  if (tables.length === 0) return { purged: false, reason: "aucune table trouvée" };
+  if (tables.length === 0) {
+    return { purged: false, reason: "aucune table trouvée", intended: true };
+  }
 
   const quoted = tables.map((t) => `"public"."${t.tablename}"`).join(", ");
   // CASCADE : l'ordre des clés étrangères n'a pas à être connu.

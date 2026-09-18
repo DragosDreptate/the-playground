@@ -40,6 +40,14 @@ describe("isAllowedInStaging", () => {
     });
   });
 
+  describe("given an email with @e2e.playground domain", () => {
+    // Domaine du jeu de données E2E. Sans ce cas, un oubli dans la garde
+    // enverrait de VRAIS emails pendant la suite de tests.
+    it("returns true", () => {
+      expect(isAllowedInStaging("host@e2e.playground", [])).toBe(true);
+    });
+  });
+
   describe("given a random email not in allowlist", () => {
     it("returns false even with a populated allowlist", () => {
       expect(isAllowedInStaging("random@gmail.com", ["dragos@gmail.com"])).toBe(false);

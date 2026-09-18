@@ -28,6 +28,15 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+// Ces données sont VISIBLES de l'Explorer par conception : lancées par erreur
+// sur la production, elles publieraient une fausse communauté sur la page
+// Découvrir. Contrairement aux seeds test et démo, celui-ci n'a pas — et ne
+// doit pas avoir — de variante `:prod`.
+if (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production") {
+  console.error("❌ Seed E2E public interdit en production.");
+  process.exit(1);
+}
+
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });
@@ -72,7 +81,10 @@ async function main() {
 
   const circle = await prisma.circle.upsert({
     where: { slug: E2E_PUBLIC_CIRCLE_SLUG },
-    update: { visibility: "PUBLIC", excludedFromExplorer: false },
+    // Score élevé sur les DEUX entités : l'onglet Communautés trie les Circles
+    // par score, l'onglet Événements trie les Moments. À 0, la donnée de test
+    // pourrait tomber hors de la première page.
+    update: { visibility: "PUBLIC", excludedFromExplorer: false, explorerScore: 100 },
     create: {
       slug: E2E_PUBLIC_CIRCLE_SLUG,
       name: "Communauté publique E2E",
@@ -81,6 +93,7 @@ async function main() {
         "Elle porte toujours des événements à venir, quelle que soit la date.",
       visibility: "PUBLIC",
       excludedFromExplorer: false,
+      explorerScore: 100,
       category: "TECH",
       city: "Paris",
     },
@@ -98,7 +111,11 @@ async function main() {
       where: { slug: m.slug },
       // Les dates sont recalculées à chaque exécution : c'est ce qui empêche
       // ce jeu de données de périmer.
-      update: { startsAt, status: "PUBLISHED" },
+      // `explorerScore` élevé : l'Explorer trie par score décroissant et
+      // pagine. À 0, la communauté pourrait ne pas figurer sur la première
+      // page, et les tests de la page Découvrir échoueraient au hasard du
+      // volume de données.
+      update: { startsAt, status: "PUBLISHED", explorerScore: 100 },
       create: {
         slug: m.slug,
         circleId: circle.id,
@@ -110,6 +127,7 @@ async function main() {
         locationName: "Paris",
         locationAddress: "Paris, France",
         status: "PUBLISHED",
+        explorerScore: 100,
       },
     });
   }

@@ -36,11 +36,22 @@ async function main() {
   // 0. Purge — uniquement sur une branche éphémère de CI. Refusée partout
   // ailleurs, notamment sur la base de dev que vise `pnpm test:e2e` en local.
   const purge = await purgeDatabase(prisma);
-  console.log(
-    purge.purged
-      ? `🧹 Base purgée (${purge.tables} tables) — la suite ne dépend d'aucune donnée préexistante`
-      : `⏭️  Purge ignorée : ${purge.reason}`
-  );
+  if (purge.purged) {
+    console.log(
+      `🧹 Base purgée (${purge.tables} tables) — la suite ne dépend d'aucune donnée préexistante`
+    );
+  } else if (purge.intended) {
+    // Intention déclarée mais purge refusée : échouer BRUYAMMENT. Se contenter
+    // d'un log laisserait la suite tourner sur une base non purgée, et la
+    // garantie centrale du chantier serait perdue en silence — les échecs
+    // ressortiraient bien plus tard, en flaky, dans des PR sans rapport.
+    throw new Error(
+      `Purge demandée (E2E_ALLOW_PURGE) mais refusée : ${purge.reason}. ` +
+        `La suite ne peut pas garantir son isolation — arrêt.`
+    );
+  } else {
+    console.log(`⏭️  Purge ignorée : ${purge.reason}`);
+  }
 
   // 1. Seed les données de test (@test.playground, masquées de l'Explorer)
   console.log("\n🌱 Seed données test...");

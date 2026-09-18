@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/infrastructure/db/prisma";
+import { SYNTHETIC_EMAIL_SUFFIXES } from "@/lib/synthetic-accounts";
 import { getAllPosts } from "@/lib/blog";
 import { buildLocalizedUrls } from "@/lib/seo";
 
@@ -35,15 +36,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     withAlternates("/legal/cgu", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
   ];
 
-  // Exclude circles owned by test/demo users
+  // Exclude circles owned by synthetic accounts (test, demo, E2E)
   const testDemoMemberships = await prisma.circleMembership.findMany({
     where: {
       role: "HOST",
       user: {
-        OR: [
-          { email: { endsWith: "@test.playground" } },
-          { email: { endsWith: "@demo.playground" } },
-        ],
+        OR: SYNTHETIC_EMAIL_SUFFIXES.map((suffix) => ({ email: { endsWith: suffix } })),
       },
     },
     select: { circleId: true },
