@@ -5,12 +5,17 @@
  * et la cron route de recalcul des scores.
  */
 
-/** Suffixe email des comptes de test — jamais affichés sur Explorer. */
-export const TEST_EMAIL_SUFFIX = "@test.playground";
+export { TEST_EMAIL_SUFFIX } from "@/lib/synthetic-accounts";
+import { TEST_EMAIL_SUFFIX } from "@/lib/synthetic-accounts";
 
 /**
  * Retourne le filtre Prisma excluant les Circles dont le Host est un compte de test.
  * À combiner dans le champ `NOT` d'un `circle.findMany()`.
+ *
+ * ⚠️ Seul `@test.playground` est masqué, DÉLIBÉRÉMENT : ce seed a une variante
+ * production, et ses données n'ont rien à faire dans la découverte publique.
+ * Les comptes démo (vitrine assumée) et E2E (base jetable) restent visibles —
+ * c'est ce qui permet aux tests de la page Découvrir d'avoir de la matière.
  */
 export function excludeTestHostFilter() {
   return {

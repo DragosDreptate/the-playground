@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/infrastructure/db/prisma";
+import { SYNTHETIC_EMAIL_SUFFIXES } from "@/lib/synthetic-accounts";
 import { createResendEmailService } from "@/infrastructure/services";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 
@@ -45,10 +46,9 @@ async function handler(request: NextRequest) {
         welcomeEmailSentAt: null,
         role: { not: "ADMIN" },
         createdAt: { lte: cutoff },
-        AND: [
-          { email: { not: { endsWith: "@test.playground" } } },
-          { email: { not: { endsWith: "@demo.playground" } } },
-        ],
+        AND: SYNTHETIC_EMAIL_SUFFIXES.map((suffix) => ({
+          email: { not: { endsWith: suffix } },
+        })),
       },
       select: {
         id: true,

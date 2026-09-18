@@ -22,6 +22,7 @@ import path from "path";
 import fs from "fs";
 
 import { AUTH, TEST_USERS } from "./fixtures";
+import { purgeDatabase } from "./purge";
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
@@ -29,14 +30,29 @@ async function main() {
   console.log("\n🎭 Global setup E2E — The Playground");
   console.log("══════════════════════════════════════════\n");
 
-  // 1. Seed les données de test
-  console.log("🌱 Seed données test...");
+  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
+  const prisma = new PrismaClient({ adapter });
+
+  // 0. Purge — uniquement sur une branche éphémère de CI. Refusée partout
+  // ailleurs, notamment sur la base de dev que vise `pnpm test:e2e` en local.
+  const purge = await purgeDatabase(prisma);
+  console.log(
+    purge.purged
+      ? `🧹 Base purgée (${purge.tables} tables) — la suite ne dépend d'aucune donnée préexistante`
+      : `⏭️  Purge ignorée : ${purge.reason}`
+  );
+
+  // 1. Seed les données de test (@test.playground, masquées de l'Explorer)
+  console.log("\n🌱 Seed données test...");
   execSync("pnpm db:seed-test-data", { stdio: "inherit" });
+
+  // 1 bis. Seed des données PUBLIQUES (@e2e.playground, visibles de l'Explorer).
+  // Sans elles, les tests de la page Découvrir n'ont aucune matière.
+  console.log("\n🌍 Seed données publiques E2E...");
+  execSync("pnpm db:seed-e2e-public", { stdio: "inherit" });
 
   // 2. Crée / reset le user onboarding-test (non onboardé)
   console.log("\n👤 Reset user onboarding-test...");
-  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
-  const prisma = new PrismaClient({ adapter });
 
   await prisma.user.upsert({
     where: { email: TEST_USERS.ONBOARDING },

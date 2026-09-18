@@ -1,5 +1,6 @@
 import { prisma } from "@/infrastructure/db/prisma";
 import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
+import { SYNTHETIC_EMAIL_SUFFIXES } from "@/lib/synthetic-accounts";
 import type {
   AdminRepository,
   AdminStats,
@@ -33,11 +34,9 @@ const DEFAULT_LIMIT = 20;
 // Exclusion users démo/test
 // ─────────────────────────────────────────────
 
-const DEMO_EMAIL_SUFFIXES = ["@demo.playground", "@test.playground"] as const;
-
 function realUserWhere(): Prisma.UserWhereInput {
   return {
-    NOT: DEMO_EMAIL_SUFFIXES.map((suffix) => ({ email: { endsWith: suffix } })),
+    NOT: SYNTHETIC_EMAIL_SUFFIXES.map((suffix) => ({ email: { endsWith: suffix } })),
   };
 }
 
