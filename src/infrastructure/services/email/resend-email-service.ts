@@ -1,4 +1,5 @@
 import { createSafeResend } from "@/lib/email/safe-resend";
+import { isSyntheticEmail } from "@/lib/synthetic-accounts";
 import { resolveFirstNamePlaceholders } from "@/lib/email/host-message-placeholders";
 import type {
   EmailService,
@@ -102,10 +103,8 @@ export function formatFromWithDisplayName(
 export { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 
-function isDemoEmail(email: string): boolean {
-  const lower = email.toLowerCase();
-  return lower.endsWith("@demo.playground") || lower.endsWith("@test.playground");
-}
+/** Comptes synthétiques (test, démo, E2E) : jamais de vrai envoi. */
+const isDemoEmail = isSyntheticEmail;
 
 export function createResendEmailService(): EmailService {
   // Utiliser un placeholder si la clé est absente pour éviter de crasher au chargement

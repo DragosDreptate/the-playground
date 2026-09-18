@@ -41,7 +41,18 @@ const prisma = new PrismaClient({
 });
 
 const DRY_RUN = !process.argv.includes("--execute");
-const TEST_DOMAIN = "@test.playground";
+/**
+ * Domaines nettoyés par ce script.
+ *
+ * ⚠️ `@demo.playground` en est délibérément ABSENT : c'est la vitrine de
+ * production. `@e2e.playground` y figure, lui, sans quoi un run E2E interrompu
+ * laisserait une communauté PUBLIQUE orpheline qu'aucune commande ne supprime.
+ */
+const CLEANUP_DOMAINS = ["@test.playground", "@e2e.playground"] as const;
+
+const cleanupEmailFilter = {
+  OR: CLEANUP_DOMAINS.map((domain) => ({ email: { endsWith: domain } })),
+};
 
 async function main() {
   console.log("\n🧹 Nettoyage données test — The Playground");
@@ -57,7 +68,7 @@ async function main() {
   // ── Inventaire ────────────────────────────────────────────────────────────
 
   const testUsers = await prisma.user.findMany({
-    where: { email: { endsWith: TEST_DOMAIN } },
+    where: cleanupEmailFilter,
     select: { id: true, email: true, name: true },
   });
 
@@ -172,7 +183,7 @@ async function main() {
   //   Account, Session, CircleMembership (circles non-test),
   //   Registration (Moments dans des Circles non-test), Comment (idem).
   const deletedUsers = await prisma.user.deleteMany({
-    where: { email: { endsWith: TEST_DOMAIN } },
+    where: cleanupEmailFilter,
   });
   console.log(
     `  ✓ Étape 3 : ${deletedUsers.count} utilisateur(s) supprimé(s) (+ comptes OAuth, sessions, et données résiduelles via cascade)`

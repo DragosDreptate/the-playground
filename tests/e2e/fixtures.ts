@@ -18,8 +18,18 @@ export const SLUGS = {
   FULL_MOMENT: "test-atelier-complet",
   /** Circle auquel appartient le Host (paris-creative-tech) */
   CIRCLE: "paris-creative-tech",
-  /** Circle public pour les tests Explorer (yoga-montmartre) */
+  /**
+   * Circle public de test (yoga-montmartre).
+   * ⚠️ MASQUÉ de l'Explorer : son hôte est en `@test.playground`, que
+   * `excludeTestHostFilter` exclut. Pour les tests de la page Découvrir,
+   * utiliser `EXPLORER_CIRCLE`.
+   */
   PUBLIC_CIRCLE: "yoga-montmartre",
+  /**
+   * Circle visible de l'Explorer, porté par un hôte `@e2e.playground` et
+   * garanti avec des événements à venir (`scripts/db-seed-e2e-public.ts`).
+   */
+  EXPLORER_CIRCLE: "e2e-communaute-publique",
   /** Circle avec Stripe Connect activé (fake stripeConnectAccountId) */
   PAID_CIRCLE: "test-paid-events",
   /** Moment payant remboursable (15,00 EUR, capacity 10) — player1 inscrit PAID */

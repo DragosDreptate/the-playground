@@ -12,8 +12,7 @@
  *
  * Règles (quand le guard est actif) :
  * 1. Email explicitement listé dans STAGING_EMAIL_ALLOWLIST (case-insensitive)
- * 2. Email qui se termine par @test.playground (auto-whitelist comptes test)
- * 3. Email qui se termine par @demo.playground (auto-whitelist comptes démo)
+ * 2. Email d'un compte synthétique — test, démo ou E2E (`synthetic-accounts.ts`)
  *
  * Fail-closed : si l'allowlist est vide ou mal formée, tout est bloqué par défaut.
  * Mieux vaut ne rien envoyer qu'envoyer par erreur à un vrai utilisateur.
@@ -25,7 +24,7 @@
 
 import { Resend } from "resend";
 
-const AUTO_WHITELIST_SUFFIXES = ["@test.playground", "@demo.playground"];
+import { isSyntheticEmail } from "@/lib/synthetic-accounts";
 
 function parseAllowlist(raw: string): string[] {
   return raw
@@ -37,7 +36,7 @@ function parseAllowlist(raw: string): string[] {
 function isAllowedInStaging(to: string, allowlist: string[]): boolean {
   const lower = to.toLowerCase();
   if (allowlist.includes(lower)) return true;
-  return AUTO_WHITELIST_SUFFIXES.some((suffix) => lower.endsWith(suffix));
+  return isSyntheticEmail(lower);
 }
 
 function normalizeRecipients(to: string | string[] | undefined): string[] {

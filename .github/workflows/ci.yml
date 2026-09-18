@@ -133,6 +133,10 @@ jobs:
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
           NEXT_PUBLIC_SENTRY_DSN: ""
           E2E_SECRET: ${{ secrets.E2E_SECRET }}
+          # Autorise la purge en tête de globalSetup. Sans effet ailleurs : le
+          # garde-fou exige EN PLUS que la base ciblée soit une branche
+          # éphémère `e2e-<run_id>` (tests/e2e/purge-guard.ts).
+          E2E_ALLOW_PURGE: "1"
 
       # Nettoyage de la branche Neon — toujours, même si les tests échouent
       - name: Delete Neon branch

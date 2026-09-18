@@ -70,6 +70,17 @@ test.describe("Découvrir — page Explorer", () => {
     const momentLinks = page.locator("a[href*='/m/']");
     await expect(momentLinks.first()).toBeVisible();
   });
+
+  test("should display the seeded public Circle, proving the suite owns its data", async ({
+    page,
+  }) => {
+    // Vérifie ce que tout le chantier promet : la donnée affichée ici vient du
+    // seed E2E, pas de ce qui traînait en base. Sans ce test, une régression du
+    // seed ou du filtre d'exclusion ressortirait bien plus tard, en flaky, dans
+    // une PR sans rapport — c'est exactement ce qui s'est produit le 18/09.
+    const circleLink = page.locator(`a[href*='/circles/${SLUGS.EXPLORER_CIRCLE}']`);
+    await expect(circleLink.first()).toBeVisible();
+  });
 });
 
 test.describe("Découvrir — page Communauté publique", () => {

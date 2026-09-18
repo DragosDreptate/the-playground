@@ -20,7 +20,13 @@ config({ path: ".env.local" });
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
-const TEST_DOMAIN = "@test.playground";
+/**
+ * Domaines nettoyés après la suite.
+ *
+ * ⚠️ `@demo.playground` en est délibérément ABSENT : c'est la vitrine de
+ * production, pas une donnée de test. Le teardown ne doit jamais y toucher.
+ */
+const CLEANUP_DOMAINS = ["@test.playground", "@e2e.playground"] as const;
 
 async function main() {
   console.log("\n🧹 Global teardown E2E — nettoyage données test");
@@ -37,7 +43,7 @@ async function main() {
 
   try {
     const testUsers = await prisma.user.findMany({
-      where: { email: { endsWith: TEST_DOMAIN } },
+      where: { OR: CLEANUP_DOMAINS.map((domain) => ({ email: { endsWith: domain } })) },
       select: { id: true },
     });
 
@@ -79,7 +85,7 @@ async function main() {
 
     // Étape 3 — Utilisateurs test (cascade : Account, Session, memberships résiduelles)
     const deletedUsers = await prisma.user.deleteMany({
-      where: { email: { endsWith: TEST_DOMAIN } },
+      where: { OR: CLEANUP_DOMAINS.map((domain) => ({ email: { endsWith: domain } })) },
     });
     console.log(`  ✓ ${deletedUsers.count} utilisateur(s) test supprimé(s)`);
 
