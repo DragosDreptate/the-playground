@@ -31,8 +31,11 @@ export async function purgeDatabase(prisma: PrismaClient): Promise<PurgeOutcome>
   // ajoutée au schéma et oubliée ici laisserait des données derrière elle,
   // et la dépendance cachée que ce chantier supprime reviendrait par la porte
   // de service.
+  // `::text` obligatoire : `pg_tables.tablename` est du type PostgreSQL `name`,
+  // que Prisma ne sait pas désérialiser (« Failed to deserialize column of
+  // type 'name' »). Sans le cast, la purge échoue à la première exécution.
   const tables = await prisma.$queryRaw<{ tablename: string }[]>`
-    SELECT tablename FROM pg_tables
+    SELECT tablename::text FROM pg_tables
     WHERE schemaname = 'public' AND tablename NOT LIKE '\\_prisma%'
   `;
   if (tables.length === 0) {
