@@ -3,8 +3,15 @@ import { createSafeResend } from "@/lib/email/safe-resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackSentryIssue, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
-import { URGENCY_META, type AnalysisResult, type UserImpact, type UserImpactLevel } from "./analysis-meta";
+import { URGENCY_META, type AnalysisResult, type UserImpact } from "./analysis-meta";
 import { buildAnalysisPrompt } from "./build-prompt";
+import { parseAnalysisResult } from "./analysis-result";
+import {
+  emptyEventContext,
+  extractEventContext,
+  type EventContext,
+  type SentryEvent,
+} from "./event-context";
 import { buildSentryIssueUrl } from "@/lib/sentry-url";
 
 export type { UserImpact, UserImpactLevel } from "./analysis-meta";
@@ -26,33 +33,9 @@ export type IssueInput = {
     filename?: string;
     function?: string;
   };
-};
-
-type SentryEventFrame = {
-  filename?: string;
-  lineNo?: number;
-  colNo?: number;
-  function?: string;
-  inApp?: boolean;
-  context?: [number, string][];
-};
-
-type SentryEvent = {
-  eventID: string;
-  title: string;
-  tags: { key: string; value: string }[];
-  request?: { url?: string; method?: string };
-  entries: {
-    type: string;
-    data: {
-      values?: {
-        type: string;
-        value: string;
-        mechanism?: { type: string; handled: boolean };
-        stacktrace?: { frames: SentryEventFrame[] };
-      }[];
-    };
-  }[];
+  /** Occurrences et utilisateurs distincts touchés, tels que reçus du webhook. */
+  eventCount?: number;
+  userCount?: number;
 };
 
 async function fetchLatestEvent(issueId: string, token: string): Promise<SentryEvent | null> {
@@ -71,43 +54,6 @@ async function fetchLatestEvent(issueId: string, token: string): Promise<SentryE
   }
 }
 
-type EventContext = {
-  stacktrace: string;
-  tags: Record<string, string>;
-  requestUrl?: string;
-  requestMethod?: string;
-};
-
-function extractEventContext(event: SentryEvent): EventContext {
-  const lines: string[] = [];
-
-  for (const entry of event.entries) {
-    if (entry.type !== "exception") continue;
-    for (const val of entry.data.values ?? []) {
-      lines.push(`${val.type}: ${val.value}`);
-      lines.push(`Handled: ${val.mechanism?.handled ?? "unknown"}`);
-      const frames = val.stacktrace?.frames ?? [];
-      const appFrames = frames.filter((f) => f.inApp);
-      const relevantFrames = appFrames.length > 0 ? appFrames.slice(-8) : frames.slice(-5);
-      for (const frame of relevantFrames) {
-        lines.push(`  ${frame.filename}:${frame.lineNo} in ${frame.function ?? "(anonymous)"}`);
-      }
-    }
-  }
-
-  const tags: Record<string, string> = {};
-  for (const t of event.tags ?? []) {
-    tags[t.key] = t.value;
-  }
-
-  return {
-    stacktrace: lines.join("\n"),
-    tags,
-    requestUrl: event.request?.url,
-    requestMethod: event.request?.method,
-  };
-}
-
 const FALLBACK_USER_IMPACT: UserImpact = {
   level: "silent",
   description: "Impact utilisateur non évalué, à vérifier manuellement dans Sentry",
@@ -121,31 +67,6 @@ function fallbackResult(issue: IssueInput, rawText?: string): AnalysisResult {
     userImpact: FALLBACK_USER_IMPACT,
     technical: rawText?.slice(0, 300) ?? `${issue.issueTitle} — analyse technique indisponible, ouvrir l'issue dans Sentry`,
   };
-}
-
-function isValidUserImpact(value: unknown): value is UserImpact {
-  if (!value || typeof value !== "object") return false;
-  const v = value as Record<string, unknown>;
-  const validLevels: UserImpactLevel[] = ["none", "silent", "degraded", "blocking"];
-  return (
-    typeof v.level === "string" &&
-    validLevels.includes(v.level as UserImpactLevel) &&
-    typeof v.description === "string" &&
-    v.description.length > 0
-  );
-}
-
-function isValidAnalysisResult(value: unknown): value is AnalysisResult {
-  if (!value || typeof value !== "object") return false;
-  const v = value as Partial<AnalysisResult>;
-  const validUrgencies: AnalysisResult["urgency"][] = ["critical", "high", "medium", "low", "noise"];
-  return (
-    typeof v.urgency === "string" && validUrgencies.includes(v.urgency as AnalysisResult["urgency"]) &&
-    typeof v.trigger === "string" && v.trigger.length > 0 &&
-    typeof v.functionalConsequence === "string" && v.functionalConsequence.length > 0 &&
-    typeof v.technical === "string" && v.technical.length > 0 &&
-    isValidUserImpact(v.userImpact)
-  );
 }
 
 async function analyzeWithClaude(
@@ -178,7 +99,7 @@ async function analyzeWithClaude(
     const closeBrace = raw.lastIndexOf("}");
     const jsonStr = openBrace >= 0 && closeBrace > openBrace ? raw.slice(openBrace, closeBrace + 1) : raw;
     const parsed = JSON.parse(jsonStr);
-    return isValidAnalysisResult(parsed) ? parsed : fallbackResult(issue, tb.text);
+    return parseAnalysisResult(parsed) ?? fallbackResult(issue, tb.text);
   } catch {
     return fallbackResult(issue, tb.text);
   }
@@ -209,9 +130,12 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   if (!token) return;
 
   const event = await fetchLatestEvent(issue.issueId, token);
-  const context: EventContext = event
-    ? extractEventContext(event)
-    : { stacktrace: "", tags: {} };
+  const context: EventContext = {
+    ...(event ? extractEventContext(event) : emptyEventContext()),
+    // Les compteurs viennent du webhook, pas de l'événement.
+    eventCount: issue.eventCount,
+    userCount: issue.userCount,
+  };
 
   const analysis = await analyzeWithClaude(issue, context);
   const sentryUrl = buildSentryIssueUrl(issue.issueId);
