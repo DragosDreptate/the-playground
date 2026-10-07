@@ -5,9 +5,89 @@ packageId: the-playground
 
 # /release Command
 
-Gère la montée de version de The Playground de bout en bout, en suivant la procédure officielle Release Please.
+Livre la branche courante en production, puis publie la nouvelle version via Release Please. Une seule commande, deux phases enchaînées.
 
-## Ce que fait ce skill
+| Invocation | Phase 1 (livrer la branche) | Phase 2 (publier la version) |
+|---|---|---|
+| `/release` depuis un worktree de chantier | ✅ | ✅ |
+| `/release --sans-version` depuis un worktree de chantier | ✅ | ❌ — pour regrouper plusieurs branches dans une même version |
+| `/release` depuis `main` (aucune branche de chantier) | ❌ | ✅ |
+
+**Un seul arrêt dans tout le flux : la confirmation du merge de la branche (phase 1, étape 1.6).** C'est lui qui part en production. Tout le reste s'enchaîne sans redemander ; seuls les STOP documentés (CI rouge, gate de revue non satisfait) interrompent.
+
+## Phase 1 — Livrer la branche courante
+
+Modèle repris de la commande `release` de club-msl, sans sa numérotation manuelle : ici, c'est Release Please qui numérote (phase 2).
+
+### Étape 1.1 — Situer la livraison
+
+- Branche courante ≠ `main`, worktree propre (`git status --short` vide), sinon **STOP**.
+- Diff de la branche : `git fetch origin main` puis **`git diff --stat origin/main...HEAD`**. **Toujours `origin/main`, jamais `main`** : la ref locale est presque toujours en retard et ferait remonter le travail d'autres PR comme s'il appartenait à la branche.
+- Commits de la branche : `git log --oneline origin/main..HEAD`. Si aucun n'est de type `feat` ou `fix`, prévenir que la phase 2 ne produira pas de version.
+
+### Étape 1.2 — Gate de revue (préalable, pas un arrêt du flux)
+
+Une PR ne part jamais sans revue `/code-review` sur le bon périmètre (`origin/main...HEAD`), findings traités.
+
+- Revue lancée et traitée **dans la session** sur cette branche → gate satisfait, continuer.
+- Sinon → **STOP** avant tout push : « Aucune revue n'a tourné sur cette branche. Lance `/code-review`, puis relance `/release`. » Seul un « on saute la revue » explicite dispense.
+
+### Étape 1.3 — Pousser et créer la PR
+
+```bash
+git push -u origin <branche>
+gh pr view <branche> --json number,url 2>/dev/null || gh pr create --base main --title "<titre conventionnel>" --body "<corps>"
+```
+
+- Titre au format Conventional Commits (`feat(...)`, `fix(...)`, `chore(...)`) : Release Please s'en sert.
+- Corps : résumé en langage produit, `closes #N` si la branche traite une issue du backlog, attribution Claude Code en fin.
+
+### Étape 1.4 — Attendre la CI, entièrement
+
+```bash
+gh pr checks <n> --watch
+```
+
+**Tous** les checks doivent être verts, **e2e compris** : `typecheck` et `test-unit` sont les seuls requis par la protection de `main`, mais `test-e2e` compte autant. Un sous-ensemble vert ne suffit pas. CI rouge → **STOP** : corriger sur la branche, repousser, réattendre.
+
+> Une branche qui ne touche que `spec/**` ou `**.md` ne déclenche pas la CI (`paths-ignore`) : aucun check à attendre.
+
+### Étape 1.5 — Schéma Prisma, avant le merge
+
+```bash
+git diff origin/main...HEAD -- prisma/schema.prisma
+```
+
+- Non vide → `pnpm db:push` (dev) puis `pnpm db:push:prod` (prod) **avant** le merge : Vercel déploie dès le merge, et la nouvelle version interrogerait des colonnes absentes. Exception : un changement **destructif** (colonne ou table supprimée) se pousse **après** le déploiement.
+- Vide → continuer.
+
+### Étape 1.6 — Merger, sur confirmation explicite (SEUL ARRÊT DU FLUX)
+
+Résumer en trois lignes (PR, checks verts, schéma) et demander : « Je merge la PR #N en prod ? ». Attendre un « oui » qui porte sur le merge lui-même.
+
+```bash
+gh pr merge <n> --merge --delete-branch
+```
+
+`--merge` (pas `--squash`) : Release Please lit les commits conventionnels de la branche pour composer la version et le changelog.
+
+### Étape 1.7 — Vérifier que la livraison a atterri
+
+- CI sur `main` après le merge : `gh run watch $(gh run list --branch main --workflow CI --limit 1 --json databaseId --jq '.[0].databaseId')`. Rouge → le dire, ne pas conclure au succès.
+- Déploiement Vercel de production sur le SHA du merge : `READY` attendu. Si aucun build n'est parti, voir la mémoire « Merge sans build Vercel ».
+- Nettoyer le worktree du chantier : `git worktree remove <chemin>`.
+
+Avec `--sans-version` : rendre compte (PR mergée, déploiement prêt) et s'arrêter là.
+
+### Transition vers la phase 2
+
+Le merge déclenche le workflow « Release Please », qui crée ou met à jour sa PR, puis « Humanize Changelog » la réécrit. Attendre la fin de « Release Please » sur `main` (`gh run watch`) avant l'étape 1 de la phase 2 ; l'étape 5 attend déjà « Humanize Changelog ».
+
+## Phase 2 — Publier la version (Release Please)
+
+Procédure officielle Release Please. Elle numérote et publie tout ce qui est mergé sur `main` depuis la dernière version.
+
+### Ce que fait cette phase
 
 1. Vérifie que le CI sur main est vert (pré-requis)
 2. Vérifie que la page Aide, la page À propos et le README sont à jour avec les features de la release
@@ -19,9 +99,9 @@ Gère la montée de version de The Playground de bout en bout, en suivant la pro
 8. Merge la PR avec `--admin` (les CI checks ne s'enregistrent pas comme PR status checks sur ce repo)
 9. Vérifie que le GitHub Release a été créé
 
-## Exécution
+### Exécution
 
-Suis ces étapes dans l'ordre, sans jamais en sauter une.
+Suis ces étapes dans l'ordre, sans jamais en sauter une. Aucun arrêt pour confirmation : l'invocation de `/release` vaut feu vert pour les merges de cette phase.
 
 ### Étape 1 — Pré-vérification : CI sur main
 
@@ -227,6 +307,9 @@ Si une fuite est détectée dans `CHANGELOG.md`, la corriger (édition manuelle 
 
 ## Règles absolues
 
+- ❌ Ne jamais merger la branche du chantier (phase 1) sans le « oui » explicite de Dragos — c'est le seul arrêt du flux
+- ❌ Ne jamais pousser la branche ni créer sa PR si aucune revue n'a tourné sur `origin/main...HEAD`
+- ❌ Ne jamais merger la branche avec un check en cours ou rouge, e2e compris
 - ❌ Ne jamais merger si le CI est rouge
 - ❌ Ne jamais pousser du code (fix, refactoring) sur la branche release-please — seuls les commits vides `ci: trigger CI checks` sont autorisés
 - ❌ Ne jamais sauter l'étape de vérification schema Prisma
