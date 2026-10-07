@@ -147,17 +147,13 @@ USECASES=$(find src/domain/usecases -name '*.ts' ! -name 'index.ts' ! -path '*__
 TESTS=$(pnpm test 2>&1 | grep 'Tests' | grep -o '[0-9]\+ passed' | grep -o '[0-9]\+')
 ```
 
-**Page À propos** — `src/app/[locale]/(routes)/(static)/about/page.tsx` (section "En chiffres") :
+**Mêmes chiffres, même arrondi, sur les deux surfaces** : page À propos (`src/app/[locale]/(routes)/(static)/about/page.tsx`, section "En chiffres") ET `README.md` (section "En chiffres") :
 - Commits : centaine inférieure + "+" (ex: 1694 → `"1 600+"`)
 - PRs : dizaine inférieure + "+" (ex: 353 → `"350+"`)
 - Usecases : valeur exacte
 - Tests : dizaine inférieure + "+" (ex: 888 → `"880+"`)
 
-**README.md** (section "En chiffres") — arrondis plus larges pour rester stable entre releases :
-- Commits : millier inférieur + "+" (ex: 2 153 → `"2 000+"`)
-- PRs : centaine inférieure + "+" (ex: 485 → `"400+"`)
-- Usecases : dizaine inférieure + "+" (ex: 87 → `"80+"`)
-- Tests : millier inférieur + "+" (ex: 1 133 → `"1 000+"`)
+> Jusqu'à la 2.18.0, le README prenait des arrondis plus larges (millier, centaine) « pour rester stable entre releases ». Abandonné le 2026-10-08 : la release touche déjà le README à chaque fois, et l'écart visible entre les deux surfaces (2 000+ contre 2 600+ commits) sous-vendait le projet là où on le lit en premier.
 
 #### Résultat
 
