@@ -59,8 +59,10 @@ async function rewriteWithClaude(rawSection: string, examples: string): Promise<
   const client = new Anthropic();
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 2048,
+    model: "claude-sonnet-5-5",
+    // Sonnet 5.5 réfléchit par défaut et cette réflexion compte dans max_tokens.
+    max_tokens: 8000,
+    output_config: { effort: "medium" },
     messages: [
       {
         role: "user",
@@ -123,9 +125,12 @@ Réécris cette section dans notre style. Réponds uniquement avec le contenu Ma
     ],
   });
 
-  const content = response.content[0];
-  if (content.type !== "text") throw new Error("Réponse inattendue de Claude");
-  return content.text.trim();
+  if (response.stop_reason === "refusal") throw new Error("Claude a refusé la réécriture (filtre de sécurité)");
+  if (response.stop_reason === "max_tokens") throw new Error("Réponse de Claude tronquée (max_tokens atteint)");
+  // Par type et non par position : la réponse peut commencer par un bloc de réflexion.
+  const text = response.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
+  if (!text) throw new Error("Réponse inattendue de Claude");
+  return text.text.trim();
 }
 
 async function main() {

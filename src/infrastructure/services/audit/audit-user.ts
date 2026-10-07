@@ -23,13 +23,13 @@ function targetsFromDossier(dossier: AuditDossier): AuditTargets {
 }
 
 // Modèle par défaut selon l'environnement : Opus en prod (meilleure finesse,
-// ~23 ¢/audit, négligeable au volume manuel) ; Sonnet en dev/staging/local
-// (~5 ¢, pour ne pas payer Opus en test). Override explicite via AUDIT_MODEL.
+// négligeable au volume manuel) ; Sonnet en dev/staging/local (pour ne pas
+// payer Opus en test). Override explicite via AUDIT_MODEL.
 const AUDIT_MODEL =
   process.env.AUDIT_MODEL ??
   (process.env.VERCEL_ENV === "production"
-    ? "claude-opus-4-8"
-    : "claude-sonnet-4-6");
+    ? "claude-opus-5-5"
+    : "claude-sonnet-5-5");
 
 const VERDICTS: AuditVerdictLean[] = [
   "likely_legit",
@@ -136,10 +136,21 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
     const client = new Anthropic({ apiKey });
     const resp = await client.messages.create({
       model: AUDIT_MODEL,
-      max_tokens: 3000, // marge pour le thinking adaptatif + le rapport
+      max_tokens: 8000, // la réflexion compte dans ce plafond, le rapport doit tenir après
       thinking: { type: "adaptive" },
+      // Explicite : le défaut diffère selon le modèle (medium sur Opus 5.5, high sur Sonnet 5.5).
+      output_config: { effort: "medium" },
       messages: [{ role: "user", content: buildAuditPrompt(dossier) }],
     });
+
+    // Refus de sécurité (nouveau sur les modèles 5.5) : le dire, plutôt que
+    // de laisser croire à un rapport mal formé.
+    if (resp.stop_reason === "refusal") {
+      return {
+        targets,
+        report: fallbackReport(dossier, "le modèle a refusé l'analyse (filtre de sécurité)"),
+      };
+    }
 
     const tb = resp.content.find(
       (b): b is Anthropic.Messages.TextBlock => b.type === "text"
@@ -150,7 +161,9 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
         targets,
         report: fallbackReport(
           dossier,
-          "le LLM n'a pas renvoyé un rapport exploitable"
+          resp.stop_reason === "max_tokens"
+            ? "réponse du modèle tronquée (plafond de tokens atteint)"
+            : "le LLM n'a pas renvoyé un rapport exploitable"
         ),
       };
     }
@@ -167,9 +180,11 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
         },
       },
     };
-  } catch {
-    // Refus, 429, panne réseau, modèle 404… : on préserve le dossier
-    // déterministe plutôt que de remonter une erreur opaque à l'admin.
+  } catch (err) {
+    // 429, panne réseau, modèle 404… : on préserve le dossier
+    // déterministe plutôt que de remonter une erreur opaque à l'admin,
+    // mais on garde la cause dans les logs pour pouvoir la diagnostiquer.
+    console.error(`[audit-user] échec de l'appel à ${AUDIT_MODEL}`, err);
     return {
       targets,
       report: fallbackReport(dossier, "erreur lors de l'appel au modèle"),

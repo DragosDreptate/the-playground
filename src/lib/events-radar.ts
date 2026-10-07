@@ -1,3 +1,5 @@
+import type { AiTextCall } from "@/lib/ai-text-call";
+
 // --- Types ---
 
 export type EventResult = {
@@ -280,10 +282,56 @@ export async function fetchMeetupData(url: string): Promise<string> {
   }
 }
 
+// --- Mots-clés + ville d'un événement — extraction Claude ---
+
+export async function extractKeywordsAndCity(
+  aiCall: AiTextCall,
+  title: string,
+  description: string,
+  locationName: string,
+  locationAddress: string
+): Promise<{ keywords: string[]; city: string | null; country: string | null }> {
+  const prompt = `Analyse cet événement et extrais les informations demandées.
+
+Titre : ${title}
+Description : ${description || "(vide)"}
+Lieu : ${locationName || "(vide)"}
+Adresse : ${locationAddress || "(vide)"}
+
+Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour :
+{
+  "keywords": ["mot1", "mot2", "mot3"],
+  "city": "NomDeVille ou null si introuvable",
+  "country": "fr ou en ou de ou nl ou es, null si inconnu"
+}
+
+Règles :
+- keywords : 2 à 3 mots-clés maximum, extraits PRINCIPALEMENT du titre (priorité 1), puis nom de lieu/communauté (priorité 2), enfin description (priorité 3). Termes les plus spécifiques et distinctifs. Éviter les termes trop génériques.
+- city : ville principale extraite de l'adresse ou du nom de lieu. null si impossible à déterminer
+- country : code pays ISO 2 lettres (fr, gb, de, nl, es...). null si inconnu`;
+
+  // Plafonds relevés de ~30 % à la migration Haiku 5.5 (tokenizer plus gourmand).
+  const text = await aiCall(prompt, 300);
+  if (!text) return { keywords: [], city: null, country: null };
+
+  try {
+    const raw = text.trim();
+    const jsonStr = raw.startsWith("{") ? raw : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
+    const parsed = JSON.parse(jsonStr) as { keywords?: string[]; city?: string | null; country?: string | null };
+    return {
+      keywords: Array.isArray(parsed.keywords) ? parsed.keywords.filter(Boolean) : [],
+      city: parsed.city ?? null,
+      country: parsed.country ?? null,
+    };
+  } catch {
+    return { keywords: [], city: null, country: null };
+  }
+}
+
 // --- Meetup — extraction Claude ---
 
 export async function extractMeetupEventsWithClaude(
-  aiCall: (prompt: string, maxTokens: number) => Promise<string | null>,
+  aiCall: AiTextCall,
   meetupRaw: string,
   ville: string,
   dateFrom: string,
@@ -298,7 +346,7 @@ Données:
 ${meetupRaw}
 JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
 
-  const text = await aiCall(prompt, 1500);
+  const text = await aiCall(prompt, 2000);
   if (!text) return [];
 
   try {
