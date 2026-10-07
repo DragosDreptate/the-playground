@@ -161,7 +161,9 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
         targets,
         report: fallbackReport(
           dossier,
-          "le LLM n'a pas renvoyé un rapport exploitable"
+          resp.stop_reason === "max_tokens"
+            ? "réponse du modèle tronquée (plafond de tokens atteint)"
+            : "le LLM n'a pas renvoyé un rapport exploitable"
         ),
       };
     }
@@ -178,9 +180,11 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
         },
       },
     };
-  } catch {
+  } catch (err) {
     // 429, panne réseau, modèle 404… : on préserve le dossier
-    // déterministe plutôt que de remonter une erreur opaque à l'admin.
+    // déterministe plutôt que de remonter une erreur opaque à l'admin,
+    // mais on garde la cause dans les logs pour pouvoir la diagnostiquer.
+    console.error(`[audit-user] échec de l'appel à ${AUDIT_MODEL}`, err);
     return {
       targets,
       report: fallbackReport(dossier, "erreur lors de l'appel au modèle"),

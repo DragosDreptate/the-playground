@@ -1,3 +1,5 @@
+import type { AiTextCall } from "@/lib/ai-text-call";
+
 // --- Types ---
 
 export type EventResult = {
@@ -283,7 +285,7 @@ export async function fetchMeetupData(url: string): Promise<string> {
 // --- Mots-clés + ville d'un événement — extraction Claude ---
 
 export async function extractKeywordsAndCity(
-  aiCall: (prompt: string, maxTokens: number) => Promise<string | null>,
+  aiCall: AiTextCall,
   title: string,
   description: string,
   locationName: string,
@@ -329,7 +331,7 @@ Règles :
 // --- Meetup — extraction Claude ---
 
 export async function extractMeetupEventsWithClaude(
-  aiCall: (prompt: string, maxTokens: number) => Promise<string | null>,
+  aiCall: AiTextCall,
   meetupRaw: string,
   ville: string,
   dateFrom: string,

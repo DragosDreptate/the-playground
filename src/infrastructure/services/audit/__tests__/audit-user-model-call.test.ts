@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { AuditDossier } from "@/infrastructure/services/audit/types";
 
 const create = vi.fn();
@@ -46,6 +46,24 @@ describe("auditUser — appel au modèle", () => {
   beforeEach(() => {
     create.mockReset();
     vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  describe("given the answer is cut by the token ceiling", () => {
+    it("should say the answer was truncated", async () => {
+      create.mockResolvedValue({
+        stop_reason: "max_tokens",
+        content: [{ type: "text", text: "{\"identitySummary\": \"Comp" }],
+        usage: { input_tokens: 100, output_tokens: 8000 },
+      });
+
+      const { report } = await auditUser("deepak@example.com");
+
+      expect(report.identitySummary).toContain("tronquée");
+    });
   });
 
   describe("given the model refuses the analysis", () => {
