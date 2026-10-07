@@ -38,7 +38,7 @@ Pour cadrer le risque : **aucun changement de comportement produit, aucun accès
 - La route webhook garde sa vérification HMAC, sa réponse immédiate et son travail différé en `after()` (`route.ts:41-94`). Le filtre `action !== "created"` reste en place.
 - Les deux canaux de diffusion restent les mêmes : email admin et Slack `#the-playground-sentry`.
 - `beforeSend` (`src/lib/sentry-before-send.ts`) n'est pas touché. Il traite un tout autre sujet, les doublons d'auth.
-- Le modèle reste Haiku 4.5. Voir les décisions ouvertes si les quatre lots ne suffisent pas.
+- Le modèle reste Haiku 4.5. Voir les décisions ouvertes si les quatre lots ne suffisent pas. (Passé à Haiku 5.5 le 2026-10-07, voir `spec/decisions.md`.)
 
 ## 3. P1 — Transmettre les données factuelles
 
