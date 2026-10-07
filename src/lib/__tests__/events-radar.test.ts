@@ -5,6 +5,7 @@ import {
   buildMeetupUrl,
   getWeekRange,
   extractMeetupData,
+  extractKeywordsAndCity,
   LUMA_CITY,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_LOCATION,
@@ -22,6 +23,7 @@ import type { EventResult } from "@/lib/events-radar";
  *   - buildMeetupUrl
  *   - getWeekRange
  *   - extractMeetupData (extraction de HTML)
+ *   - extractKeywordsAndCity (appel IA injecté, seul le parsing est testé)
  *   - constantes de mapping (LUMA_CITY, EVENTBRITE_LOCATION, etc.)
  *
  * Les fonctions qui font des appels réseau (fetchAndFilter*, fetchMeetupData)
@@ -407,5 +409,31 @@ describe("MEETUP_LOCATION mapping", () => {
 
   it("should map london to gb--London", () => {
     expect(MEETUP_LOCATION["london"]).toBe("gb--London");
+  });
+});
+
+describe("extractKeywordsAndCity", () => {
+  const call = (answer: string | null) => async () => answer;
+
+  it.each([
+    ["a bare JSON answer", '{"keywords":["Product","Discovery"],"city":"Paris","country":"fr"}'],
+    ["JSON wrapped in text", 'Voici :\n{"keywords":["Product","Discovery"],"city":"Paris","country":"fr"}\nFin.'],
+  ])("should parse %s", async (_, answer) => {
+    expect(await extractKeywordsAndCity(call(answer), "t", "", "", "")).toEqual({
+      keywords: ["Product", "Discovery"],
+      city: "Paris",
+      country: "fr",
+    });
+  });
+
+  it.each([
+    ["no answer (refusal or empty response)", null],
+    ["an unparseable answer", "pas de JSON"],
+  ])("should return empty results given %s", async (_, answer) => {
+    expect(await extractKeywordsAndCity(call(answer), "t", "", "", "")).toEqual({
+      keywords: [],
+      city: null,
+      country: null,
+    });
   });
 });

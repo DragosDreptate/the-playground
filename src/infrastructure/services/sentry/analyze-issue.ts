@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
 import { createSafeResend } from "@/lib/email/safe-resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackSentryIssue, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
@@ -17,7 +18,6 @@ import { buildSentryIssueUrl } from "@/lib/sentry-url";
 export type { UserImpact, UserImpactLevel } from "./analysis-meta";
 
 const SENTRY_REGION = "https://de.sentry.io";
-const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
 export type IssueInput = {
   issueId: string;
@@ -81,27 +81,20 @@ async function analyzeWithClaude(
     };
   }
 
-  const client = new Anthropic({ apiKey });
-  const prompt = buildAnalysisPrompt(issue, context);
-
-  const resp = await client.messages.create({
-    model: ANTHROPIC_MODEL,
-    max_tokens: 900,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
-  if (!tb) return fallbackResult(issue);
+  const aiCall = createFastTextCall(new Anthropic({ apiKey }));
+  // 1200 et non plus 900 : Haiku 5.5 compte ~30 % de tokens en plus pour le même texte.
+  const text = await aiCall(buildAnalysisPrompt(issue, context), 1200);
+  if (!text) return fallbackResult(issue);
 
   try {
-    const raw = tb.text.trim();
+    const raw = text.trim();
     const openBrace = raw.indexOf("{");
     const closeBrace = raw.lastIndexOf("}");
     const jsonStr = openBrace >= 0 && closeBrace > openBrace ? raw.slice(openBrace, closeBrace + 1) : raw;
     const parsed = JSON.parse(jsonStr);
-    return parseAnalysisResult(parsed) ?? fallbackResult(issue, tb.text);
+    return parseAnalysisResult(parsed) ?? fallbackResult(issue, text);
   } catch {
-    return fallbackResult(issue, tb.text);
+    return fallbackResult(issue, text);
   }
 }
 

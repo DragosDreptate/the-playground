@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { auth } from "@/infrastructure/auth/auth.config";
+import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
@@ -11,8 +12,6 @@ import {
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
 } from "@/lib/events-radar";
-
-const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -35,16 +34,7 @@ export async function POST(request: NextRequest) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 
       try {
-        const client = new Anthropic({ apiKey });
-        const aiCall = async (prompt: string, maxTokens: number) => {
-          const resp = await client.messages.create({
-            model: ANTHROPIC_MODEL,
-            max_tokens: maxTokens,
-            messages: [{ role: "user", content: prompt }],
-          });
-          const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
-          return tb?.text ?? null;
-        };
+        const aiCall = createFastTextCall(new Anthropic({ apiKey }));
 
         const kwArray = keywords ? keywords.split(",").map((k) => k.trim()).filter(Boolean) : [];
         const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
