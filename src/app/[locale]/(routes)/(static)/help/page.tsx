@@ -79,6 +79,7 @@ export default async function HelpPage() {
         { id: "rejoindre", label: t("sidebar.rejoindre") },
         { id: "waitlist", label: t("sidebar.waitlist") },
         { id: "calendar", label: t("sidebar.calendar") },
+        { id: "timezone", label: t("sidebar.timezone") },
         { id: "cancel", label: t("sidebar.cancel") },
         { id: "paidEvents", label: t("sidebar.paidEvents") },
         { id: "comments", label: t("sidebar.comments") },
@@ -242,6 +243,24 @@ export default async function HelpPage() {
                   <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                     {t(`participant.calendar.${item}`)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Fuseaux horaires */}
+            <div className="space-y-4">
+              <SectionH3 id="timezone">{t("participant.timezone.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.timezone.intro")}
+              </p>
+              <ul className="space-y-2">
+                {(["item1", "item2", "item3"] as const).map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    {t(`participant.timezone.${item}`)}
                   </li>
                 ))}
               </ul>

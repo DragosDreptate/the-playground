@@ -49,6 +49,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - Devient automatiquement membre de la communauté
 - **Profil public** avec bio, ville, liens sociaux
 - Ajout à son calendrier en un clic (Google Calendar, Apple Calendar, .ics)
+- **Fuseaux horaires** : horaires affichés dans le fuseau de l'appareil, emails à l'heure du lieu de l'événement
 - Notifications email (confirmation, rappel 24h avant, changements, annulations)
 - Page communauté : prochains événements, membres, historique
 - Fil de commentaires (avec photos) sur chaque événement
@@ -68,7 +69,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 | **Framework** | Next.js 16 (App Router, SSR) |
 | **Langage** | TypeScript strict, full-stack |
 | **Base de données** | PostgreSQL · Neon serverless (EU) |
-| **ORM** | Prisma |
+| **ORM** | Prisma 7 |
 | **Auth** | Auth.js v5 · Magic link + OAuth (Google, GitHub, LinkedIn) |
 | **UI** | Tailwind CSS 4 + shadcn/ui |
 | **Email** | Resend + react-email |
@@ -84,10 +85,10 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 
 | | |
 | --- | --- |
-| **2 000+** | commits |
-| **500+** | pull requests |
-| **80+** | cas d'usage (domain usecases) |
-| **1 000+** | tests (unit + integration + E2E) |
+| **2 600+** | commits |
+| **540+** | pull requests |
+| **89** | cas d'usage (domain usecases) |
+| **1 680+** | tests (unit + integration) |
 
 ## Architecture
 
@@ -145,7 +146,7 @@ pnpm dev              # http://localhost:3000
 
 ### Authentification en local
 
-Trois options, **au moins une** doit être configurée dans `.env.local` :
+Quatre options, **au moins une** doit être configurée dans `.env.local` :
 
 | Option | Effort | Avantages |
 |---|---|---|

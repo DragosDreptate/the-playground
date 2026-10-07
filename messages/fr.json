@@ -1739,6 +1739,7 @@
       "rejoindre": "Rejoindre une communauté",
       "waitlist": "Liste d'attente",
       "calendar": "Ajouter à son calendrier",
+      "timezone": "Les fuseaux horaires",
       "cancel": "Annuler son inscription",
       "comments": "Les commentaires",
       "mySpace": "Mon espace",
@@ -1795,6 +1796,13 @@
         "intro": "Après votre inscription, un bouton « Ajouter à mon calendrier » est disponible sur la page de l'événement. Cliquez dessus pour choisir votre format :",
         "item1": "Google Calendar : ouvre directement dans votre navigateur",
         "item2": "Fichier .ics : compatible avec Apple Calendar, Outlook et la plupart des agendas"
+      },
+      "timezone": {
+        "title": "Les fuseaux horaires",
+        "intro": "Les horaires d'un événement s'affichent dans le fuseau horaire de votre appareil. Un événement à 19h à Paris apparaît donc à 13h pour un participant à New York.",
+        "item1": "Quand vous créez un événement, l'heure saisie correspond au fuseau horaire de votre appareil, qui devient celui de l'événement",
+        "item2": "Les emails de confirmation et de rappel indiquent l'heure du lieu de l'événement",
+        "item3": "L'ajout à votre calendrier (Google Calendar ou fichier .ics) conserve l'heure exacte, votre agenda la convertit dans votre fuseau"
       },
       "cancel": {
         "title": "Annuler son inscription",

@@ -1739,6 +1739,7 @@
       "rejoindre": "Join a community",
       "waitlist": "Waitlist",
       "calendar": "Add to calendar",
+      "timezone": "Time zones",
       "cancel": "Cancel registration",
       "comments": "Comments",
       "mySpace": "My Dashboard",
@@ -1795,6 +1796,13 @@
         "intro": "After registering, an \"Add to calendar\" button is available on the event page. Click it to choose your format:",
         "item1": "Google Calendar: opens directly in your browser",
         "item2": ".ics file: compatible with Apple Calendar, Outlook and most calendar apps"
+      },
+      "timezone": {
+        "title": "Time zones",
+        "intro": "Event times are displayed in your device's time zone. An event at 7 PM in Paris shows as 1 PM for an attendee in New York.",
+        "item1": "When you create an event, the time you enter refers to your device's time zone, which becomes the event's time zone",
+        "item2": "Confirmation and reminder emails show the time at the event's location",
+        "item3": "Adding the event to your calendar (Google Calendar or .ics file) keeps the exact time, and your calendar converts it to your time zone"
       },
       "cancel": {
         "title": "Cancel your registration",
