@@ -1,10 +1,11 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   deduplicateByUrl,
   buildEventbriteUrl,
   getWeekRange,
   meetupSearchWindow,
   meetupNodesToEvents,
+  fetchMeetupEvents,
   extractEventbriteEvents,
   extractKeywordsAndCity,
   LUMA_CITY,
@@ -292,6 +293,111 @@ describe("meetupNodesToEvents", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
+// fetchMeetupEvents — appels à l'API Meetup (fetch simulé)
+// ─────────────────────────────────────────────────────────────
+
+describe("fetchMeetupEvents", () => {
+  type GqlBody = { query: string; variables: Record<string, unknown> };
+  const PARIS = { locationSearch: [{ lat: 48.86, lon: 2.34 }] };
+  const searchResult = (...nodes: (MeetupEventNode | null)[]) => ({ search: { edges: nodes.map((node) => ({ node })) } });
+  const jsonResponse = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+
+  /** Simule l'API : géocodage puis recherche, et garde les corps envoyés. */
+  function stubMeetup(searchResponse: () => Response | Promise<Response>) {
+    const bodies: GqlBody[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, init: RequestInit) => {
+      const body = JSON.parse(init.body as string) as GqlBody;
+      bodies.push(body);
+      return body.query.includes("locationSearch") ? jsonResponse({ data: PARIS }) : searchResponse();
+    }));
+    return bodies;
+  }
+
+  let warn: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => {
+    warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    warn.mockRestore();
+  });
+
+  describe("given keywords", () => {
+    it("should search by keyword, in person, around the geocoded city", async () => {
+      const bodies = stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
+
+      const events = await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"]);
+
+      expect(events.map((e) => e.title)).toEqual(["Meetup 1"]);
+      expect(bodies[0].variables).toEqual({ query: "paris fr" });
+      expect(bodies[1].query).toContain("eventSearch");
+      expect(bodies[1].variables.filter).toMatchObject({
+        lat: 48.86,
+        lon: 2.34,
+        eventType: "PHYSICAL",
+        query: "product",
+        startDateRange: "2026-10-11T00:00:00Z",
+        endDateRange: "2026-10-19T23:59:59Z",
+      });
+    });
+  });
+
+  describe("given no keyword", () => {
+    it("should list the nearby events without a text query", async () => {
+      const bodies = stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
+
+      await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", []);
+
+      expect(bodies[1].query).toContain("recommendedEvents");
+      expect(bodies[1].variables.filter).not.toHaveProperty("query");
+    });
+  });
+
+  describe("given a city whose country is unknown", () => {
+    it("should geocode the city alone instead of assuming France", async () => {
+      const bodies = stubMeetup(() => jsonResponse({ data: searchResult() }));
+
+      await fetchMeetupEvents("montréal", undefined, "2026-10-12", "2026-10-18", ["product"]);
+
+      expect(bodies[0].variables).toEqual({ query: "montréal" });
+    });
+  });
+
+  describe("given a partial response (data plus errors)", () => {
+    it("should keep the events and warn", async () => {
+      stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1"), null), errors: [{ message: "venue" }] }));
+
+      const events = await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"]);
+
+      expect(events).toHaveLength(1);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("partielle"), expect.anything());
+    });
+  });
+
+  describe("given Meetup answers outside its schema or blocks the call", () => {
+    it.each([
+      ["errors without data", () => jsonResponse({ errors: [{ message: "Validation error" }] })],
+      ["an HTML page with status 200 (anti-bot)", () => new Response("<html>challenge</html>", { status: 200 })],
+      ["an HTTP error", () => new Response("", { status: 503 })],
+    ])("should return no event and warn, given %s", async (_, response) => {
+      stubMeetup(response);
+
+      expect(await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Meetup"), expect.anything());
+    });
+  });
+
+  describe("given a network failure", () => {
+    it("should return no event, silently like the other sources", async () => {
+      stubMeetup(() => Promise.reject(new TypeError("fetch failed")));
+
+      expect(await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
 // extractEventbriteEvents — lecture du JSON-LD de la page
 // ─────────────────────────────────────────────────────────────
 
@@ -348,12 +454,25 @@ describe("extractEventbriteEvents", () => {
     });
   });
 
-  describe("given a page without any event structure (Eventbrite changed its page)", () => {
-    it("should warn", () => {
+  describe("given a page Eventbrite changed (no readable event)", () => {
+    it.each([
+      ["no event structure at all", { "@type": "BreadcrumbList", itemListElement: [] }],
+      [
+        "a non-empty list whose elements are no longer events",
+        { "@type": "ItemList", itemListElement: [{ "@type": "ListItem", url: "https://www.eventbrite.fr/e/a" }] },
+      ],
+    ])("should warn, given %s", (_, block) => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      expect(extract(eventbritePage({ "@type": "BreadcrumbList", itemListElement: [] }))).toEqual([]);
+      expect(extract(eventbritePage(block))).toEqual([]);
       expect(warn).toHaveBeenCalledWith(expect.stringContaining("Eventbrite"));
       warn.mockRestore();
+    });
+  });
+
+  describe("given null entries in the JSON-LD", () => {
+    it("should skip them and still read the events", () => {
+      const html = eventbritePage([null, { "@type": "ItemList", itemListElement: [null, { item: eventbriteEvent("a") }] }]);
+      expect(extract(html).map((e) => e.title)).toEqual(["a"]);
     });
   });
 });

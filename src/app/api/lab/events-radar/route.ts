@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
           fetchAndFilterLumaEvents(ville, kwArray, dateFrom, dateEnd),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),
-          fetchMeetupEvents(ville, expectedCountry, dateFrom, dateEnd, kwArray),
+          fetchMeetupEvents(ville, EVENTBRITE_COUNTRY[ville.toLowerCase()], dateFrom, dateEnd, kwArray),
         ]);
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);

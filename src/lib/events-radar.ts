@@ -141,20 +141,36 @@ type EventbriteJsonLd = {
   location?: { name?: string; address?: { addressLocality?: string; addressRegion?: string; addressCountry?: string } };
   eventAttendanceMode?: string;
   description?: string;
-  itemListElement?: { item?: EventbriteJsonLd }[];
+  itemListElement?: ({ item?: EventbriteJsonLd } | null)[];
 };
 
 /**
  * Événements d'un bloc JSON-LD Eventbrite. Depuis 2026, la page de recherche
  * les regroupe dans une `ItemList` (`itemListElement[].item`) ; l'ancien format
  * (événements posés à plat, seuls ou en tableau) reste accepté.
+ *
+ * `readable` dit si le bloc porte des événements qu'on sait lire. Une liste
+ * vide est une recherche sans résultat (lisible) ; une liste dont aucun élément
+ * ne donne d'événement signale qu'Eventbrite a changé de format.
  */
-function eventbriteJsonLdItems(data: EventbriteJsonLd | EventbriteJsonLd[]): EventbriteJsonLd[] {
-  return (Array.isArray(data) ? data : [data]).flatMap((node) =>
-    node["@type"] === "ItemList"
-      ? (node.itemListElement ?? []).flatMap((el) => (el.item ? [el.item] : []))
-      : [node]
+function eventbriteJsonLdEvents(data: unknown): { events: EventbriteJsonLd[]; readable: boolean } {
+  const nodes = (Array.isArray(data) ? data : [data]).filter(
+    (n): n is EventbriteJsonLd => !!n && typeof n === "object"
   );
+  const events: EventbriteJsonLd[] = [];
+  let readable = false;
+  for (const node of nodes) {
+    if (node["@type"] === "Event") {
+      events.push(node);
+      readable = true;
+    } else if (node["@type"] === "ItemList") {
+      const elements = node.itemListElement ?? [];
+      const listed = elements.flatMap((el) => (el?.item?.["@type"] === "Event" ? [el.item] : []));
+      events.push(...listed);
+      if (elements.length === 0 || listed.length > 0) readable = true;
+    }
+  }
+  return { events, readable };
 }
 
 export function extractEventbriteEvents(
@@ -171,16 +187,14 @@ export function extractEventbriteEvents(
   });
 
   const events: EventResult[] = [];
-  let structureFound = false;
+  let readable = false;
 
   for (const block of blocks) {
     try {
-      const data = JSON.parse(block) as EventbriteJsonLd | EventbriteJsonLd[];
-      if ((Array.isArray(data) ? data : [data]).some((n) => n["@type"] === "ItemList" || n["@type"] === "Event")) {
-        structureFound = true;
-      }
-      for (const item of eventbriteJsonLdItems(data)) {
-        if (item["@type"] !== "Event" || !item.startDate || !item.url) continue;
+      const parsed = eventbriteJsonLdEvents(JSON.parse(block));
+      if (parsed.readable) readable = true;
+      for (const item of parsed.events) {
+        if (!item.startDate || !item.url) continue;
         const date = item.startDate.slice(0, 10);
         if (date < dateFrom || date > dateEnd) continue;
         // Exclure les événements online — le radar cherche les conflits physiques
@@ -205,9 +219,8 @@ export function extractEventbriteEvents(
     } catch { /* bloc JSON-LD invalide */ }
   }
 
-  // Une recherche sans résultat garde sa liste (vide) : aucune structure du
-  // tout signale qu'Eventbrite a changé sa page, panne sinon invisible.
-  if (!structureFound) console.warn("[radar] Eventbrite : aucune donnée d'événement lisible dans la page");
+  // Panne sinon invisible : la page répond mais Eventbrite a changé son format.
+  if (!readable) console.warn("[radar] Eventbrite : aucune donnée d'événement lisible dans la page");
 
   return events;
 }
@@ -263,8 +276,10 @@ const MEETUP_EVENT_FIELDS = "edges { node { title dateTime eventType eventUrl de
 const MEETUP_LOCATION_QUERY = "query($query: String!) { locationSearch(query: $query) { lat lon } }";
 // Avec mot-clé : moteur de recherche du site. Sans mot-clé, `eventSearch`
 // ne renvoie rien : on prend les événements recommandés de la zone.
-const MEETUP_KEYWORD_QUERY = `query($filter: EventSearchFilter!) { search: eventSearch(filter: $filter, first: 20) { ${MEETUP_EVENT_FIELDS} } }`;
-const MEETUP_NEARBY_QUERY = `query($filter: RecommendedEventsFilter!) { search: recommendedEvents(filter: $filter, first: 20) { ${MEETUP_EVENT_FIELDS} } }`;
+// 50 résultats : sur une fenêtre de 9 jours dans une grande ville, 20 pouvaient
+// se concentrer sur les premiers jours et laisser la fin de semaine vide.
+const MEETUP_KEYWORD_QUERY = `query($filter: EventSearchFilter!) { search: eventSearch(filter: $filter, first: 50) { ${MEETUP_EVENT_FIELDS} } }`;
+const MEETUP_NEARBY_QUERY = `query($filter: RecommendedEventsFilter!) { search: recommendedEvents(filter: $filter, first: 50) { ${MEETUP_EVENT_FIELDS} } }`;
 
 export type MeetupEventNode = {
   title?: string;
@@ -310,11 +325,14 @@ export function meetupNodesToEvents(nodes: MeetupEventNode[], dateFrom: string, 
 
 /**
  * Appel GraphQL. `null` si l'API ne répond pas comme attendu : en cas de
- * changement de schéma, l'avertissement évite une panne invisible.
+ * changement de schéma ou de blocage, l'avertissement évite une panne invisible.
+ * Seuls les échecs réseau et les délais dépassés restent silencieux, comme pour
+ * les autres sources.
  */
 async function meetupGql<T>(query: string, variables: Record<string, unknown>): Promise<T | null> {
+  let res: Response;
   try {
-    const res = await fetch(MEETUP_GQL_URL, {
+    res = await fetch(MEETUP_GQL_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -324,27 +342,39 @@ async function meetupGql<T>(query: string, variables: Record<string, unknown>): 
       body: JSON.stringify({ query, variables }),
       signal: AbortSignal.timeout(15000),
     });
-    const json = res.ok ? ((await res.json()) as { data?: T | null; errors?: unknown[] }) : null;
-    if (!json?.data || json.errors?.length) {
-      console.warn(`[radar] Meetup : réponse inattendue de l'API (HTTP ${res.status})`, json?.errors?.[0] ?? "");
-      return null;
-    }
-    return json.data;
   } catch {
-    return null; // réseau ou timeout : même traitement que les autres sources
+    return null;
   }
+
+  let json: { data?: T | null; errors?: unknown[] } | null = null;
+  try {
+    json = res.ok ? await res.json() : null;
+  } catch { /* corps non JSON : page anti-robots ou de maintenance */ }
+
+  if (!json?.data) {
+    console.warn(`[radar] Meetup : réponse inattendue de l'API (HTTP ${res.status})`, json?.errors?.[0] ?? "");
+    return null;
+  }
+  // Réponse partielle (un champ en erreur sur un événement) : on garde le reste.
+  if (json.errors?.length) console.warn("[radar] Meetup : réponse partielle de l'API", json.errors[0]);
+  return json.data;
 }
 
+/**
+ * `country` (code ISO, ex. "fr") affine le géocodage d'une ville connue ; pour
+ * une ville inconnue on l'omet plutôt que de supposer la France, sous peine de
+ * chercher Montréal dans l'Aude.
+ */
 export async function fetchMeetupEvents(
   ville: string,
-  country: string,
+  country: string | undefined,
   dateFrom: string,
   dateEnd: string,
   keywords: string[]
 ): Promise<EventResult[]> {
   const located = await meetupGql<{ locationSearch: { lat: number; lon: number }[] | null }>(
     MEETUP_LOCATION_QUERY,
-    { query: `${ville} ${country}` }
+    { query: country ? `${ville} ${country}` : ville }
   );
   const place = located?.locationSearch?.[0];
   if (!place) return [];
@@ -360,11 +390,13 @@ export async function fetchMeetupEvents(
 
   const results = await Promise.all(
     queries.map(async (kw) => {
-      const data = await meetupGql<{ search: { edges: { node: MeetupEventNode }[] } | null }>(
+      const data = await meetupGql<{ search: { edges: ({ node: MeetupEventNode | null } | null)[] } | null }>(
         kw ? MEETUP_KEYWORD_QUERY : MEETUP_NEARBY_QUERY,
         { filter: kw ? { ...baseFilter, query: kw } : baseFilter }
       );
-      return meetupNodesToEvents((data?.search?.edges ?? []).map((e) => e.node), dateFrom, dateEnd);
+      // Une réponse partielle peut contenir des entrées nulles.
+      const nodes = (data?.search?.edges ?? []).flatMap((e) => (e?.node ? [e.node] : []));
+      return meetupNodesToEvents(nodes, dateFrom, dateEnd);
     })
   );
 
