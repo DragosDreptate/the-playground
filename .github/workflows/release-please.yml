@@ -6,9 +6,12 @@ on:
       - main
   workflow_dispatch:
 
+# Les droits d'écriture viennent de RELEASE_PLEASE_TOKEN (jeton personnel à
+# portée fine : Contents, Pull requests, Issues sur ce seul dépôt), pas du
+# GITHUB_TOKEN. Avec GITHUB_TOKEN, les événements de la PR de release ne
+# déclenchaient pas normalement les workflows (runs en attente d'approbation).
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release-please:
@@ -16,6 +19,6 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json

@@ -68,6 +68,21 @@ jobs:
 
   test-e2e:
     name: test-e2e
+    # Pas d'e2e sur les releases : la PR Release Please et son merge ne touchent
+    # que le numéro de version et le changelog, déjà couverts par typecheck et
+    # test-unit (les seuls checks exigés). Économise ~7 min par passage.
+    # Conditions strictes : la branche doit venir de ce dépôt (une PR de fork
+    # nommée pareil garde son e2e), et sur main seul le commit de merge de la PR
+    # de release est concerné (un revert de release garde son e2e).
+    if: >-
+      !(
+        (github.event_name == 'pull_request'
+          && github.head_ref == 'release-please--branches--main--components--the-playground'
+          && github.event.pull_request.head.repo.full_name == github.repository)
+        || (github.event_name == 'push'
+          && startsWith(github.event.head_commit.message, 'Merge pull request #')
+          && contains(github.event.head_commit.message, 'from DragosDreptate/release-please--branches--main--components--the-playground'))
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

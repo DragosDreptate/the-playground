@@ -32,6 +32,14 @@ Une PR ne part jamais sans revue `/code-review` sur le bon périmètre (`origin/
 - Revue lancée et traitée **dans la session** sur cette branche → gate satisfait, continuer.
 - Sinon → **STOP** avant tout push : « Aucune revue n'a tourné sur cette branche. Lance `/code-review`, puis relance `/release`. » Seul un « on saute la revue » explicite dispense.
 
+### Étape 1.2b — Pages statiques, sur la branche du chantier
+
+Sauf avec `--sans-version` : appliquer l'**étape 2 de la phase 2** (audit README + page Aide, chiffres de la page À propos et du README) **directement sur la branche du chantier**, et committer le résultat dessus (`docs(release): pages statiques à jour`). Pas de branche ni de PR séparée : la CI complète ne tourne ainsi qu'une fois, sur la PR du chantier, au lieu de deux PR et deux passages sur `main`.
+
+Les chiffres se calculent sur la branche : ses commits et ses tests comptent déjà. **Exception, les PR** : `gh pr list --state merged` ne compte pas celle du chantier, pas encore mergée. Utiliser `PRS + 1`.
+
+**Pas de revue sur ce commit, assumé** : il ne contient que du contenu (README, page Aide, chiffres de la page À propos), jamais de code, comme l'ancienne PR pré-release qui était mergée sans revue (« jamais de code-review en release »). S'il fallait toucher autre chose que ces fichiers, ce n'est plus l'étape 1.2b : STOP et le signaler.
+
 ### Étape 1.3 — Pousser et créer la PR
 
 ```bash
@@ -95,7 +103,7 @@ Procédure officielle Release Please. Elle numérote et publie tout ce qui est m
 2. Vérifie que la page Aide, la page À propos et le README sont à jour avec les features de la release
 3. Trouve la PR Release Please en attente
 4. Attend que "Humanize Changelog" ait fini (s'il tourne)
-5. Déclenche le CI via commit vide (branch protection l'exige — `workflow_dispatch` ne satisfait pas les PR checks)
+5. Attend la CI déclenchée automatiquement (jeton `RELEASE_PLEASE_TOKEN`) ; commit vide seulement en repli
 6. Attend le CI vert
 7. Vérifie le schema Prisma avant le merge
 8. Merge la PR avec `--admin` (les CI checks ne s'enregistrent pas comme PR status checks sur ce repo)
@@ -115,9 +123,19 @@ gh run list --branch main --workflow CI --limit 1 --json conclusion --jq '.[0].c
 
 Si `conclusion != "success"` → **STOP**. Le CI sur main doit être vert avant de lancer une release. Un test flaky sur main sera flaky sur la branche release aussi. Informer l'utilisateur et s'arrêter.
 
+Vérifier aussi que **Release Please** a réussi sur le dernier commit de main :
+
+```bash
+gh run list --branch main --workflow "Release Please" --limit 1 --json headSha,conclusion
+```
+
+Si `conclusion != "success"` → **STOP**. Cause la plus probable : `RELEASE_PLEASE_TOKEN` expiré ou révoqué (un jeton vide ou expiré ne retombe pas sur `GITHUB_TOKEN`, le workflow échoue). Sans ce contrôle, l'étape 3 trouverait une PR de release périmée, sans les derniers merges, et le GitHub Release ne serait pas créé. Demander à Dragos de régénérer le jeton (GitHub → Settings → Developer settings → Fine-grained tokens, sur ce dépôt : Contents, Pull requests, Issues en lecture-écriture) et de l'enregistrer **depuis son propre terminal** : `gh secret set RELEASE_PLEASE_TOKEN --repo DragosDreptate/the-playground` (via `!` dans Claude Code, la saisie masquée ne fonctionne pas et le secret serait enregistré vide). Puis relancer le workflow Release Please.
+
 ### Étape 2 — Vérifier les pages statiques (OBLIGATOIRE)
 
-Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Deux vérifications :
+**Déjà faite à l'étape 1.2b** quand la phase 1 vient de tourner sans `--sans-version` : passer directement à l'étape 3.
+
+Sinon (`/release` lancé depuis `main`), vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Deux vérifications :
 
 #### 2a — Audit exhaustif README + page Aide
 
@@ -192,7 +210,9 @@ Extraire et afficher la version proposée depuis le titre.
 
 ### Étape 5 — Attendre que "Humanize Changelog" ait fini
 
-Avant de pousser le commit vide, s'assurer que le workflow "Humanize Changelog" n'est pas en cours sur la branche. S'il tourne encore, il pourrait pousser un commit après le CI, invalidant les checks.
+Release Please pousse sa PR avec le jeton `RELEASE_PLEASE_TOKEN` (pas `GITHUB_TOKEN`) : ses événements déclenchent donc normalement « Humanize Changelog » puis la CI. Attendre que Humanize ait fini avant de regarder la CI : il pousse un commit qui la relance sur le head final.
+
+> Conséquence assumée : à **chaque** merge de chantier, Release Please met sa PR à jour, ce qui relance Humanize (un appel Claude, quelques centimes) et une CI légère (typecheck + test-unit, ~1 min, e2e sauté). C'était le fonctionnement d'origine, avant le blocage du 18/09/2026.
 
 ```bash
 gh run list --workflow="Humanize Changelog" --branch NOM_BRANCHE --limit 1 --json databaseId,status,conclusion
@@ -205,7 +225,8 @@ gh run watch RUN_ID_HUMANIZE
 ```
 
 - Si `status == "completed"` ou aucun run trouvé → continuer.
-- Si `conclusion == "action_required"` → le run attend une approbation et le changelog n'a **pas** été réécrit. L'approuver (`gh api -X POST repos/DragosDreptate/the-playground/actions/runs/RUN_ID/approve`), attendre sa fin, puis vérifier la politique d'approbation du dépôt : `gh api repos/DragosDreptate/the-playground/actions/permissions/fork-pr-contributor-approval` doit valoir `first_time_contributors`. À `all_external_contributors`, GitHub traite `github-actions[bot]` en contributeur externe et bloque tous ses workflows (cas rencontré du 18/09 au 08/10/2026).
+- Si `conclusion == "action_required"` → le run attend une approbation et le changelog n'a **pas** été réécrit. Ne devrait plus arriver depuis le jeton dédié (cas rencontré du 18/09 au 08/10/2026, quand Release Please poussait avec `GITHUB_TOKEN` ; la politique d'approbation des contributeurs externes n'y était pour rien). Approuver le run (`gh api -X POST repos/DragosDreptate/the-playground/actions/runs/RUN_ID/approve`), attendre sa fin, et signaler l'anomalie à Dragos.
+- Si `conclusion == "failure"` → lire le log : un échec au push signale un `RELEASE_PLEASE_TOKEN` expiré (voir l'étape 1).
 
 Après la fin de Humanize, toujours récupérer le HEAD le plus récent :
 
@@ -215,21 +236,26 @@ git checkout NOM_BRANCHE
 git reset --hard origin/NOM_BRANCHE
 ```
 
-### Étape 6 — Déclencher le CI via commit vide
+### Étape 6 — Trouver le run CI du head de la PR
 
-Le `workflow_dispatch` ne satisfait pas les branch protection checks de GitHub — il faut un commit sur la branche pour déclencher le CI dans le contexte PR.
+La CI tourne d'elle-même sur le head final (commit de Humanize, ou commit de Release Please si le changelog n'a pas changé). Sur la branche de release, `test-e2e` est **sauté par conception** (seuls la version et le changelog changent) : typecheck et test-unit suffisent.
+
+```bash
+HEAD_SHA=$(gh pr view NUMBER --json headRefOid --jq .headRefOid)
+# Le run peut mettre quelques secondes à être enregistré : attendre jusqu'à 90 s avant de conclure qu'il manque
+for i in $(seq 1 18); do
+  RUN=$(gh run list --workflow=CI --commit "$HEAD_SHA" --limit 1 --json databaseId --jq '.[0].databaseId')
+  [ -n "$RUN" ] && break
+  sleep 5
+done
+echo "run CI : ${RUN:-aucun}"
+```
+
+**Repli seulement si aucun run CI n'existe pour ce head après cette attente** (jeton absent ou expiré) : le déclencher par un commit vide, le `workflow_dispatch` ne satisfaisant pas les checks de branche.
 
 ```bash
 git commit --allow-empty -m "ci: trigger CI checks for release PR"
 git push origin NOM_BRANCHE
-```
-
-> Le workflow "Humanize Changelog" sera re-déclenché par le push (event `synchronize`), mais il détectera que CHANGELOG.md n'a pas changé et sortira immédiatement sans pousser de commit. Aucune race condition possible.
-
-Récupérer l'ID du run CI déclenché :
-
-```bash
-gh run list --workflow=CI --branch NOM_BRANCHE --limit 1 --json databaseId,status
 ```
 
 Afficher le lien vers le run GitHub Actions.
@@ -319,7 +345,7 @@ Si une fuite est détectée dans `CHANGELOG.md`, la corriger (édition manuelle 
 - ❌ Ne jamais chercher la PR par titre avec `--search` (les parenthèses cassent la recherche GitHub)
 - ✅ Toujours chercher la PR par branche avec `--head "release-please--branches--main--components--the-playground"`
 - ✅ Toujours vérifier que le CI sur main est vert AVANT de commencer
-- ✅ Toujours utiliser `git commit --allow-empty + git push` pour déclencher/redéclencher le CI
+- ✅ Laisser la CI se déclencher seule sur la PR de release (jeton `RELEASE_PLEASE_TOKEN`) ; commit vide `git commit --allow-empty + git push` uniquement en repli si aucun run n'existe pour le head
 - ✅ Toujours utiliser `--admin` au merge (les CI checks ne s'enregistrent pas comme PR status checks)
 - ✅ Toujours laisser Release Please gérer la version et le changelog
 
