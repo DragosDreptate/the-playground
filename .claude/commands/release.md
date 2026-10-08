@@ -66,8 +66,10 @@ git diff origin/main...HEAD -- prisma/schema.prisma
 Résumer en trois lignes (PR, checks verts, schéma) et demander : « Je merge la PR #N en prod ? ». Attendre un « oui » qui porte sur le merge lui-même.
 
 ```bash
-gh pr merge <n> --merge --delete-branch
+gh pr merge <n> --merge
 ```
+
+**Pas de `--delete-branch`** : lancé depuis un worktree, `gh` tente de basculer le dossier local sur `main`, déjà occupé par le répertoire principal. La branche se supprime au nettoyage (étape 1.7).
 
 `--merge` (pas `--squash`) : Release Please lit les commits conventionnels de la branche pour composer la version et le changelog.
 
@@ -75,7 +77,7 @@ gh pr merge <n> --merge --delete-branch
 
 - CI sur `main` après le merge : `gh run watch $(gh run list --branch main --workflow CI --limit 1 --json databaseId --jq '.[0].databaseId')`. Rouge → le dire, ne pas conclure au succès.
 - Déploiement Vercel de production sur le SHA du merge : `READY` attendu. Si aucun build n'est parti, voir la mémoire « Merge sans build Vercel ».
-- Nettoyer le worktree du chantier : `git worktree remove <chemin>`.
+- Nettoyer, une fois la phase 2 terminée (le worktree peut y servir) : `git worktree remove <chemin>`, `git branch -D <branche>`, `git push origin --delete <branche>`.
 
 Avec `--sans-version` : rendre compte (PR mergée, déploiement prêt) et s'arrêter là.
 
@@ -203,6 +205,7 @@ gh run watch RUN_ID_HUMANIZE
 ```
 
 - Si `status == "completed"` ou aucun run trouvé → continuer.
+- Si `conclusion == "action_required"` → le run attend une approbation et le changelog n'a **pas** été réécrit. L'approuver (`gh api -X POST repos/DragosDreptate/the-playground/actions/runs/RUN_ID/approve`), attendre sa fin, puis vérifier la politique d'approbation du dépôt : `gh api repos/DragosDreptate/the-playground/actions/permissions/fork-pr-contributor-approval` doit valoir `first_time_contributors`. À `all_external_contributors`, GitHub traite `github-actions[bot]` en contributeur externe et bloque tous ses workflows (cas rencontré du 18/09 au 08/10/2026).
 
 Après la fin de Humanize, toujours récupérer le HEAD le plus récent :
 
