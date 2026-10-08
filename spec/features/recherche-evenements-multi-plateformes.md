@@ -14,6 +14,42 @@ Faire de The Playground **l'endroit où l'on cherche ses événements**, toutes 
 
 C'est un levier d'acquisition, pas une fin en soi : chaque visite doit avoir une chance de se convertir (inscription, adhésion à une Communauté, création d'une Communauté).
 
+## Paysage concurrentiel (recherche du 2026-10-08)
+
+**Constat : en France, aucun site grand public établi ne réunit les événements de Luma, Meetup et Eventbrite en un seul endroit.** Ce qui s'en approche se range en trois familles.
+
+**Agrégateurs tech européens** (les plus proches de cette spec)
+
+| Acteur | Ce qu'il fait | Limites relevées |
+|---|---|---|
+| [Brainberg](https://brainberg.eu/) | Agenda tech européen (meetups, conférences, hackathons, ateliers). Collecte quotidienne depuis plusieurs plateformes sources, dédoublonnage par empreinte entre sources. ~1 400 événements à venir annoncés en Europe. Open source (MIT) | Sources non nommées sur le site. Paris absent des villes mises en avant. Volume faible au regard de nos mesures (des centaines d'événements par mois et par source à Paris) |
+| [dev.events](https://dev.events/EU/FR) | Conférences, meetups et hackathons pour développeurs, filtrables par ville française et par thème | Public développeurs uniquement. Mode d'alimentation non documenté (saisie ou collecte) |
+
+**Agrégateurs généralistes**
+
+| Acteur | Ce qu'il fait | Limites relevées |
+|---|---|---|
+| [AllEvents](https://allevents.in/paris/startup) | Agenda mondial (40 000+ villes) alimenté par plusieurs sources, avec des pages Paris par thème | Fiches périmées, doublons, qualité inégale (avis relevés dans les comparatifs) |
+| [OpenAgenda](https://openagenda.com/) | Agendas ouverts et fédérés : un événement saisi une fois, diffusé sur plusieurs agendas. Très utilisé par les communes et la culture | N'importe pas Luma ni Meetup. Absent des communautés tech. Reste candidat comme **source** (voir le tableau des plateformes) |
+
+**Outils d'extraction et assistants** (briques ou services, pas des sites de découverte)
+
+| Acteur | Ce qu'il fait |
+|---|---|
+| [Events Finder](https://apify.com/luis.pinto/events-finder) et [Event Scraper Pro](https://apify.com/webdatalabs/event-scraper-pro) (Apify) | Extraient Luma, Eventbrite et Meetup en une passe et fusionnent les résultats. Events Finder note chaque événement avec un modèle d'IA selon un profil, comme notre Radar |
+| [Scouty](https://www.meetscouty.com/blog/best-event-discovery-apps-2026) | Assistant IA qui surveille le web et prévient sur WhatsApp quand un événement correspond aux centres d'intérêt décrits. Américain, pas de couverture française annoncée |
+
+**Ce qu'on trouve aujourd'hui côté France** : les pages de chaque plateforme, qui ne montrent que leurs propres événements ([Luma Paris](https://luma.com/paris), [Meetup](https://www.meetup.com/fr-FR/find/)), des communautés qui tiennent leur propre agenda ([AI Tinkerers Paris](https://paris.aitinkerers.org/)), et des listes tenues à la main (agenda de Maddyness, guides annuels, newsletters).
+
+**Ce qu'on en retient**
+
+1. **La place est libre en France** : personne ne couvre « tous les événements de ma ville, toutes plateformes confondues », bien fini et en français.
+2. **Le concept est validé ailleurs**, et les acteurs existants butent sur nos difficultés déjà notées : dédoublonnage entre plateformes, collecte quotidienne, qualité dans la durée (voir « Fiabilité et surveillance »). La qualité des résultats est donc le premier critère de différence.
+3. **Aucun ne va au-delà de la liste.** Notre différence structurelle : un événement trouvé ailleurs peut mener vers une Communauté qui dure (cf. positionnement community-centric). C'est elle qui transforme l'outil de recherche en levier d'acquisition.
+4. **Brainberg vaut une lecture de code avant d'implémenter** : sources réellement utilisées, méthode de dédoublonnage, couverture réelle de Paris. Non fait à ce jour.
+
+Points non vérifiés : sources exactes de Brainberg, mode d'alimentation de dev.events, chiffres d'AllEvents (tirés d'un comparatif tiers).
+
 ## Solution envisagée
 
 ### Étape 1. Une page publique de recherche multi-plateformes
