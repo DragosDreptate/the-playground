@@ -7,10 +7,9 @@ import {
   meetupNodesToEvents,
   fetchMeetupEvents,
   fetchAndFilterLumaEvents,
-  resolveCityPosition,
+  resolveSearchPosition,
   extractEventbriteEvents,
   extractKeywordsAndCity,
-  LUMA_CITY,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_LOCATION,
   EVENTBRITE_COUNTRY,
@@ -27,7 +26,7 @@ import type { CityPosition, EventResult, MeetupEventNode } from "@/lib/events-ra
  *   - meetupSearchWindow, meetupNodesToEvents (API Meetup)
  *   - extractEventbriteEvents (lecture de la page de recherche)
  *   - extractKeywordsAndCity (appel IA injecté, seul le parsing est testé)
- *   - constantes de mapping (LUMA_CITY, EVENTBRITE_LOCATION, etc.)
+ *   - constantes de mapping (LUMA_LOCATION_TERMS, EVENTBRITE_LOCATION, etc.)
  *
  * Les fonctions qui font des appels réseau (fetchAndFilter*, fetchMeetupEvents)
  * sont exclues de ces tests unitaires — elles appartiennent aux tests d'intégration.
@@ -324,22 +323,22 @@ describe("appels réseau du radar (fetch simulé)", () => {
     warn.mockRestore();
   });
 
-  describe("resolveCityPosition", () => {
-    it("should use the built-in position of a known city, without any network call", async () => {
-      const calls = stubFetch(() => jsonResponse({}));
-      expect(await resolveCityPosition("Paris")).toEqual(PARIS);
-      expect(calls).toHaveLength(0);
+  describe("resolveSearchPosition", () => {
+    it("should take the first place found for the address", async () => {
+      const search = vi.fn(async () => [
+        { latitude: 44.93, longitude: 4.89 },
+        { latitude: 39.47, longitude: -0.38 },
+      ]);
+      expect(await resolveSearchPosition(search, "12 rue de la République, Valence")).toEqual({ lat: 44.93, lon: 4.89 });
+      expect(search).toHaveBeenCalledWith("12 rue de la République, Valence");
     });
 
-    it("should geocode an unknown city by its name alone, without assuming a country", async () => {
-      const calls = stubFetch(() => jsonResponse({ data: { locationSearch: [{ lat: 45.5, lon: -73.57 }] } }));
-      expect(await resolveCityPosition("montréal")).toEqual({ lat: 45.5, lon: -73.57 });
-      expect(calls[0].body?.variables).toEqual({ query: "montréal" });
-    });
-
-    it("should return null when the city cannot be geocoded", async () => {
-      stubFetch(() => jsonResponse({ data: { locationSearch: [] } }));
-      expect(await resolveCityPosition("nulle-part")).toBeNull();
+    it.each([
+      ["no place is found", async () => []],
+      ["the search fails", async () => { throw new Error("timeout"); }],
+    ])("should return null and warn when %s", async (_case, search) => {
+      expect(await resolveSearchPosition(search, "nulle-part")).toBeNull();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("nulle-part"));
     });
   });
 
@@ -520,23 +519,6 @@ describe("extractEventbriteEvents", () => {
 // ─────────────────────────────────────────────────────────────
 // Constantes de mapping — vérification de complétude
 // ─────────────────────────────────────────────────────────────
-
-describe("LUMA_CITY mapping", () => {
-  it("should map 'paris' to 'Paris'", () => {
-    expect(LUMA_CITY["paris"]).toBe("Paris");
-  });
-
-  it("should map 'london' to 'London'", () => {
-    expect(LUMA_CITY["london"]).toBe("London");
-  });
-
-  it("should contain all major French cities", () => {
-    const frenchCities = ["paris", "lyon", "bordeaux", "marseille", "toulouse", "nantes", "lille", "strasbourg"];
-    for (const city of frenchCities) {
-      expect(LUMA_CITY).toHaveProperty(city);
-    }
-  });
-});
 
 describe("LUMA_LOCATION_TERMS mapping", () => {
   it("should provide location terms for Paris including île-de-france", () => {

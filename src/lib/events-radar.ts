@@ -23,40 +23,33 @@ export function deduplicateByUrl(events: EventResult[]): EventResult[] {
   });
 }
 
-// --- Position de la ville (partagée par Luma et Meetup) ---
+// --- Position de recherche (partagée par Luma et Meetup) ---
 
 export type CityPosition = { lat: number; lon: number };
 
-/** Centre des villes connues du radar : aucun appel réseau pour les cas courants. */
-export const CITY_POSITION: Record<string, CityPosition> = {
-  paris: { lat: 48.8566, lon: 2.3522 }, lyon: { lat: 45.764, lon: 4.8357 },
-  bordeaux: { lat: 44.8378, lon: -0.5792 }, marseille: { lat: 43.2965, lon: 5.3698 },
-  toulouse: { lat: 43.6047, lon: 1.4442 }, nantes: { lat: 47.2184, lon: -1.5536 },
-  lille: { lat: 50.6292, lon: 3.0573 }, strasbourg: { lat: 48.5734, lon: 7.7521 },
-  london: { lat: 51.5072, lon: -0.1276 }, berlin: { lat: 52.52, lon: 13.405 },
-  amsterdam: { lat: 52.3676, lon: 4.9041 },
-};
+/**
+ * Recherche de lieux injectée (port PlacesService, adapter Google Places) pour
+ * que cette logique reste testable sans réseau. Seules les coordonnées servent.
+ */
+export type PlaceSearch = (query: string) => Promise<{ latitude: number; longitude: number }[]>;
 
 /**
- * Position d'une ville : table des villes connues, sinon géocodage Meetup (ville
- * seule, sans supposer de pays : sinon Montréal tomberait dans l'Aude).
- * Luma en a besoin car il ignore le nom de ville (`near`) et place la recherche
- * d'après l'adresse IP de l'appelant, c'est-à-dire du serveur Vercel en prod.
+ * Position autour de laquelle chercher. Luma en a besoin car il ignore le nom de
+ * ville (`near`) et place la recherche d'après l'adresse IP de l'appelant,
+ * c'est-à-dire du serveur Vercel en prod. Le radar géocode l'adresse de
+ * l'événement plutôt que la ville seule, qui peut exister dans plusieurs pays.
+ * Sans position, Luma et Meetup ne renvoient rien : l'avertissement le signale.
  */
-export async function resolveCityPosition(ville: string): Promise<CityPosition | null> {
-  const known = CITY_POSITION[ville.toLowerCase()];
-  if (known) return known;
-  const located = await meetupGql<{ locationSearch: CityPosition[] | null }>(MEETUP_LOCATION_QUERY, { query: ville });
-  return located?.locationSearch?.[0] ?? null;
+export async function resolveSearchPosition(searchPlaces: PlaceSearch, query: string): Promise<CityPosition | null> {
+  try {
+    const [place] = await searchPlaces(query);
+    if (place) return { lat: place.latitude, lon: place.longitude };
+  } catch { /* échec réseau ou délai dépassé */ }
+  console.warn(`[radar] position introuvable pour « ${query} » : pas de recherche Luma ni Meetup`);
+  return null;
 }
 
 // --- Luma API — une requête par mot-clé en parallèle ---
-
-export const LUMA_CITY: Record<string, string> = {
-  paris: "Paris", lyon: "Lyon", bordeaux: "Bordeaux", marseille: "Marseille",
-  toulouse: "Toulouse", nantes: "Nantes", lille: "Lille", strasbourg: "Strasbourg",
-  london: "London", berlin: "Berlin", amsterdam: "Amsterdam",
-};
 
 // Termes de localisation acceptables par ville (insensible à la casse)
 export const LUMA_LOCATION_TERMS: Record<string, string[]> = {
@@ -122,7 +115,7 @@ export async function fetchAndFilterLumaEvents(
             // Exclure les événements online — le radar cherche les conflits physiques
             if (e.event.location_type !== "offline") return false;
             const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
-            if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
+            if (featuredSlug && featuredSlug === villeKey) return true;
             const loc = e.event.geo_address_info?.city_state?.toLowerCase();
             if (loc) return locationTerms.some((t) => loc.includes(t));
             return false;
@@ -307,7 +300,6 @@ const MEETUP_GQL_URL = "https://www.meetup.com/gql2";
 const MEETUP_RADIUS_KM = 25;
 
 const MEETUP_EVENT_FIELDS = "edges { node { title dateTime eventType eventUrl description venue { name city } } }";
-const MEETUP_LOCATION_QUERY = "query($query: String!) { locationSearch(query: $query) { lat lon } }";
 // Avec mot-clé : moteur de recherche du site. Sans mot-clé, `eventSearch`
 // ne renvoie rien : on prend les événements recommandés de la zone.
 // 50 résultats : sur une fenêtre de 9 jours dans une grande ville, 20 pouvaient

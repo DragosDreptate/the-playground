@@ -18,9 +18,9 @@ Le Radar est intégré au formulaire de **création et modification** d'événem
 
 | Source | Méthode | Filtrage |
 |---|---|---|
-| **Luma** | API REST (`api.lu.ma/discover/get-paginated-events`) | Par coordonnées (`latitude`/`longitude`), par mot-clé (`query`), filtrage date + localisation côté serveur. Luma ignore `near` et place la recherche selon l'adresse IP de l'appelant (en prod, le serveur Vercel) : d'où les coordonnées, depuis le 2026-10-08. La position est partagée avec Meetup (table des villes connues, sinon géocodage) |
+| **Luma** | API REST (`api.lu.ma/discover/get-paginated-events`) | Par coordonnées (`latitude`/`longitude`), par mot-clé (`query`), filtrage date + localisation côté serveur. Luma ignore `near` et place la recherche selon l'adresse IP de l'appelant (en prod, le serveur Vercel) : d'où les coordonnées, depuis le 2026-10-08. La position est géocodée par la recherche de lieux de Google Places (même clé que l'autocomplétion d'adresse) : adresse de l'événement suivie de la ville pour le radar organisateur, ville seule pour le lab. Elle est partagée avec Meetup. Sans position (Google en erreur, lieu introuvable), Luma et Meetup ne renvoient rien et un avertissement est écrit dans les logs ; Eventbrite, qui cherche par ville, n'attend pas le géocodage |
 | **Eventbrite** | Scraping HTML + extraction JSON-LD (schema.org), événements regroupés dans une `ItemList` depuis 2026 (ancien format à plat toujours accepté) | Par ville (URL path), par mot-clé (`?q=`), filtrage date + localisation + pays côté serveur |
-| **Meetup** | Point d'accès GraphQL du site (`www.meetup.com/gql2`, non documenté, sans authentification) : géocodage de la ville (`locationSearch`), puis `eventSearch` (avec mot-clé) ou `recommendedEvents` (sans) | Par position + rayon de 25 km, présentiel (`eventType: PHYSICAL`), plage de dates précise (élargie d'un jour en UTC, puis filtrée sur la date locale). Pas d'IA |
+| **Meetup** | Point d'accès GraphQL du site (`www.meetup.com/gql2`, non documenté, sans authentification) : `eventSearch` (avec mot-clé) ou `recommendedEvents` (sans) | Autour de la position partagée avec Luma (Google Places) + rayon de 25 km, présentiel (`eventType: PHYSICAL`), plage de dates précise (élargie d'un jour en UTC, puis filtrée sur la date locale). Pas d'IA |
 
 **Mobilizon** a été retiré (source marginale, maintenance complexe).
 
