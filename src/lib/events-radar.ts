@@ -253,9 +253,8 @@ export async function fetchAndFilterEventbriteEvents(
  * (`/gql2`, sans authentification) : sa page de recherche ignore désormais
  * la plage de dates demandée, l'API la respecte.
  *
- * Choix assumé (spec/decisions.md, 2026-10-08) : cette API n'est pas publique
- * et le robots.txt de Meetup interdit `/gql*`. Retenu parce que le radar tourne
- * moins d'une fois par mois ; à revoir si le volume monte ou si Meetup bloque.
+ * Ce point d'accès n'est pas documenté et peut changer sans préavis : usage
+ * ponctuel, à réévaluer si le volume du radar augmente (spec/decisions.md, 2026-10-08).
  */
 const MEETUP_GQL_URL = "https://www.meetup.com/gql2";
 const MEETUP_RADIUS_KM = 25;
