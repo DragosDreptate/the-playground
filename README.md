@@ -41,7 +41,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - Gérer ses participants de façon persistante (pas événement par événement)
 - **Email groupé** aux participants d'un événement (inscrits, liste d'attente ou tous)
 - Export CSV des inscrits, liste d'attente automatique
-- **Radar IA** — détection des événements similaires à venir (via Claude)
+- **Radar IA** — détection des événements concurrents (Luma, Eventbrite, Meetup) autour de votre lieu et de votre date, pour choisir le bon créneau (mots-clés extraits via Claude)
 
 **Pour le participant**
 - Découverte via lien partagé (mobile-first)
@@ -86,9 +86,9 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 | | |
 | --- | --- |
 | **2 600+** | commits |
-| **540+** | pull requests |
+| **550+** | pull requests |
 | **89** | cas d'usage (domain usecases) |
-| **1 690+** | tests (unit + integration) |
+| **1 700+** | tests (unit + integration) |
 
 ## Architecture
 
