@@ -543,8 +543,18 @@ Meetup pour la richesse des données communautaires (catégories, membres, group
 2. ~~Couverture limitée~~ → **résolu** : Luma API + Eventbrite JSON-LD + Meetup scraping couvrent l'essentiel du marché FR
 3. ~~Événements "en ligne"~~ → **résolu** : exclus du radar (physique uniquement)
 4. ~~Décision sources MVP~~ → **résolu** : scraping direct sans SerpAPI
-5. **Meetup scraping fragile** — parsing `__NEXT_DATA__` dépend de la structure HTML Next.js qui peut changer
+5. **Meetup fragile** — le point d'accès GraphQL du site n'est pas documenté et peut changer sans préavis (avertissement dans les logs si la réponse sort du schéma)
 6. **Pas de cache** — chaque recherche = 3 fetches réseau. Cache court-terme (1-4h) à envisager pour les performances
+
+### Pistes notées aux revues du 2026-10-08 (non traitées)
+
+Relevées pendant le correctif Luma (coordonnées, géocodage Google Places), laissées hors périmètre :
+
+- **Communes voisines exclues côté Luma** : la recherche se fait autour d'un point, mais le filtre par nom de ville (`featured_city`, `city_state`) écarte Boulogne-Billancourt pour Paris, alors que Meetup garde un rayon de 25 km. À trancher avec le lab sans plafond.
+- **Noms de ville non normalisés** : espaces, accents et noms français (« Londres ») ne correspondent pas aux listes `LUMA_LOCATION_TERMS` / `EVENTBRITE_*`.
+- **Quatre listes parallèles pour les mêmes villes** (`LUMA_LOCATION_TERMS`, `EVENTBRITE_LOCATION`, `EVENTBRITE_COUNTRY`) : une table unique par ville éviterait les oublis.
+- **Coordonnées de l'autocomplétion jetées** : le formulaire d'événement ne garde que le texte de l'adresse, et le radar la géocode à nouveau. Les conserver (requête du radar, ou schéma) supprimerait cet appel. Piste pour #630.
+- **Deux intégrations Google Places** : la route d'autocomplétion appelle Google directement, sans passer par l'adapter `PlacesService` créé pour le radar.
 
 ---
 
