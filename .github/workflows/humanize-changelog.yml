@@ -7,9 +7,10 @@ on:
     branches:
       - main
 
+# Le GITHUB_TOKEN ne sert qu'à lire. L'écriture (push de la réécriture) passe
+# par RELEASE_PLEASE_TOKEN, injecté uniquement au moment du push.
 permissions:
-  contents: write
-  pull-requests: read
+  contents: read
 
 jobs:
   humanize:
@@ -19,19 +20,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # persist-credentials: false — aucun jeton n'est écrit dans .git/config,
+      # donc ni les scripts d'installation des dépendances ni le script de
+      # réécriture ne peuvent lire le jeton personnel (longue durée).
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           fetch-depth: 0
+          persist-credentials: false
 
-      # Skip rapide : les commits vides poussés par /release pour déclencher le CI
-      # ne modifient pas CHANGELOG.md — inutile d'installer les deps et d'appeler Claude.
-      # On compare avec origin/main (la base de la PR), pas HEAD~1 qui ne voit que le dernier commit.
-      - name: Vérifier si CHANGELOG.md a changé
+      # Skip rapide, avant toute installation :
+      # - le dernier commit est déjà notre réécriture (ce workflow se redéclenche
+      #   sur son propre push) ;
+      # - ou CHANGELOG.md ne diffère pas de main (comparaison avec origin/main,
+      #   la base de la PR, pas HEAD~1 qui ne voit que le dernier commit).
+      - name: Vérifier s'il y a un changelog à réécrire
         id: check-changelog
         run: |
-          if git diff origin/main --name-only | grep -q "^CHANGELOG.md$"; then
+          if [ "$(git log -1 --format=%s)" = "docs(changelog): réécriture automatique en langage utilisateur" ]; then
+            echo "Dernier commit = réécriture déjà faite — skip."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          elif git diff origin/main --name-only | grep -q "^CHANGELOG.md$"; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "CHANGELOG.md inchangé — skip."
@@ -61,6 +70,8 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BRANCH: ${{ github.head_ref }}
+          PUSH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -68,12 +79,13 @@ jobs:
           for i in 1 2 3; do
             echo "=== Tentative $i/3 ==="
 
-            # Repartir du HEAD distant (en cas de force-push entre-temps)
+            # Repartir du HEAD distant (en cas de force-push entre-temps).
+            # Dépôt public : la lecture ne demande aucun jeton.
             git fetch origin "$BRANCH"
             git reset --hard "origin/$BRANCH"
 
-            # Humaniser
-            pnpm tsx scripts/humanize-changelog.ts
+            # Humaniser, sans exposer le jeton personnel au script
+            env -u PUSH_TOKEN pnpm tsx scripts/humanize-changelog.ts
 
             # Vérifier si le script a modifié quelque chose
             if git diff --quiet; then
@@ -87,7 +99,7 @@ jobs:
             # sur le head final de la PR, ce qui rend inutile le commit vide de /release.
             git commit -m "docs(changelog): réécriture automatique en langage utilisateur"
 
-            if git push origin "$BRANCH"; then
+            if git push "https://x-access-token:${PUSH_TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}"; then
               echo "Push réussi à la tentative $i."
               exit 0
             fi
