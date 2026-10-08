@@ -9,6 +9,7 @@ import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
   fetchMeetupEvents,
+  resolveCityPosition,
   extractKeywordsAndCity,
   deduplicateByUrl,
   getWeekRange,
@@ -106,10 +107,12 @@ export async function POST(request: NextRequest) {
         const expectedCountry = EVENTBRITE_COUNTRY[city.toLowerCase()] ?? "fr";
 
         // Étape 3 : fetches parallèles sur la semaine complète — un appel par mot-clé (OR)
+        // Position résolue une fois, partagée par Luma et Meetup
+        const position = await resolveCityPosition(city);
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
-          fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
+          fetchAndFilterLumaEvents(city, position, keywords, weekFrom, weekTo),
           fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
-          fetchMeetupEvents(city, EVENTBRITE_COUNTRY[city.toLowerCase()], weekFrom, weekTo, keywords),
+          fetchMeetupEvents(position, weekFrom, weekTo, keywords),
         ]);
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);

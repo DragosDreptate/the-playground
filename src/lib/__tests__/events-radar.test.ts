@@ -6,6 +6,8 @@ import {
   meetupSearchWindow,
   meetupNodesToEvents,
   fetchMeetupEvents,
+  fetchAndFilterLumaEvents,
+  resolveCityPosition,
   extractEventbriteEvents,
   extractKeywordsAndCity,
   LUMA_CITY,
@@ -13,7 +15,7 @@ import {
   EVENTBRITE_LOCATION,
   EVENTBRITE_COUNTRY,
 } from "@/lib/events-radar";
-import type { EventResult, MeetupEventNode } from "@/lib/events-radar";
+import type { CityPosition, EventResult, MeetupEventNode } from "@/lib/events-radar";
 
 /**
  * Tests — Fonctions pures de lib/events-radar.ts
@@ -293,24 +295,24 @@ describe("meetupNodesToEvents", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// fetchMeetupEvents — appels à l'API Meetup (fetch simulé)
+// Appels réseau : position, Luma, Meetup (fetch simulé)
 // ─────────────────────────────────────────────────────────────
 
-describe("fetchMeetupEvents", () => {
+describe("appels réseau du radar (fetch simulé)", () => {
   type GqlBody = { query: string; variables: Record<string, unknown> };
-  const PARIS = { locationSearch: [{ lat: 48.86, lon: 2.34 }] };
+  const PARIS: CityPosition = { lat: 48.8566, lon: 2.3522 };
   const searchResult = (...nodes: (MeetupEventNode | null)[]) => ({ search: { edges: nodes.map((node) => ({ node })) } });
   const jsonResponse = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
 
-  /** Simule l'API : géocodage puis recherche, et garde les corps envoyés. */
-  function stubMeetup(searchResponse: () => Response | Promise<Response>) {
-    const bodies: GqlBody[] = [];
-    vi.stubGlobal("fetch", vi.fn(async (_url: string, init: RequestInit) => {
-      const body = JSON.parse(init.body as string) as GqlBody;
-      bodies.push(body);
-      return body.query.includes("locationSearch") ? jsonResponse({ data: PARIS }) : searchResponse();
+  /** Simule fetch et garde les URL et corps envoyés. */
+  function stubFetch(respond: (url: string, body: GqlBody | null) => Response | Promise<Response>) {
+    const calls: { url: string; body: GqlBody | null }[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      const body = init?.body ? (JSON.parse(init.body as string) as GqlBody) : null;
+      calls.push({ url: String(url), body });
+      return respond(String(url), body);
     }));
-    return bodies;
+    return calls;
   }
 
   let warn: ReturnType<typeof vi.spyOn>;
@@ -322,77 +324,115 @@ describe("fetchMeetupEvents", () => {
     warn.mockRestore();
   });
 
-  describe("given keywords", () => {
-    it("should search by keyword, in person, around the geocoded city", async () => {
-      const bodies = stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
+  describe("resolveCityPosition", () => {
+    it("should use the built-in position of a known city, without any network call", async () => {
+      const calls = stubFetch(() => jsonResponse({}));
+      expect(await resolveCityPosition("Paris")).toEqual(PARIS);
+      expect(calls).toHaveLength(0);
+    });
 
-      const events = await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"]);
+    it("should geocode an unknown city by its name alone, without assuming a country", async () => {
+      const calls = stubFetch(() => jsonResponse({ data: { locationSearch: [{ lat: 45.5, lon: -73.57 }] } }));
+      expect(await resolveCityPosition("montréal")).toEqual({ lat: 45.5, lon: -73.57 });
+      expect(calls[0].body?.variables).toEqual({ query: "montréal" });
+    });
 
-      expect(events.map((e) => e.title)).toEqual(["Meetup 1"]);
-      expect(bodies[0].variables).toEqual({ query: "paris fr" });
-      expect(bodies[1].query).toContain("eventSearch");
-      expect(bodies[1].variables.filter).toMatchObject({
-        lat: 48.86,
-        lon: 2.34,
-        eventType: "PHYSICAL",
-        query: "product",
-        startDateRange: "2026-10-11T00:00:00Z",
-        endDateRange: "2026-10-19T23:59:59Z",
+    it("should return null when the city cannot be geocoded", async () => {
+      stubFetch(() => jsonResponse({ data: { locationSearch: [] } }));
+      expect(await resolveCityPosition("nulle-part")).toBeNull();
+    });
+  });
+
+  describe("fetchAndFilterLumaEvents", () => {
+    it("should search around the city coordinates, not by city name (Luma ignores it and uses the caller's IP)", async () => {
+      const calls = stubFetch(() => jsonResponse({ entries: [] }));
+
+      await fetchAndFilterLumaEvents("paris", PARIS, ["IA"], "2026-10-08", "2026-11-01");
+
+      const params = new URL(calls[0].url).searchParams;
+      expect(params.get("latitude")).toBe("48.8566");
+      expect(params.get("longitude")).toBe("2.3522");
+      expect(params.get("query")).toBe("IA");
+      expect(params.has("near")).toBe(false);
+    });
+
+    it("should not call Luma without a position", async () => {
+      const calls = stubFetch(() => jsonResponse({ entries: [] }));
+      expect(await fetchAndFilterLumaEvents("paris", null, ["IA"], "2026-10-08", "2026-11-01")).toEqual([]);
+      expect(calls).toHaveLength(0);
+    });
+  });
+
+  describe("fetchMeetupEvents", () => {
+    describe("given keywords", () => {
+      it("should search by keyword, in person, around the position", async () => {
+        const calls = stubFetch(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
+
+        const events = await fetchMeetupEvents(PARIS, "2026-10-12", "2026-10-18", ["product"]);
+
+        expect(events.map((e) => e.title)).toEqual(["Meetup 1"]);
+        expect(calls[0].body?.query).toContain("eventSearch");
+        expect(calls[0].body?.variables.filter).toMatchObject({
+          lat: 48.8566,
+          lon: 2.3522,
+          eventType: "PHYSICAL",
+          query: "product",
+          startDateRange: "2026-10-11T00:00:00Z",
+          endDateRange: "2026-10-19T23:59:59Z",
+        });
       });
     });
-  });
 
-  describe("given no keyword", () => {
-    it("should list the nearby events without a text query", async () => {
-      const bodies = stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
+    describe("given no keyword", () => {
+      it("should list the nearby events without a text query", async () => {
+        const calls = stubFetch(() => jsonResponse({ data: searchResult(meetupNode("1")) }));
 
-      await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", []);
+        await fetchMeetupEvents(PARIS, "2026-10-12", "2026-10-18", []);
 
-      expect(bodies[1].query).toContain("recommendedEvents");
-      expect(bodies[1].variables.filter).not.toHaveProperty("query");
+        expect(calls[0].body?.query).toContain("recommendedEvents");
+        expect(calls[0].body?.variables.filter).not.toHaveProperty("query");
+      });
     });
-  });
 
-  describe("given a city whose country is unknown", () => {
-    it("should geocode the city alone instead of assuming France", async () => {
-      const bodies = stubMeetup(() => jsonResponse({ data: searchResult() }));
-
-      await fetchMeetupEvents("montréal", undefined, "2026-10-12", "2026-10-18", ["product"]);
-
-      expect(bodies[0].variables).toEqual({ query: "montréal" });
+    describe("given no position", () => {
+      it("should not call Meetup", async () => {
+        const calls = stubFetch(() => jsonResponse({}));
+        expect(await fetchMeetupEvents(null, "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
+        expect(calls).toHaveLength(0);
+      });
     });
-  });
 
-  describe("given a partial response (data plus errors)", () => {
-    it("should keep the events and warn", async () => {
-      stubMeetup(() => jsonResponse({ data: searchResult(meetupNode("1"), null), errors: [{ message: "venue" }] }));
+    describe("given a partial response (data plus errors)", () => {
+      it("should keep the events and warn", async () => {
+        stubFetch(() => jsonResponse({ data: searchResult(meetupNode("1"), null), errors: [{ message: "venue" }] }));
 
-      const events = await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"]);
+        const events = await fetchMeetupEvents(PARIS, "2026-10-12", "2026-10-18", ["product"]);
 
-      expect(events).toHaveLength(1);
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining("partielle"), expect.anything());
+        expect(events).toHaveLength(1);
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining("partielle"), expect.anything());
+      });
     });
-  });
 
-  describe("given Meetup answers outside its schema or blocks the call", () => {
-    it.each([
-      ["errors without data", () => jsonResponse({ errors: [{ message: "Validation error" }] })],
-      ["an HTML page with status 200 (anti-bot)", () => new Response("<html>challenge</html>", { status: 200 })],
-      ["an HTTP error", () => new Response("", { status: 503 })],
-    ])("should return no event and warn, given %s", async (_, response) => {
-      stubMeetup(response);
+    describe("given Meetup answers outside its schema or blocks the call", () => {
+      it.each([
+        ["errors without data", () => jsonResponse({ errors: [{ message: "Validation error" }] })],
+        ["an HTML page with status 200 (anti-bot)", () => new Response("<html>challenge</html>", { status: 200 })],
+        ["an HTTP error", () => new Response("", { status: 503 })],
+      ])("should return no event and warn, given %s", async (_, response) => {
+        stubFetch(response);
 
-      expect(await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Meetup"), expect.anything());
+        expect(await fetchMeetupEvents(PARIS, "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining("Meetup"), expect.anything());
+      });
     });
-  });
 
-  describe("given a network failure", () => {
-    it("should return no event, silently like the other sources", async () => {
-      stubMeetup(() => Promise.reject(new TypeError("fetch failed")));
+    describe("given a network failure", () => {
+      it("should return no event, silently like the other sources", async () => {
+        stubFetch(() => Promise.reject(new TypeError("fetch failed")));
 
-      expect(await fetchMeetupEvents("paris", "fr", "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
-      expect(warn).not.toHaveBeenCalled();
+        expect(await fetchMeetupEvents(PARIS, "2026-10-12", "2026-10-18", ["product"])).toEqual([]);
+        expect(warn).not.toHaveBeenCalled();
+      });
     });
   });
 });

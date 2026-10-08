@@ -4,6 +4,7 @@ import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
   fetchMeetupEvents,
+  resolveCityPosition,
   deduplicateByUrl,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
@@ -35,10 +36,12 @@ export async function POST(request: NextRequest) {
         send({ type: "status", message: `Radar — ${ville} — ${periodLabel}` });
         send({ type: "status", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
 
+        // Position résolue une fois, partagée par Luma et Meetup
+        const position = await resolveCityPosition(ville);
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
-          fetchAndFilterLumaEvents(ville, kwArray, dateFrom, dateEnd),
+          fetchAndFilterLumaEvents(ville, position, kwArray, dateFrom, dateEnd),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),
-          fetchMeetupEvents(ville, EVENTBRITE_COUNTRY[ville.toLowerCase()], dateFrom, dateEnd, kwArray),
+          fetchMeetupEvents(position, dateFrom, dateEnd, kwArray),
         ]);
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);

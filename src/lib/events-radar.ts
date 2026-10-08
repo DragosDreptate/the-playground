@@ -23,6 +23,33 @@ export function deduplicateByUrl(events: EventResult[]): EventResult[] {
   });
 }
 
+// --- Position de la ville (partagée par Luma et Meetup) ---
+
+export type CityPosition = { lat: number; lon: number };
+
+/** Centre des villes connues du radar : aucun appel réseau pour les cas courants. */
+export const CITY_POSITION: Record<string, CityPosition> = {
+  paris: { lat: 48.8566, lon: 2.3522 }, lyon: { lat: 45.764, lon: 4.8357 },
+  bordeaux: { lat: 44.8378, lon: -0.5792 }, marseille: { lat: 43.2965, lon: 5.3698 },
+  toulouse: { lat: 43.6047, lon: 1.4442 }, nantes: { lat: 47.2184, lon: -1.5536 },
+  lille: { lat: 50.6292, lon: 3.0573 }, strasbourg: { lat: 48.5734, lon: 7.7521 },
+  london: { lat: 51.5072, lon: -0.1276 }, berlin: { lat: 52.52, lon: 13.405 },
+  amsterdam: { lat: 52.3676, lon: 4.9041 },
+};
+
+/**
+ * Position d'une ville : table des villes connues, sinon géocodage Meetup (ville
+ * seule, sans supposer de pays : sinon Montréal tomberait dans l'Aude).
+ * Luma en a besoin car il ignore le nom de ville (`near`) et place la recherche
+ * d'après l'adresse IP de l'appelant, c'est-à-dire du serveur Vercel en prod.
+ */
+export async function resolveCityPosition(ville: string): Promise<CityPosition | null> {
+  const known = CITY_POSITION[ville.toLowerCase()];
+  if (known) return known;
+  const located = await meetupGql<{ locationSearch: CityPosition[] | null }>(MEETUP_LOCATION_QUERY, { query: ville });
+  return located?.locationSearch?.[0] ?? null;
+}
+
 // --- Luma API — une requête par mot-clé en parallèle ---
 
 export const LUMA_CITY: Record<string, string> = {
@@ -60,10 +87,13 @@ type LumaEntry = {
 
 export async function fetchAndFilterLumaEvents(
   ville: string,
+  position: CityPosition | null,
   keywords: string[],
   dateFrom: string,
   dateEnd: string
 ): Promise<EventResult[]> {
+  // Sans position, Luma chercherait autour du serveur : rien d'exploitable.
+  if (!position) return [];
   const queries = keywords.length > 0 ? keywords : [""];
   const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
   const villeKey = ville.toLowerCase();
@@ -71,7 +101,11 @@ export async function fetchAndFilterLumaEvents(
   const results = await Promise.all(
     queries.map(async (kw): Promise<EventResult[]> => {
       try {
-        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "10" });
+        const params = new URLSearchParams({
+          latitude: String(position.lat),
+          longitude: String(position.lon),
+          pagination_limit: "10",
+        });
         if (kw) params.set("query", kw);
         const res = await fetch(`https://api.lu.ma/discover/get-paginated-events?${params}`, {
           headers: { Accept: "application/json" },
@@ -360,28 +394,17 @@ async function meetupGql<T>(query: string, variables: Record<string, unknown>): 
   return json.data;
 }
 
-/**
- * `country` (code ISO, ex. "fr") affine le géocodage d'une ville connue ; pour
- * une ville inconnue on l'omet plutôt que de supposer la France, sous peine de
- * chercher Montréal dans l'Aude.
- */
 export async function fetchMeetupEvents(
-  ville: string,
-  country: string | undefined,
+  position: CityPosition | null,
   dateFrom: string,
   dateEnd: string,
   keywords: string[]
 ): Promise<EventResult[]> {
-  const located = await meetupGql<{ locationSearch: { lat: number; lon: number }[] | null }>(
-    MEETUP_LOCATION_QUERY,
-    { query: country ? `${ville} ${country}` : ville }
-  );
-  const place = located?.locationSearch?.[0];
-  if (!place) return [];
+  if (!position) return [];
 
   const baseFilter = {
-    lat: place.lat,
-    lon: place.lon,
+    lat: position.lat,
+    lon: position.lon,
     radius: MEETUP_RADIUS_KM,
     eventType: "PHYSICAL",
     ...meetupSearchWindow(dateFrom, dateEnd),
