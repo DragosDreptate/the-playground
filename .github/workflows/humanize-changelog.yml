@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           fetch-depth: 0
 
       # Skip rapide : les commits vides poussés par /release pour déclencher le CI
@@ -83,7 +83,9 @@ jobs:
 
             # Committer et pousser
             git add CHANGELOG.md
-            git commit -m "docs(changelog): réécriture automatique en langage utilisateur [skip ci]"
+            # Pas de [skip ci] : poussé avec RELEASE_PLEASE_TOKEN, ce commit relance la CI
+            # sur le head final de la PR, ce qui rend inutile le commit vide de /release.
+            git commit -m "docs(changelog): réécriture automatique en langage utilisateur"
 
             if git push origin "$BRANCH"; then
               echo "Push réussi à la tentative $i."

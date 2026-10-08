@@ -68,6 +68,12 @@ jobs:
 
   test-e2e:
     name: test-e2e
+    # Pas d'e2e sur les releases : la PR Release Please et son merge ne touchent
+    # que le numéro de version et le changelog, déjà couverts par typecheck et
+    # test-unit (les seuls checks exigés). Économise ~7 min par passage.
+    if: >-
+      github.head_ref != 'release-please--branches--main--components--the-playground'
+      && !contains(github.event.head_commit.message, 'release-please--branches--main--components--the-playground')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
