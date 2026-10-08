@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
         // Position de la ville, partagée par Luma et Meetup ; Eventbrite ne l'attend pas.
         const places = createGooglePlacesService(process.env.GOOGLE_PLACES_API_KEY);
-        const positionP = resolveSearchPosition(places.search, ville);
+        const positionP = resolveSearchPosition((q) => places.search(q), ville);
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
           positionP.then((position) => fetchAndFilterLumaEvents(ville, position, kwArray, dateFrom, dateEnd)),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),

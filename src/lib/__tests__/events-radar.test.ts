@@ -333,12 +333,17 @@ describe("appels réseau du radar (fetch simulé)", () => {
       expect(search).toHaveBeenCalledWith("12 rue de la République, Valence");
     });
 
-    it.each([
-      ["no place is found", async () => []],
-      ["the search fails", async () => { throw new Error("timeout"); }],
-    ])("should return null and warn when %s", async (_case, search) => {
-      expect(await resolveSearchPosition(search, "nulle-part")).toBeNull();
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining("nulle-part"));
+    it("should return null and warn, without logging the organizer's address, when no place is found", async () => {
+      expect(await resolveSearchPosition(async () => [], "12 rue X, appartement 3, Lyon")).toBeNull();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("aucun lieu trouvé"));
+      expect(JSON.stringify(warn.mock.calls)).not.toContain("appartement");
+    });
+
+    it("should return null and log the cause when the search fails, so an outage is not mistaken for an unknown place", async () => {
+      const cause = new Error("timeout");
+      expect(await resolveSearchPosition(async () => { throw cause; }, "12 rue X, appartement 3, Lyon")).toBeNull();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("géocodage en échec"), cause);
+      expect(JSON.stringify(warn.mock.calls)).not.toContain("appartement");
     });
   });
 

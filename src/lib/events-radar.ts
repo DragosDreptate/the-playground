@@ -38,14 +38,17 @@ export type PlaceSearch = (query: string) => Promise<{ latitude: number; longitu
  * ville (`near`) et place la recherche d'après l'adresse IP de l'appelant,
  * c'est-à-dire du serveur Vercel en prod. Le radar géocode l'adresse de
  * l'événement plutôt que la ville seule, qui peut exister dans plusieurs pays.
- * Sans position, Luma et Meetup ne renvoient rien : l'avertissement le signale.
+ * Sans position, Luma et Meetup ne renvoient rien : l'avertissement le signale,
+ * sans citer l'adresse (celle d'un brouillon peut être un domicile).
  */
 export async function resolveSearchPosition(searchPlaces: PlaceSearch, query: string): Promise<CityPosition | null> {
   try {
     const [place] = await searchPlaces(query);
     if (place) return { lat: place.latitude, lon: place.longitude };
-  } catch { /* échec réseau ou délai dépassé */ }
-  console.warn(`[radar] position introuvable pour « ${query} » : pas de recherche Luma ni Meetup`);
+    console.warn("[radar] aucun lieu trouvé pour l'adresse : pas de recherche Luma ni Meetup");
+  } catch (err) {
+    console.warn("[radar] géocodage en échec : pas de recherche Luma ni Meetup", err);
+  }
   return null;
 }
 

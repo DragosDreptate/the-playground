@@ -43,7 +43,7 @@ describe("GooglePlacesService", () => {
       const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
       expect(url).toBe("https://places.googleapis.com/v1/places:searchText");
       expect((init.headers as Record<string, string>)["X-Goog-Api-Key"]).toBe("key-123");
-      expect(JSON.parse(init.body as string)).toMatchObject({ textQuery: "Station F, Paris" });
+      expect(JSON.parse(init.body as string)).toMatchObject({ textQuery: "Station F, Paris", regionCode: "fr" });
     });
   });
 

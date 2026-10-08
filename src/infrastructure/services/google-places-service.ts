@@ -36,7 +36,10 @@ export function createGooglePlacesService(apiKey: string | undefined): PlacesSer
           "X-Goog-Api-Key": apiKey,
           "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.location",
         },
-        body: JSON.stringify({ textQuery: query, pageSize: 5, languageCode: "fr" }),
+        // regionCode oriente les noms ambigus (Valence, Saint-Denis) vers la France
+        // sans exclure les autres pays : sinon Google départage selon la position
+        // de l'appelant, le serveur.
+        body: JSON.stringify({ textQuery: query, pageSize: 5, languageCode: "fr", regionCode: "fr" }),
         signal: AbortSignal.timeout(10000),
       });
       if (!res.ok) {
