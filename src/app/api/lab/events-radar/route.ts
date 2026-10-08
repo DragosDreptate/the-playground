@@ -1,9 +1,11 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/infrastructure/auth/auth.config";
+import { createGooglePlacesService } from "@/infrastructure/services/google-places-service";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
   fetchMeetupEvents,
+  resolveSearchPosition,
   deduplicateByUrl,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
@@ -35,10 +37,13 @@ export async function POST(request: NextRequest) {
         send({ type: "status", message: `Radar — ${ville} — ${periodLabel}` });
         send({ type: "status", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
 
+        // Position de la ville, partagée par Luma et Meetup ; Eventbrite ne l'attend pas.
+        const places = createGooglePlacesService(process.env.GOOGLE_PLACES_API_KEY);
+        const positionP = resolveSearchPosition((q) => places.search(q), ville);
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
-          fetchAndFilterLumaEvents(ville, kwArray, dateFrom, dateEnd),
+          positionP.then((position) => fetchAndFilterLumaEvents(ville, position, kwArray, dateFrom, dateEnd)),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),
-          fetchMeetupEvents(ville, EVENTBRITE_COUNTRY[ville.toLowerCase()], dateFrom, dateEnd, kwArray),
+          positionP.then((position) => fetchMeetupEvents(position, dateFrom, dateEnd, kwArray)),
         ]);
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);

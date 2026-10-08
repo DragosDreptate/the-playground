@@ -4,11 +4,13 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { prisma } from "@/infrastructure/db/prisma";
 import { UserRole } from "@prisma/client";
 import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
+import { createGooglePlacesService } from "@/infrastructure/services/google-places-service";
 
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
   fetchMeetupEvents,
+  resolveSearchPosition,
   extractKeywordsAndCity,
   deduplicateByUrl,
   getWeekRange,
@@ -106,10 +108,14 @@ export async function POST(request: NextRequest) {
         const expectedCountry = EVENTBRITE_COUNTRY[city.toLowerCase()] ?? "fr";
 
         // Étape 3 : fetches parallèles sur la semaine complète — un appel par mot-clé (OR)
+        // Position de l'adresse, partagée par Luma et Meetup ; Eventbrite cherche
+        // par ville et ne l'attend pas.
+        const places = createGooglePlacesService(process.env.GOOGLE_PLACES_API_KEY);
+        const positionP = resolveSearchPosition((q) => places.search(q), [locationAddress, city].filter(Boolean).join(", "));
         const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
-          fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
+          positionP.then((position) => fetchAndFilterLumaEvents(city, position, keywords, weekFrom, weekTo)),
           fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
-          fetchMeetupEvents(city, EVENTBRITE_COUNTRY[city.toLowerCase()], weekFrom, weekTo, keywords),
+          positionP.then((position) => fetchMeetupEvents(position, weekFrom, weekTo, keywords)),
         ]);
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);
