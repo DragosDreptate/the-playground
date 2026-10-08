@@ -3,7 +3,6 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
-  buildMeetupUrl,
   fetchMeetupEvents,
   deduplicateByUrl,
   LUMA_LOCATION_TERMS,
@@ -31,21 +30,17 @@ export async function POST(request: NextRequest) {
         const kwArray = keywords ? keywords.split(",").map((k) => k.trim()).filter(Boolean) : [];
         const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
         const expectedCountry = EVENTBRITE_COUNTRY[ville.toLowerCase()] ?? "fr";
-        const meetupKws = kwArray.length > 0 ? kwArray : [""];
 
         const periodLabel = dateEnd === dateFrom ? dateFrom : `${dateFrom} → ${dateEnd}`;
         send({ type: "status", message: `Radar — ${ville} — ${periodLabel}` });
         send({ type: "status", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
 
-        const [lumaEvents, eventbriteEvents, meetupResults] = await Promise.all([
+        const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
           fetchAndFilterLumaEvents(ville, kwArray, dateFrom, dateEnd),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),
-          Promise.all(
-            meetupKws.map((kw) => fetchMeetupEvents(buildMeetupUrl(ville, dateFrom, dateEnd, kw), dateFrom, dateEnd))
-          ),
+          fetchMeetupEvents(ville, expectedCountry, dateFrom, dateEnd, kwArray),
         ]);
 
-        const meetupEvents = deduplicateByUrl(meetupResults.flat());
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);
         allEvents.sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
 

@@ -246,98 +246,130 @@ export async function fetchAndFilterEventbriteEvents(
   return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
-// --- Meetup — scraping HTML ---
+// --- Meetup — API GraphQL interne du site ---
 
-export const MEETUP_LOCATION: Record<string, string> = {
-  paris: "fr--Paris", lyon: "fr--Lyon", bordeaux: "fr--Bordeaux", marseille: "fr--Marseille",
-  toulouse: "fr--Toulouse", nantes: "fr--Nantes", lille: "fr--Lille", strasbourg: "fr--Strasbourg",
-  london: "gb--London", berlin: "de--Berlin", amsterdam: "nl--Amsterdam",
-};
+/**
+ * Meetup est interrogé par l'API GraphQL qu'utilise son propre site
+ * (`/gql2`, sans authentification) : sa page de recherche ignore désormais
+ * la plage de dates demandée, l'API la respecte.
+ *
+ * Choix assumé (spec/decisions.md, 2026-10-08) : cette API n'est pas publique
+ * et le robots.txt de Meetup interdit `/gql*`. Retenu parce que le radar tourne
+ * moins d'une fois par mois ; à revoir si le volume monte ou si Meetup bloque.
+ */
+const MEETUP_GQL_URL = "https://www.meetup.com/gql2";
+const MEETUP_RADIUS_KM = 25;
 
-export function buildMeetupUrl(ville: string, dateFrom: string, dateEnd: string, keyword: string): string {
-  const params = new URLSearchParams({
-    location: MEETUP_LOCATION[ville.toLowerCase()] ?? `fr--${ville}`,
-    source: "EVENTS",
-    startDateRange: dateFrom,
-    endDateRange: dateEnd,
-  });
-  if (keyword) params.set("keywords", keyword);
-  return `https://www.meetup.com/find/events/?${params}`;
-}
+const MEETUP_EVENT_FIELDS = "edges { node { title dateTime eventType eventUrl description venue { name city } } }";
+const MEETUP_LOCATION_QUERY = "query($query: String!) { locationSearch(query: $query) { lat lon } }";
+// Avec mot-clé : moteur de recherche du site. Sans mot-clé, `eventSearch`
+// ne renvoie rien : on prend les événements recommandés de la zone.
+const MEETUP_KEYWORD_QUERY = `query($filter: EventSearchFilter!) { search: eventSearch(filter: $filter, first: 20) { ${MEETUP_EVENT_FIELDS} } }`;
+const MEETUP_NEARBY_QUERY = `query($filter: RecommendedEventsFilter!) { search: recommendedEvents(filter: $filter, first: 20) { ${MEETUP_EVENT_FIELDS} } }`;
 
-type MeetupApolloRef = { __ref?: string };
-type MeetupVenue = { name?: string; city?: string };
-type MeetupApolloEvent = {
+export type MeetupEventNode = {
   title?: string;
-  dateTime?: string; // "2026-10-08T18:30:00+02:00", heure locale de l'événement
+  dateTime?: string; // "2026-10-14T19:00:00+02:00", heure locale de l'événement
+  eventType?: string; // "PHYSICAL" | "ONLINE" | ...
   eventUrl?: string;
-  eventType?: string; // "PHYSICAL" | "ONLINE" | ... ; absent sur les entrées partielles
   description?: string;
-  venue?: MeetupVenue & MeetupApolloRef;
+  venue?: { name?: string; city?: string } | null;
 };
 
 /**
- * Événements Meetup lus directement dans la page de recherche, sans IA.
- *
- * Depuis 2026, la page porte ses résultats dans le cache Apollo du bloc
- * `__NEXT_DATA__` (`pageProps.__APOLLO_STATE__`, une entrée `Event:<id>` par
- * événement). Les entrées sans `eventType` sont des références partielles
- * d'autres requêtes de la page : seules les entrées complètes sont lues.
- * Présentiel uniquement, comme pour Eventbrite : le radar cherche les conflits physiques.
+ * Fenêtre envoyée à l'API, élargie d'un jour de chaque côté : l'API raisonne
+ * en instants UTC, alors que la semaine du radar se compte en dates locales.
+ * Le filtre exact se fait ensuite sur la date locale (meetupNodesToEvents).
  */
-export function extractMeetupEvents(html: string, dateFrom: string, dateEnd: string): EventResult[] {
-  const nd = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
-  let apollo: Record<string, unknown> | null = null;
-  try {
-    const parsed = nd ? (JSON.parse(nd[1]) as { props?: { pageProps?: { __APOLLO_STATE__?: Record<string, unknown> } } }) : null;
-    apollo = parsed?.props?.pageProps?.__APOLLO_STATE__ ?? null;
-  } catch { /* JSON illisible : même traitement qu'un bloc absent */ }
-
-  if (!apollo) {
-    // Panne sinon invisible : la page répond mais Meetup a changé sa structure.
-    console.warn("[radar] Meetup : aucune donnée d'événement lisible dans la page");
-    return [];
-  }
-
-  const venueOf = (venue: MeetupApolloEvent["venue"]): MeetupVenue | undefined =>
-    venue?.__ref ? (apollo[venue.__ref] as MeetupVenue | undefined) : venue;
-
-  return Object.entries(apollo)
-    .filter(([key]) => key.startsWith("Event:"))
-    .map(([, value]) => value as MeetupApolloEvent)
-    .filter((e) => e.eventType === "PHYSICAL" && e.dateTime && e.eventUrl)
-    .flatMap((e): EventResult[] => {
-      const date = e.dateTime!.slice(0, 10);
-      if (date < dateFrom || date > dateEnd) return [];
-      const venue = venueOf(e.venue);
-      return [{
-        title: e.title ?? "Sans titre",
-        date,
-        time: e.dateTime!.slice(11, 16) || null,
-        location: venue?.name ?? venue?.city ?? null,
-        url: e.eventUrl!,
-        source: "meetup",
-        description: e.description ? e.description.slice(0, 150) : null,
-      }];
-    })
-    .slice(0, 10);
+export function meetupSearchWindow(dateFrom: string, dateEnd: string): { startDateRange: string; endDateRange: string } {
+  const shift = (date: string, days: number) => {
+    const d = new Date(`${date}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+  };
+  return { startDateRange: `${shift(dateFrom, -1)}T00:00:00Z`, endDateRange: `${shift(dateEnd, 1)}T23:59:59Z` };
 }
 
-export async function fetchMeetupEvents(url: string, dateFrom: string, dateEnd: string): Promise<EventResult[]> {
+/** Événements en présentiel de la semaine demandée, au format du radar. */
+export function meetupNodesToEvents(nodes: MeetupEventNode[], dateFrom: string, dateEnd: string): EventResult[] {
+  return nodes
+    .filter((n) => n.eventType === "PHYSICAL" && n.dateTime && n.eventUrl)
+    .flatMap((n): EventResult[] => {
+      const date = n.dateTime!.slice(0, 10);
+      if (date < dateFrom || date > dateEnd) return [];
+      return [{
+        title: n.title ?? "Sans titre",
+        date,
+        time: n.dateTime!.slice(11, 16) || null,
+        location: n.venue?.name ?? n.venue?.city ?? null,
+        url: n.eventUrl!,
+        source: "meetup",
+        description: n.description ? n.description.slice(0, 150) : null,
+      }];
+    });
+}
+
+/**
+ * Appel GraphQL. `null` si l'API ne répond pas comme attendu : en cas de
+ * changement de schéma, l'avertissement évite une panne invisible.
+ */
+async function meetupGql<T>(query: string, variables: Record<string, unknown>): Promise<T | null> {
   try {
-    const res = await fetch(url, {
+    const res = await fetch(MEETUP_GQL_URL, {
+      method: "POST",
       headers: {
+        "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
         "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
-        Accept: "text/html,application/xhtml+xml",
       },
+      body: JSON.stringify({ query, variables }),
       signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return [];
-    return extractMeetupEvents(await res.text(), dateFrom, dateEnd);
+    const json = res.ok ? ((await res.json()) as { data?: T | null; errors?: unknown[] }) : null;
+    if (!json?.data || json.errors?.length) {
+      console.warn(`[radar] Meetup : réponse inattendue de l'API (HTTP ${res.status})`, json?.errors?.[0] ?? "");
+      return null;
+    }
+    return json.data;
   } catch {
-    return [];
+    return null; // réseau ou timeout : même traitement que les autres sources
   }
+}
+
+export async function fetchMeetupEvents(
+  ville: string,
+  country: string,
+  dateFrom: string,
+  dateEnd: string,
+  keywords: string[]
+): Promise<EventResult[]> {
+  const located = await meetupGql<{ locationSearch: { lat: number; lon: number }[] | null }>(
+    MEETUP_LOCATION_QUERY,
+    { query: `${ville} ${country}` }
+  );
+  const place = located?.locationSearch?.[0];
+  if (!place) return [];
+
+  const baseFilter = {
+    lat: place.lat,
+    lon: place.lon,
+    radius: MEETUP_RADIUS_KM,
+    eventType: "PHYSICAL",
+    ...meetupSearchWindow(dateFrom, dateEnd),
+  };
+  const queries = keywords.length > 0 ? keywords : [""];
+
+  const results = await Promise.all(
+    queries.map(async (kw) => {
+      const data = await meetupGql<{ search: { edges: { node: MeetupEventNode }[] } | null }>(
+        kw ? MEETUP_KEYWORD_QUERY : MEETUP_NEARBY_QUERY,
+        { filter: kw ? { ...baseFilter, query: kw } : baseFilter }
+      );
+      return meetupNodesToEvents((data?.search?.edges ?? []).map((e) => e.node), dateFrom, dateEnd);
+    })
+  );
+
+  return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
 // --- Mots-clés + ville d'un événement — extraction Claude ---

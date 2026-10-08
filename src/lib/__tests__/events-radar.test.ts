@@ -2,18 +2,17 @@ import { describe, it, expect, vi } from "vitest";
 import {
   deduplicateByUrl,
   buildEventbriteUrl,
-  buildMeetupUrl,
   getWeekRange,
-  extractMeetupEvents,
+  meetupSearchWindow,
+  meetupNodesToEvents,
   extractEventbriteEvents,
   extractKeywordsAndCity,
   LUMA_CITY,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_LOCATION,
   EVENTBRITE_COUNTRY,
-  MEETUP_LOCATION,
 } from "@/lib/events-radar";
-import type { EventResult } from "@/lib/events-radar";
+import type { EventResult, MeetupEventNode } from "@/lib/events-radar";
 
 /**
  * Tests — Fonctions pures de lib/events-radar.ts
@@ -21,9 +20,9 @@ import type { EventResult } from "@/lib/events-radar";
  * Seules les fonctions pures (sans I/O) sont testées ici :
  *   - deduplicateByUrl
  *   - buildEventbriteUrl
- *   - buildMeetupUrl
  *   - getWeekRange
- *   - extractMeetupEvents, extractEventbriteEvents (lecture des pages de recherche)
+ *   - meetupSearchWindow, meetupNodesToEvents (API Meetup)
+ *   - extractEventbriteEvents (lecture de la page de recherche)
  *   - extractKeywordsAndCity (appel IA injecté, seul le parsing est testé)
  *   - constantes de mapping (LUMA_CITY, EVENTBRITE_LOCATION, etc.)
  *
@@ -158,58 +157,6 @@ describe("buildEventbriteUrl", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// buildMeetupUrl
-// ─────────────────────────────────────────────────────────────
-
-describe("buildMeetupUrl", () => {
-  describe("given Paris with a keyword", () => {
-    it("should build a valid Meetup URL", () => {
-      const url = buildMeetupUrl("paris", "2026-03-01", "2026-03-31", "tech");
-      expect(url).toContain("https://www.meetup.com/find/events/");
-      expect(url).toContain("fr--Paris");
-    });
-
-    it("should include the date range", () => {
-      const url = buildMeetupUrl("paris", "2026-03-01", "2026-03-31", "");
-      expect(url).toContain("startDateRange=2026-03-01");
-      expect(url).toContain("endDateRange=2026-03-31");
-    });
-
-    it("should include the source=EVENTS param", () => {
-      const url = buildMeetupUrl("paris", "2026-03-01", "2026-03-31", "");
-      expect(url).toContain("source=EVENTS");
-    });
-
-    it("should include the keyword when provided", () => {
-      const url = buildMeetupUrl("paris", "2026-03-01", "2026-03-31", "javascript");
-      expect(url).toContain("keywords=javascript");
-    });
-  });
-
-  describe("given no keyword", () => {
-    it("should not include keywords param when empty", () => {
-      const url = buildMeetupUrl("paris", "2026-03-01", "2026-03-31", "");
-      expect(url).not.toContain("keywords=");
-    });
-  });
-
-  describe("given different cities", () => {
-    it.each([
-      ["paris", "fr--Paris"],
-      ["lyon", "fr--Lyon"],
-      ["london", "gb--London"],
-      ["berlin", "de--Berlin"],
-    ])(
-      "should use the correct location for %s",
-      (ville, expectedLocation) => {
-        const url = buildMeetupUrl(ville, "2026-03-01", "2026-03-31", "");
-        expect(url).toContain(expectedLocation);
-      }
-    );
-  });
-});
-
-// ─────────────────────────────────────────────────────────────
 // getWeekRange
 // ─────────────────────────────────────────────────────────────
 
@@ -277,32 +224,39 @@ describe("getWeekRange", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// extractMeetupEvents — lecture du cache Apollo de la page
+// Meetup — fenêtre de recherche et conversion des résultats de l'API
 // ─────────────────────────────────────────────────────────────
 
-function meetupPage(apollo: Record<string, unknown>): string {
-  const nextData = { props: { pageProps: { __APOLLO_STATE__: apollo } } };
-  return `<html><script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script></html>`;
-}
+describe("meetupSearchWindow", () => {
+  it("should widen the week by one day on each side, in UTC", () => {
+    expect(meetupSearchWindow("2026-10-12", "2026-10-18")).toEqual({
+      startDateRange: "2026-10-11T00:00:00Z",
+      endDateRange: "2026-10-19T23:59:59Z",
+    });
+  });
 
-const meetupEvent = (id: string, overrides: Record<string, unknown> = {}) => ({
-  [`Event:${id}`]: {
-    title: `Meetup ${id}`,
-    dateTime: "2026-10-14T19:00:00+02:00",
-    eventUrl: `https://www.meetup.com/groupe/events/${id}/`,
-    eventType: "PHYSICAL",
-    description: "Une soirée produit",
-    venue: { name: "Station F", city: "Paris" },
-    ...overrides,
-  },
+  it("should cross month and year boundaries", () => {
+    expect(meetupSearchWindow("2026-01-01", "2026-12-31")).toEqual({
+      startDateRange: "2025-12-31T00:00:00Z",
+      endDateRange: "2027-01-01T23:59:59Z",
+    });
+  });
 });
 
-describe("extractMeetupEvents", () => {
-  describe("given a search page with events in the Apollo cache", () => {
-    it("should read the in-person events of the requested week", () => {
-      const html = meetupPage({ ...meetupEvent("1"), ...meetupEvent("2", { dateTime: "2026-10-20T19:00:00+02:00" }) });
+const meetupNode = (id: string, overrides: Partial<MeetupEventNode> = {}): MeetupEventNode => ({
+  title: `Meetup ${id}`,
+  dateTime: "2026-10-14T19:00:00+02:00",
+  eventType: "PHYSICAL",
+  eventUrl: `https://www.meetup.com/groupe/events/${id}/`,
+  description: "Une soirée produit",
+  venue: { name: "Station F", city: "Paris" },
+  ...overrides,
+});
 
-      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([
+describe("meetupNodesToEvents", () => {
+  describe("given in-person events of the requested week", () => {
+    it("should convert them to radar events", () => {
+      expect(meetupNodesToEvents([meetupNode("1")], "2026-10-12", "2026-10-18")).toEqual([
         {
           title: "Meetup 1",
           date: "2026-10-14",
@@ -315,38 +269,24 @@ describe("extractMeetupEvents", () => {
       ]);
     });
 
-    it.each([
-      ["an online event", { eventType: "ONLINE" }],
-      ["a partial entry without eventType", { eventType: undefined }],
-      ["an entry without URL", { eventUrl: undefined }],
-    ])("should skip %s", (_, overrides) => {
-      const html = meetupPage(meetupEvent("1", overrides));
-      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([]);
-    });
-
-    it("should resolve a venue stored as an Apollo reference", () => {
-      const html = meetupPage({
-        ...meetupEvent("1", { venue: { __ref: "Venue:9" } }),
-        "Venue:9": { name: "Le Wagon", city: "Paris" },
-      });
-      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")[0].location).toBe("Le Wagon");
-    });
-
-    it("should return at most 10 events", () => {
-      const apollo = Object.assign({}, ...Array.from({ length: 12 }, (_, i) => meetupEvent(String(i))));
-      expect(extractMeetupEvents(meetupPage(apollo), "2026-10-12", "2026-10-18")).toHaveLength(10);
+    it("should fall back on the venue city, then on no location", () => {
+      const events = meetupNodesToEvents(
+        [meetupNode("1", { venue: { city: "Paris" } }), meetupNode("2", { venue: null })],
+        "2026-10-12",
+        "2026-10-18"
+      );
+      expect(events.map((e) => e.location)).toEqual(["Paris", null]);
     });
   });
 
-  describe("given a page without the Apollo cache (Meetup changed its page)", () => {
+  describe("given events to filter out", () => {
     it.each([
-      ["no __NEXT_DATA__ block", "<html><body>Meetup</body></html>"],
-      ["an unparseable __NEXT_DATA__ block", '<script id="__NEXT_DATA__" type="application/json">{oops</script>'],
-    ])("should return no event and warn, given %s", (_, html) => {
-      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([]);
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Meetup"));
-      warn.mockRestore();
+      ["online", { eventType: "ONLINE" }],
+      ["without URL", { eventUrl: undefined }],
+      ["before the week (local date, widened API window)", { dateTime: "2026-10-11T23:30:00+02:00" }],
+      ["after the week", { dateTime: "2026-10-19T08:00:00+02:00" }],
+    ])("should skip an event %s", (_, overrides) => {
+      expect(meetupNodesToEvents([meetupNode("1", overrides)], "2026-10-12", "2026-10-18")).toEqual([]);
     });
   });
 });
@@ -468,16 +408,6 @@ describe("EVENTBRITE_COUNTRY mapping", () => {
 
   it("should map berlin to 'de'", () => {
     expect(EVENTBRITE_COUNTRY["berlin"]).toBe("de");
-  });
-});
-
-describe("MEETUP_LOCATION mapping", () => {
-  it("should map paris to fr--Paris", () => {
-    expect(MEETUP_LOCATION["paris"]).toBe("fr--Paris");
-  });
-
-  it("should map london to gb--London", () => {
-    expect(MEETUP_LOCATION["london"]).toBe("gb--London");
   });
 });
 
