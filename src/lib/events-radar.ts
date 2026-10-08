@@ -141,9 +141,23 @@ type EventbriteJsonLd = {
   location?: { name?: string; address?: { addressLocality?: string; addressRegion?: string; addressCountry?: string } };
   eventAttendanceMode?: string;
   description?: string;
+  itemListElement?: { item?: EventbriteJsonLd }[];
 };
 
-function extractEventbriteEvents(
+/**
+ * Événements d'un bloc JSON-LD Eventbrite. Depuis 2026, la page de recherche
+ * les regroupe dans une `ItemList` (`itemListElement[].item`) ; l'ancien format
+ * (événements posés à plat, seuls ou en tableau) reste accepté.
+ */
+function eventbriteJsonLdItems(data: EventbriteJsonLd | EventbriteJsonLd[]): EventbriteJsonLd[] {
+  return (Array.isArray(data) ? data : [data]).flatMap((node) =>
+    node["@type"] === "ItemList"
+      ? (node.itemListElement ?? []).flatMap((el) => (el.item ? [el.item] : []))
+      : [node]
+  );
+}
+
+export function extractEventbriteEvents(
   html: string,
   dateFrom: string,
   dateEnd: string,
@@ -157,12 +171,15 @@ function extractEventbriteEvents(
   });
 
   const events: EventResult[] = [];
+  let structureFound = false;
 
   for (const block of blocks) {
     try {
       const data = JSON.parse(block) as EventbriteJsonLd | EventbriteJsonLd[];
-      const items = Array.isArray(data) ? data : [data];
-      for (const item of items) {
+      if ((Array.isArray(data) ? data : [data]).some((n) => n["@type"] === "ItemList" || n["@type"] === "Event")) {
+        structureFound = true;
+      }
+      for (const item of eventbriteJsonLdItems(data)) {
         if (item["@type"] !== "Event" || !item.startDate || !item.url) continue;
         const date = item.startDate.slice(0, 10);
         if (date < dateFrom || date > dateEnd) continue;
@@ -187,6 +204,10 @@ function extractEventbriteEvents(
       }
     } catch { /* bloc JSON-LD invalide */ }
   }
+
+  // Une recherche sans résultat garde sa liste (vide) : aucune structure du
+  // tout signale qu'Eventbrite a changé sa page, panne sinon invisible.
+  if (!structureFound) console.warn("[radar] Eventbrite : aucune donnée d'événement lisible dans la page");
 
   return events;
 }
@@ -244,28 +265,65 @@ export function buildMeetupUrl(ville: string, dateFrom: string, dateEnd: string,
   return `https://www.meetup.com/find/events/?${params}`;
 }
 
-export function extractMeetupData(html: string): string {
+type MeetupApolloRef = { __ref?: string };
+type MeetupVenue = { name?: string; city?: string };
+type MeetupApolloEvent = {
+  title?: string;
+  dateTime?: string; // "2026-10-08T18:30:00+02:00", heure locale de l'événement
+  eventUrl?: string;
+  eventType?: string; // "PHYSICAL" | "ONLINE" | ... ; absent sur les entrées partielles
+  description?: string;
+  venue?: MeetupVenue & MeetupApolloRef;
+};
+
+/**
+ * Événements Meetup lus directement dans la page de recherche, sans IA.
+ *
+ * Depuis 2026, la page porte ses résultats dans le cache Apollo du bloc
+ * `__NEXT_DATA__` (`pageProps.__APOLLO_STATE__`, une entrée `Event:<id>` par
+ * événement). Les entrées sans `eventType` sont des références partielles
+ * d'autres requêtes de la page : seules les entrées complètes sont lues.
+ * Présentiel uniquement, comme pour Eventbrite : le radar cherche les conflits physiques.
+ */
+export function extractMeetupEvents(html: string, dateFrom: string, dateEnd: string): EventResult[] {
   const nd = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
-  if (nd) {
-    try {
-      const pp = (((JSON.parse(nd[1]) as Record<string, unknown>)?.props as Record<string, unknown>)?.pageProps ?? {}) as Record<string, unknown>;
-      const hit = [(pp?.pagePayload as Record<string, unknown>)?.eventResults, pp?.eventSearch, pp?.searchResultsData, pp?.serverData].find(Boolean);
-      if (hit) {
-        const s = JSON.stringify(hit);
-        return s.length > 10000 ? s.slice(0, 10000) + "…" : s;
-      }
-    } catch { /* next */ }
+  let apollo: Record<string, unknown> | null = null;
+  try {
+    const parsed = nd ? (JSON.parse(nd[1]) as { props?: { pageProps?: { __APOLLO_STATE__?: Record<string, unknown> } } }) : null;
+    apollo = parsed?.props?.pageProps?.__APOLLO_STATE__ ?? null;
+  } catch { /* JSON illisible : même traitement qu'un bloc absent */ }
+
+  if (!apollo) {
+    // Panne sinon invisible : la page répond mais Meetup a changé sa structure.
+    console.warn("[radar] Meetup : aucune donnée d'événement lisible dans la page");
+    return [];
   }
-  const blocks: string[] = [];
-  html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi, (_, b) => { blocks.push(b); return ""; });
-  if (blocks.length) {
-    const s = "[" + blocks.join(",") + "]";
-    return s.length > 10000 ? s.slice(0, 10000) + "…" : s;
-  }
-  return html.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").slice(0, 6000);
+
+  const venueOf = (venue: MeetupApolloEvent["venue"]): MeetupVenue | undefined =>
+    venue?.__ref ? (apollo[venue.__ref] as MeetupVenue | undefined) : venue;
+
+  return Object.entries(apollo)
+    .filter(([key]) => key.startsWith("Event:"))
+    .map(([, value]) => value as MeetupApolloEvent)
+    .filter((e) => e.eventType === "PHYSICAL" && e.dateTime && e.eventUrl)
+    .flatMap((e): EventResult[] => {
+      const date = e.dateTime!.slice(0, 10);
+      if (date < dateFrom || date > dateEnd) return [];
+      const venue = venueOf(e.venue);
+      return [{
+        title: e.title ?? "Sans titre",
+        date,
+        time: e.dateTime!.slice(11, 16) || null,
+        location: venue?.name ?? venue?.city ?? null,
+        url: e.eventUrl!,
+        source: "meetup",
+        description: e.description ? e.description.slice(0, 150) : null,
+      }];
+    })
+    .slice(0, 10);
 }
 
-export async function fetchMeetupData(url: string): Promise<string> {
+export async function fetchMeetupEvents(url: string, dateFrom: string, dateEnd: string): Promise<EventResult[]> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -275,10 +333,10 @@ export async function fetchMeetupData(url: string): Promise<string> {
       },
       signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return "";
-    return extractMeetupData(await res.text());
+    if (!res.ok) return [];
+    return extractMeetupEvents(await res.text(), dateFrom, dateEnd);
   } catch {
-    return "";
+    return [];
   }
 }
 
@@ -325,39 +383,6 @@ Règles :
     };
   } catch {
     return { keywords: [], city: null, country: null };
-  }
-}
-
-// --- Meetup — extraction Claude ---
-
-export async function extractMeetupEventsWithClaude(
-  aiCall: AiTextCall,
-  meetupRaw: string,
-  ville: string,
-  dateFrom: string,
-  dateEnd: string
-): Promise<EventResult[]> {
-  if (meetupRaw.length < 50) return [];
-
-  const prompt = `Extrais les 10 premiers événements Meetup EN PRÉSENTIEL (physiques) de ces données.
-Exclure les événements en ligne / online / virtual.
-Ville: ${ville}, période: ${dateFrom}→${dateEnd}
-Données:
-${meetupRaw}
-JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
-
-  const text = await aiCall(prompt, 2000);
-  if (!text) return [];
-
-  try {
-    const cb = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    const clean = cb ? cb[1].trim() : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-    const parsed = JSON.parse(clean) as { events: EventResult[] };
-    return (parsed.events ?? [])
-      .filter((e) => e.date && e.date >= dateFrom && e.date <= dateEnd)
-      .slice(0, 10);
-  } catch {
-    return [];
   }
 }
 

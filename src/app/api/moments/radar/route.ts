@@ -8,10 +8,9 @@ import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
-  fetchMeetupData,
   buildMeetupUrl,
+  fetchMeetupEvents,
   extractKeywordsAndCity,
-  extractMeetupEventsWithClaude,
   deduplicateByUrl,
   getWeekRange,
   LUMA_LOCATION_TERMS,
@@ -113,10 +112,7 @@ export async function POST(request: NextRequest) {
           fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
           fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
           Promise.all(
-            meetupKws.map(async (kw) => {
-              const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
-              return extractMeetupEventsWithClaude(aiCall, raw, city!, weekFrom, weekTo);
-            })
+            meetupKws.map((kw) => fetchMeetupEvents(buildMeetupUrl(city!, weekFrom, weekTo, kw), weekFrom, weekTo))
           ),
         ]);
 

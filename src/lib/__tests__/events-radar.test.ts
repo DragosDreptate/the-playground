@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   deduplicateByUrl,
   buildEventbriteUrl,
   buildMeetupUrl,
   getWeekRange,
-  extractMeetupData,
+  extractMeetupEvents,
+  extractEventbriteEvents,
   extractKeywordsAndCity,
   LUMA_CITY,
   LUMA_LOCATION_TERMS,
@@ -22,11 +23,11 @@ import type { EventResult } from "@/lib/events-radar";
  *   - buildEventbriteUrl
  *   - buildMeetupUrl
  *   - getWeekRange
- *   - extractMeetupData (extraction de HTML)
+ *   - extractMeetupEvents, extractEventbriteEvents (lecture des pages de recherche)
  *   - extractKeywordsAndCity (appel IA injecté, seul le parsing est testé)
  *   - constantes de mapping (LUMA_CITY, EVENTBRITE_LOCATION, etc.)
  *
- * Les fonctions qui font des appels réseau (fetchAndFilter*, fetchMeetupData)
+ * Les fonctions qui font des appels réseau (fetchAndFilter*, fetchMeetupEvents)
  * sont exclues de ces tests unitaires — elles appartiennent aux tests d'intégration.
  */
 
@@ -276,75 +277,143 @@ describe("getWeekRange", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// extractMeetupData — extraction depuis HTML
+// extractMeetupEvents — lecture du cache Apollo de la page
 // ─────────────────────────────────────────────────────────────
 
-describe("extractMeetupData", () => {
-  describe("given empty HTML", () => {
-    it("should return an empty string for empty input", () => {
-      expect(extractMeetupData("")).toBe("");
-    });
-  });
+function meetupPage(apollo: Record<string, unknown>): string {
+  const nextData = { props: { pageProps: { __APOLLO_STATE__: apollo } } };
+  return `<html><script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script></html>`;
+}
 
-  describe("given HTML without __NEXT_DATA__ or JSON-LD", () => {
-    it("should return a stripped version of the HTML", () => {
-      const html = "<html><body><h1>Hello World</h1></body></html>";
-      const result = extractMeetupData(html);
-      expect(result).toContain("Hello World");
-      expect(result).not.toContain("<script");
-      expect(result).not.toContain("<style");
-    });
+const meetupEvent = (id: string, overrides: Record<string, unknown> = {}) => ({
+  [`Event:${id}`]: {
+    title: `Meetup ${id}`,
+    dateTime: "2026-10-14T19:00:00+02:00",
+    eventUrl: `https://www.meetup.com/groupe/events/${id}/`,
+    eventType: "PHYSICAL",
+    description: "Une soirée produit",
+    venue: { name: "Station F", city: "Paris" },
+    ...overrides,
+  },
+});
 
-    it("should strip script tags", () => {
-      const html = "<body><script>alert('xss')</script><p>Content</p></body>";
-      const result = extractMeetupData(html);
-      expect(result).not.toContain("alert");
-      expect(result).toContain("Content");
-    });
-  });
+describe("extractMeetupEvents", () => {
+  describe("given a search page with events in the Apollo cache", () => {
+    it("should read the in-person events of the requested week", () => {
+      const html = meetupPage({ ...meetupEvent("1"), ...meetupEvent("2", { dateTime: "2026-10-20T19:00:00+02:00" }) });
 
-  describe("given HTML with a valid __NEXT_DATA__ block containing eventResults", () => {
-    it("should extract the event results data", () => {
-      const eventData = { events: [{ name: "Tech Meetup" }] };
-      const nextData = {
-        props: {
-          pageProps: {
-            pagePayload: {
-              eventResults: eventData,
-            },
-          },
+      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([
+        {
+          title: "Meetup 1",
+          date: "2026-10-14",
+          time: "19:00",
+          location: "Station F",
+          url: "https://www.meetup.com/groupe/events/1/",
+          source: "meetup",
+          description: "Une soirée produit",
         },
-      };
-      const html = `<html>
-        <script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>
-        <body>Fallback content</body>
-      </html>`;
+      ]);
+    });
 
-      const result = extractMeetupData(html);
-      expect(result).toContain("Tech Meetup");
+    it.each([
+      ["an online event", { eventType: "ONLINE" }],
+      ["a partial entry without eventType", { eventType: undefined }],
+      ["an entry without URL", { eventUrl: undefined }],
+    ])("should skip %s", (_, overrides) => {
+      const html = meetupPage(meetupEvent("1", overrides));
+      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([]);
+    });
+
+    it("should resolve a venue stored as an Apollo reference", () => {
+      const html = meetupPage({
+        ...meetupEvent("1", { venue: { __ref: "Venue:9" } }),
+        "Venue:9": { name: "Le Wagon", city: "Paris" },
+      });
+      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")[0].location).toBe("Le Wagon");
+    });
+
+    it("should return at most 10 events", () => {
+      const apollo = Object.assign({}, ...Array.from({ length: 12 }, (_, i) => meetupEvent(String(i))));
+      expect(extractMeetupEvents(meetupPage(apollo), "2026-10-12", "2026-10-18")).toHaveLength(10);
     });
   });
 
-  describe("given HTML with JSON-LD blocks", () => {
-    it("should extract the JSON-LD structured data", () => {
-      const jsonLd = { "@type": "Event", "name": "Design Workshop" };
-      const html = `<html>
-        <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-        <body>Page content</body>
-      </html>`;
+  describe("given a page without the Apollo cache (Meetup changed its page)", () => {
+    it.each([
+      ["no __NEXT_DATA__ block", "<html><body>Meetup</body></html>"],
+      ["an unparseable __NEXT_DATA__ block", '<script id="__NEXT_DATA__" type="application/json">{oops</script>'],
+    ])("should return no event and warn, given %s", (_, html) => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      expect(extractMeetupEvents(html, "2026-10-12", "2026-10-18")).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Meetup"));
+      warn.mockRestore();
+    });
+  });
+});
 
-      const result = extractMeetupData(html);
-      expect(result).toContain("Design Workshop");
+// ─────────────────────────────────────────────────────────────
+// extractEventbriteEvents — lecture du JSON-LD de la page
+// ─────────────────────────────────────────────────────────────
+
+function eventbritePage(...blocks: unknown[]): string {
+  return blocks.map((b) => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join("");
+}
+
+const eventbriteEvent = (name: string, overrides: Record<string, unknown> = {}) => ({
+  "@type": "Event",
+  name,
+  startDate: "2026-10-14T19:00:00+02:00",
+  url: `https://www.eventbrite.fr/e/${name}`,
+  location: { name: "Station F", address: { addressLocality: "Paris", addressRegion: "IDF", addressCountry: "FR" } },
+  ...overrides,
+});
+
+describe("extractEventbriteEvents", () => {
+  const extract = (html: string) =>
+    extractEventbriteEvents(html, "2026-10-12", "2026-10-18", LUMA_LOCATION_TERMS.paris, "fr");
+
+  describe("given events wrapped in an ItemList (current page format)", () => {
+    it("should read the events of the list", () => {
+      const html = eventbritePage({
+        "@type": "ItemList",
+        itemListElement: [{ item: eventbriteEvent("a") }, { item: eventbriteEvent("b") }],
+      });
+      expect(extract(html).map((e) => e.title)).toEqual(["a", "b"]);
     });
   });
 
-  describe("given very long HTML (> 6000 chars without structured data)", () => {
-    it("should truncate the output to avoid memory issues", () => {
-      const longContent = "x".repeat(10000);
-      const html = `<body>${longContent}</body>`;
-      const result = extractMeetupData(html);
-      // The result should be the truncated body (6000 chars limit for stripped HTML)
-      expect(result.length).toBeLessThanOrEqual(6000);
+  describe("given events laid flat (previous page format)", () => {
+    it("should still read them", () => {
+      expect(extract(eventbritePage([eventbriteEvent("a")])).map((e) => e.title)).toEqual(["a"]);
+    });
+  });
+
+  describe("given events to filter out", () => {
+    it.each([
+      ["out of the week", { startDate: "2026-10-25T19:00:00+02:00" }],
+      ["online", { eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode" }],
+      ["in another country", { location: { address: { addressLocality: "Paris", addressCountry: "US" } } }],
+    ])("should skip an event %s", (_, overrides) => {
+      const html = eventbritePage({ "@type": "ItemList", itemListElement: [{ item: eventbriteEvent("a", overrides) }] });
+      expect(extract(html)).toEqual([]);
+    });
+  });
+
+  describe("given an empty result list", () => {
+    it("should return no event without warning", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      expect(extract(eventbritePage({ "@type": "ItemList", itemListElement: [] }))).toEqual([]);
+      expect(warn).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+  });
+
+  describe("given a page without any event structure (Eventbrite changed its page)", () => {
+    it("should warn", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      expect(extract(eventbritePage({ "@type": "BreadcrumbList", itemListElement: [] }))).toEqual([]);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Eventbrite"));
+      warn.mockRestore();
     });
   });
 });
