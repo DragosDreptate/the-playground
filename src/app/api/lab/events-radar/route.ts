@@ -1,13 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { auth } from "@/infrastructure/auth/auth.config";
-import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
-  fetchMeetupData,
-  buildMeetupUrl,
-  extractMeetupEventsWithClaude,
+  fetchMeetupEvents,
   deduplicateByUrl,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
@@ -24,9 +20,6 @@ export async function POST(request: NextRequest) {
   };
   const dateEnd = dateTo || dateFrom;
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return Response.json({ error: "ANTHROPIC_API_KEY manquante" }, { status: 500 });
-
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -34,29 +27,20 @@ export async function POST(request: NextRequest) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 
       try {
-        const aiCall = createFastTextCall(new Anthropic({ apiKey }));
-
         const kwArray = keywords ? keywords.split(",").map((k) => k.trim()).filter(Boolean) : [];
         const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
         const expectedCountry = EVENTBRITE_COUNTRY[ville.toLowerCase()] ?? "fr";
-        const meetupKws = kwArray.length > 0 ? kwArray : [""];
 
         const periodLabel = dateEnd === dateFrom ? dateFrom : `${dateFrom} → ${dateEnd}`;
         send({ type: "status", message: `Radar — ${ville} — ${periodLabel}` });
         send({ type: "status", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
 
-        const [lumaEvents, eventbriteEvents, meetupResults] = await Promise.all([
+        const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
           fetchAndFilterLumaEvents(ville, kwArray, dateFrom, dateEnd),
           fetchAndFilterEventbriteEvents(ville, dateFrom, dateEnd, locationTerms, expectedCountry, kwArray),
-          Promise.all(
-            meetupKws.map(async (kw) => {
-              const raw = await fetchMeetupData(buildMeetupUrl(ville, dateFrom, dateEnd, kw));
-              return extractMeetupEventsWithClaude(aiCall, raw, ville, dateFrom, dateEnd);
-            })
-          ),
+          fetchMeetupEvents(ville, EVENTBRITE_COUNTRY[ville.toLowerCase()], dateFrom, dateEnd, kwArray),
         ]);
 
-        const meetupEvents = deduplicateByUrl(meetupResults.flat());
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);
         allEvents.sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
 

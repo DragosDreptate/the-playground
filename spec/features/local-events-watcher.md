@@ -4,7 +4,7 @@
 > Ce document trace l'exploration initiale et les décisions, suivi de l'état de l'implémentation actuelle.
 >
 > Statut : **Implémenté et en production**
-> Dernière mise à jour : 2026-03-30
+> Dernière mise à jour : 2026-10-08 (Meetup par GraphQL, Eventbrite `ItemList`, avertissements)
 
 ---
 
@@ -19,10 +19,12 @@ Le Radar est intégré au formulaire de **création et modification** d'événem
 | Source | Méthode | Filtrage |
 |---|---|---|
 | **Luma** | API REST (`api.lu.ma/discover/get-paginated-events`) | Par ville (`near`), par mot-clé (`query`), filtrage date + localisation côté serveur |
-| **Eventbrite** | Scraping HTML + extraction JSON-LD (schema.org) | Par ville (URL path), par mot-clé (`?q=`), filtrage date + localisation + pays côté serveur |
-| **Meetup** | Scraping HTML + extraction `__NEXT_DATA__` + parsing Claude Haiku | Par ville (`location`), par mot-clé (`keywords`), extraction IA des événements structurés |
+| **Eventbrite** | Scraping HTML + extraction JSON-LD (schema.org), événements regroupés dans une `ItemList` depuis 2026 (ancien format à plat toujours accepté) | Par ville (URL path), par mot-clé (`?q=`), filtrage date + localisation + pays côté serveur |
+| **Meetup** | Point d'accès GraphQL du site (`www.meetup.com/gql2`, non documenté, sans authentification) : géocodage de la ville (`locationSearch`), puis `eventSearch` (avec mot-clé) ou `recommendedEvents` (sans) | Par position + rayon de 25 km, présentiel (`eventType: PHYSICAL`), plage de dates précise (élargie d'un jour en UTC, puis filtrée sur la date locale). Pas d'IA |
 
 **Mobilizon** a été retiré (source marginale, maintenance complexe).
+
+> Historique Meetup : lecture de la page de recherche (`__NEXT_DATA__`) puis extraction par Claude Haiku jusqu'en octobre 2026. Meetup a déplacé ses résultats et ignore désormais la plage de dates de sa page : voir `spec/decisions.md` (2026-10-08).
 
 ### Flux de données
 
@@ -38,9 +40,10 @@ Le Radar est intégré au formulaire de **création et modification** d'événem
 - **Événements online exclus** — le radar cherche les conflits physiques uniquement
   - Luma : `location_type !== "offline"` → exclu
   - Eventbrite : `eventAttendanceMode` contient "Online" ou "Mixed" → exclu
-  - Meetup : instruction Claude d'exclure les événements en ligne
+  - Meetup : filtre `eventType: PHYSICAL` côté API, revérifié côté serveur
 - **Pas de post-filtre par mot-clé** — les plateformes filtrent par pertinence via leurs query params, on fait confiance à leur ranking
 - **Fenêtre temporelle** : semaine complète (lundi → dimanche) autour de la date de l'événement
+- **Pannes signalées** : un avertissement `[radar]` est écrit dans les logs quand Meetup répond hors schéma ou qu'une page Eventbrite ne contient plus aucune structure d'événements (une liste vide n'en déclenche pas)
 
 ### Gestion des mots-clés
 
@@ -59,17 +62,17 @@ Le Radar est intégré au formulaire de **création et modification** d'événem
 
 | Fichier | Rôle |
 |---|---|
-| `src/lib/events-radar.ts` | Librairie partagée : scraping, dédup, extraction Meetup/Claude, utilitaires |
+| `src/lib/events-radar.ts` | Librairie partagée : sources Luma, Eventbrite, Meetup, dédup, extraction des mots-clés (appel IA injecté), utilitaires |
 | `src/components/moments/moment-form-radar.tsx` | Composant UI (modale, keywords, résultats) |
-| `src/app/api/moments/radar/route.ts` | API SSE production (auth + rate limit + extraction keywords Claude + scraping) |
-| `src/app/api/lab/events-radar/route.ts` | API SSE lab admin (même code de scraping, sans extraction keywords) |
+| `src/app/api/moments/radar/route.ts` | API SSE production (auth + rate limit + extraction keywords Claude + sources) |
+| `src/app/api/lab/events-radar/route.ts` | API SSE lab admin (mêmes sources, sans extraction keywords ni appel IA) |
 
 ### Décisions d'implémentation
 
 | Décision | Raison |
 |---|---|
 | Scraping direct (pas SerpAPI) | Gratuit, suffisant pour le volume MVP |
-| Claude Haiku pour extraction keywords + Meetup | Rapide et peu coûteux |
+| Claude Haiku pour l'extraction des keywords | Rapide et peu coûteux (Meetup n'utilise plus l'IA depuis 2026-10) |
 | 1 requête par keyword (OR) | Plus de résultats qu'un AND, couverture élargie |
 | 10 résultats max par plateforme | Confiance au ranking des plateformes, évite le bruit |
 | Physique uniquement | Le radar sert à éviter les conflits de créneau local |

@@ -8,10 +8,8 @@ import { createFastTextCall } from "@/infrastructure/services/ai/fast-model";
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
-  fetchMeetupData,
-  buildMeetupUrl,
+  fetchMeetupEvents,
   extractKeywordsAndCity,
-  extractMeetupEventsWithClaude,
   deduplicateByUrl,
   getWeekRange,
   LUMA_LOCATION_TERMS,
@@ -108,19 +106,11 @@ export async function POST(request: NextRequest) {
         const expectedCountry = EVENTBRITE_COUNTRY[city.toLowerCase()] ?? "fr";
 
         // Étape 3 : fetches parallèles sur la semaine complète — un appel par mot-clé (OR)
-        const meetupKws = keywords.length > 0 ? keywords : [""];
-        const [lumaEvents, eventbriteEvents, meetupResults] = await Promise.all([
+        const [lumaEvents, eventbriteEvents, meetupEvents] = await Promise.all([
           fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
           fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
-          Promise.all(
-            meetupKws.map(async (kw) => {
-              const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
-              return extractMeetupEventsWithClaude(aiCall, raw, city!, weekFrom, weekTo);
-            })
-          ),
+          fetchMeetupEvents(city, EVENTBRITE_COUNTRY[city.toLowerCase()], weekFrom, weekTo, keywords),
         ]);
-
-        const meetupEvents = deduplicateByUrl(meetupResults.flat());
 
         const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);
 
