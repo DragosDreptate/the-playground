@@ -88,7 +88,7 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 | **2 600+** | commits |
 | **540+** | pull requests |
 | **89** | cas d'usage (domain usecases) |
-| **1 680+** | tests (unit + integration) |
+| **1 690+** | tests (unit + integration) |
 
 ## Architecture
 

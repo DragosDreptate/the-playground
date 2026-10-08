@@ -378,7 +378,7 @@ export default async function AboutPage() {
             { value: "2 600+", label: isFr ? "commits" : "commits" },
             { value: "540+", label: isFr ? "pull requests" : "pull requests" },
             { value: "89", label: isFr ? "cas d'usage" : "use cases" },
-            { value: "1 680+", label: isFr ? "tests" : "tests" },
+            { value: "1 690+", label: isFr ? "tests" : "tests" },
           ].map(({ value, label }) => (
             <div key={label} className="text-center">
               <p className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
