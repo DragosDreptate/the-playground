@@ -22,7 +22,7 @@ C'est un levier d'acquisition, pas une fin en soi : chaque visite doit avoir une
 
 | Acteur | Ce qu'il fait | Limites relevées |
 |---|---|---|
-| [Brainberg](https://brainberg.eu/) | Agenda tech européen (meetups, conférences, hackathons, ateliers). Collecte quotidienne depuis plusieurs plateformes sources, dédoublonnage par empreinte entre sources. ~1 400 événements à venir annoncés en Europe. Open source (MIT) | Sources non nommées sur le site. Paris absent des villes mises en avant. Volume faible au regard de nos mesures (des centaines d'événements par mois et par source à Paris) |
+| [Brainberg](https://brainberg.eu/) ([code](https://github.com/Pwuts/brainberg)) | Agenda tech européen (meetups, conférences, hackathons, ateliers). Sources : Luma, Meetup, Eventbrite, dev.events, confs.tech, plus des pages d'événements lues par leurs données structurées. Collecte planifiée, dédoublonnage entre sources. ~1 400 événements à venir annoncés en Europe. Projet solo, TypeScript | Rate beaucoup d'événements (constaté par Dragos, expliqué par le code : voir l'analyse ci-dessous). Paris absent des villes mises en avant. Licence MIT annoncée sur le site, mais aucun fichier de licence dans le dépôt : s'en inspirer, ne pas copier |
 | [dev.events](https://dev.events/EU/FR) | Conférences, meetups et hackathons pour développeurs, filtrables par ville française et par thème | Public développeurs uniquement. Mode d'alimentation non documenté (saisie ou collecte) |
 
 **Agrégateurs généralistes**
@@ -46,9 +46,53 @@ C'est un levier d'acquisition, pas une fin en soi : chaque visite doit avoir une
 1. **La place est libre en France** : personne ne couvre « tous les événements de ma ville, toutes plateformes confondues », bien fini et en français.
 2. **Le concept est validé ailleurs**, et les acteurs existants butent sur nos difficultés déjà notées : dédoublonnage entre plateformes, collecte quotidienne, qualité dans la durée (voir « Fiabilité et surveillance »). La qualité des résultats est donc le premier critère de différence.
 3. **Aucun ne va au-delà de la liste.** Notre différence structurelle : un événement trouvé ailleurs peut mener vers une Communauté qui dure (cf. positionnement community-centric). C'est elle qui transforme l'outil de recherche en levier d'acquisition.
-4. **Brainberg vaut une lecture de code avant d'implémenter** : sources réellement utilisées, méthode de dédoublonnage, couverture réelle de Paris. Non fait à ce jour.
+4. **Le code de Brainberg a été lu** (analyse ci-dessous) : il confirme que la couverture se joue sur la façon d'interroger chaque source, et donne une base de dédoublonnage réutilisable en idée.
 
-Points non vérifiés : sources exactes de Brainberg, mode d'alimentation de dev.events, chiffres d'AllEvents (tirés d'un comparatif tiers).
+Points non vérifiés : mode d'alimentation de dev.events, chiffres d'AllEvents (tirés d'un comparatif tiers).
+
+### Analyse du code de Brainberg (2026-10-09)
+
+Lecture du dépôt `Pwuts/brainberg` (dernier commit de juillet 2026), centrée sur les points qui nous concernent.
+
+**Pourquoi il rate des événements : chaque source est interrogée de façon étroite**
+
+| Source | Ce que fait Brainberg | Conséquence | Notre approche (Radar) |
+|---|---|---|---|
+| Luma | Ne lit que des **calendriers Luma ajoutés à la main** par l'admin (`scraperSources`), paginés en entier | Aucun événement hors de ces calendriers. Pas de découverte par ville | Recherche par coordonnées sur toute la ville (`discover/get-paginated-events`) |
+| Meetup | Lit la page HTML `meetup.com/find` par ville (données `__NEXT_DATA__`), **catégorie Tech uniquement**, **première page seulement** (aucune pagination) | Quelques dizaines d'événements par ville au mieux | API GraphQL du site, paginée par curseur |
+| Eventbrite | API Eventbrite avec jeton (`/v3/destination/search/`), mot-clé fixe `tech`, **par pays** (pas par ville), **10 pages au plus par pays** | Un plafond pour toute la France, quel que soit le volume réel | Page de recherche HTML par ville (JSON-LD) |
+| Toutes | Filtre de mots exclus sur le titre (soirée, yoga, cocktail…), puis **modération par Claude Haiku** des nouveaux événements, qui peut rejeter ou mettre en attente | Le périmètre « tech » est voulu, mais des faux rejets sont possibles sans relecture | Pas de filtre éditorial au-delà du mot-clé |
+
+Leçon pour nous : **la couverture dépend d'abord de la façon d'interroger chaque source**, avant toute question de dédoublonnage ou d'affichage. Nos mesures du radar (voir « Volumes mesurés ») couvrent déjà beaucoup plus large.
+
+**Dédoublonnage entre sources : trois couches, une base réutilisable en idée**
+
+1. **Même lien** : toutes les URL connues de l'événement (page, inscription, source) sont normalisées et stockées comme empreintes. Une URL déjà vue = même événement.
+2. **Empreinte exacte** : titre normalisé (minuscules, sans année, sans « meetup », « conference »…) + jour + ville, ou « online ».
+3. **Rapprochement approximatif** : mots du titre en commun à plus de 60 % (indice de Jaccard), début à moins d'un jour d'écart, même ville si les deux en ont une.
+
+En cas de doublon, l'événement garde **toutes ses sources** (table de liaison), et une source plus fiable peut écraser les champs : Eventbrite > Meetup > Luma. Les pourcentages de doublons attrapés par couche, dans leur document de cadrage (`plans/archive/data-source-analysis.md`), sont des estimations, pas des mesures.
+
+Défauts à ne pas reproduire :
+- **La normalisation supprime les lettres accentuées** (`[^a-z0-9]`) : « Café IA » devient « caf ia ». Sans effet entre deux titres identiques, mais elle fausse le rapprochement approximatif en français. Il faut d'abord retirer les accents, puis normaliser.
+- **Le rapprochement approximatif ne compare que 50 candidats**, pris sur toute l'Europe à ±1 jour, sans filtre de ville ni tri. Au volume de Paris (des centaines d'événements par mois et par source), des doublons passeraient à travers. Il faut filtrer par ville ou par distance avant de comparer.
+- **La ville comparée est un texte** : « Paris » et « Paris 11e » ne correspondent pas. Comparer plutôt une distance entre coordonnées.
+
+**Collecte planifiée et fiabilité**
+
+- Une route protégée par un secret lance toutes les collectes, une par une, ou une seule source. Chaque passage est journalisé (`scraperRuns`) : trouvés, créés, mis à jour, doublons, rejetés, en attente, erreurs. Un écran d'admin permet de prévisualiser une collecte avant de l'enregistrer.
+- Aucune alerte quand une source tombe à zéro : le compteur existe, personne n'est prévenu. C'est le même défaut que celui relevé sur notre radar (« Fiabilité et surveillance »).
+- **Événements annulés ou supprimés à la source : non traités.** La date de dernière vue est enregistrée mais rien ne s'en sert. Un événement annulé reste affiché. À prévoir chez nous si on stocke les événements.
+
+**Géocodage** : Nominatim (OpenStreetMap), gratuit mais limité à une requête par seconde, pour les villes inconnues et les adresses sans coordonnées. Les villes sont une table de ~100 entrées, complétée au fil des collectes.
+
+**Ce qu'on en retient pour #630**
+
+1. **Reprendre l'idée du dédoublonnage en trois couches** (lien, empreinte exacte, rapprochement approximatif), en corrigeant les trois défauts ci-dessus, et garder toutes les sources d'un même événement.
+2. **Journaliser chaque collecte par source**, comme `scraperRuns`, et y brancher l'alerte qui leur manque.
+3. **Prévoir dès le départ la disparition des événements annulés**, en s'appuyant sur la date de dernière vue.
+4. **Ne rien copier tel quel** tant qu'aucune licence n'est publiée dans le dépôt.
+5. **Piste à vérifier** : l'API Eventbrite `/v3/destination/search/` avec un jeton personnel et une pagination par `continuation`. Si elle accepte une recherche par ville, elle serait plus solide que notre lecture de la page HTML. Non testé.
 
 ## Solution envisagée
 
