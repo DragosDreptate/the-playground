@@ -88,7 +88,7 @@ Défauts à ne pas reproduire :
 
 **Ce qu'on en retient pour #630**
 
-1. **Reprendre l'idée du dédoublonnage en trois couches** (lien, empreinte exacte, rapprochement approximatif), en corrigeant les trois défauts ci-dessus, et garder toutes les sources d'un même événement.
+1. **Reprendre l'idée du rapprochement en trois couches** (lien, empreinte exacte, rapprochement approximatif), en corrigeant les trois défauts ci-dessus. Il sert à **empiler** les occurrences d'un même événement, jamais à en supprimer : voir la règle « Un événement, toutes ses plateformes, regroupées en pile » ci-dessous. Pas de source prioritaire à la Brainberg pour choisir le lien d'inscription.
 2. **Journaliser chaque collecte par source**, comme `scraperRuns`, et y brancher l'alerte qui leur manque.
 3. **Prévoir dès le départ la disparition des événements annulés**, en s'appuyant sur la date de dernière vue.
 4. **Ne rien copier tel quel** tant qu'aucune licence n'est publiée dans le dépôt.
@@ -98,7 +98,14 @@ Défauts à ne pas reproduire :
 
 ### Étape 1. Une page publique de recherche multi-plateformes
 
-- Ville, période, mot-clé : une seule recherche, les résultats de toutes les plateformes réunis, dédupliqués, triés par date.
+- Ville, période, mot-clé : une seule recherche, les résultats de toutes les plateformes réunis, triés par date.
+- **Un événement, toutes ses plateformes, regroupées en pile** (règle posée par Dragos le 2026-10-09). On garde **toutes les occurrences** d'un même événement, une par plateforme, à égalité. On ne retient pas une plateforme « officielle » :
+  - le visiteur a ses habitudes et préfère parfois l'une ou l'autre (compte existant, application installée) ;
+  - on ne sait pas laquelle porte les vraies inscriptions : l'organisateur peut gérer sa liste sur Luma et publier sur Meetup pour la visibilité, ou l'inverse.
+
+  Pour ne pas encombrer la liste, les occurrences rapprochées s'affichent **en pile (stack)** : une carte au premier plan, les autres empilées derrière, avec les logos des plateformes et leur nombre visibles d'un coup d'œil. Déplier la pile montre chaque occurrence avec ce que sa plateforme en dit (inscrits, prix, places) et son propre lien. Forme exacte à maquetter (pile qui se déplie sur place, ou fiche avec la liste des plateformes).
+
+  Le rapprochement sert donc à empiler, jamais à masquer une occurrence. Un rapprochement erroné (deux événements différents dans la même pile) est plus grave qu'un doublon visible : en cas de doute, laisser deux résultats séparés.
 - **Le plus de plateformes possible**, ajoutées au fil de l'eau. La base technique existe : le Radar organisateur interroge déjà trois plateformes avec la même forme de résultat.
 - Chaque résultat renvoie **directement vers la page de l'hébergeur** de l'événement. The Playground ne republie pas le contenu et ne prend pas l'inscription.
 - Les événements hébergés sur The Playground apparaissent dans les mêmes résultats, mis en avant.
