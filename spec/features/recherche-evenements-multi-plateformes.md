@@ -115,6 +115,24 @@ Défauts à ne pas reproduire :
 - L'Explorer, aujourd'hui annuaire de Communautés publiques, affiche aussi ces événements, avec le même renvoi vers l'hébergeur.
 - Les événements The Playground restent distingués (badge, place, parcours d'inscription intégré).
 
+## Principe d'accès aux plateformes (décidé le 2026-10-09)
+
+**Jamais de contournement d'un blocage. Une plateforme qui nous bloque sort des sources.**
+
+- **Interdit** : rotation d'adresses IP, proxys (résidentiels ou non), en-têtes qui se font passer pour un navigateur, retour après un blocage par tout autre moyen. Si une plateforme nous bloque, on la retire des sources et on lui écrit (demande d'accès, partenariat).
+- **Pratiques obligatoires** :
+  - un en-tête qui nous nomme, avec une adresse de contact ;
+  - des pauses entre les pages ;
+  - l'arrêt immédiat sur une réponse « trop de requêtes » (429) ;
+  - le volume le plus bas possible ;
+  - l'API officielle quand elle existe (Eventbrite).
+- **Pourquoi** :
+  1. Contourner une mesure technique fait passer d'une zone grise contractuelle (CGU) à un risque pénal : revenir après un blocage peut être qualifié d'accès ou de maintien frauduleux dans un système informatique (article 323-1 du Code pénal).
+  2. Notre défense repose sur la bonne foi : on renvoie le trafic et on ne nuit pas à la plateforme, critère de l'arrêt CV-Online (CJUE, 2021). Se cacher la détruit.
+  3. Les réseaux d'adresses résidentielles passent souvent par des appareils de particuliers enrôlés sans réel consentement : incompatible avec l'image de The Playground.
+  4. Le code de The Playground est public : tout mécanisme de contournement serait visible des plateformes concernées.
+- **Brainberg fait de même** : un en-tête `Brainberg/1.0 (https://brainberg.eu)`, des pauses de 0,5 à 2,5 s selon la source, une attente de 30 s sur une réponse 429 d'Eventbrite (par son API officielle avec jeton), aucun proxy ni rotation d'adresses, hébergé sur un seul serveur (conteneur Docker).
+
 ## Plateformes candidates
 
 | Plateforme | État | Remarque |
