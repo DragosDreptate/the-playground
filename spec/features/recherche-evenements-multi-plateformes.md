@@ -244,7 +244,22 @@ Ces totaux sont **avant regroupement en piles** et **avant tout filtre de thème
 2. **La recherche par mot-clé des plateformes est inutilisable telle quelle** : Luma cherche dans le monde entier avec un plafond de 50, Eventbrite ignore le mot-clé, Meetup s'arrête à 30 jours. Ça confirme B1 : collecter sans mot-clé et chercher dans notre base.
 3. **Eventbrite ne laisse parcourir que 49 pages de 20, soit 980 événements par recherche.** Sur 30 jours, 1 357 annoncés : une partie est hors d'atteinte. La collecte doit découper la période en fenêtres d'une semaine (637 événements, 32 pages). C'est aussi la source la plus coûteuse en requêtes : environ 70 pages par mois pour Paris. Le point d'accès `/v3/destination/search/` pagine aussi ; il ne réduirait les requêtes que si ses pages dépassent 20 événements (à vérifier).
 4. **Luma ne renvoie vraisemblablement que les événements de sa page de découverte** (non vérifié). Ceux que leurs organisateurs n'y référencent pas n'apparaîtraient alors que via les calendriers suivis un par un (méthode Brainberg). Le volume réel de Luma à Paris serait donc plus élevé.
-5. **Coût de collecte estimé pour Paris, horizon 30 jours** : Luma ~6 pages, Meetup ~8 pages, Eventbrite ~70 pages, soit **environ 85 requêtes par collecte**.
+5. **Coût de collecte estimé pour Paris, horizon 30 jours** : Luma ~6 pages, Meetup ~8 pages, Eventbrite ~70 pages, soit **environ 85 requêtes par collecte**. Ramené à ~80 avec des pages Meetup de 200 (test du 2026-10-09 ci-dessous).
+
+### Test d'accès aux plateformes (2026-10-09)
+
+Depuis le poste de Dragos, avec l'en-tête qui nous nomme, ~15 requêtes.
+
+| Point testé | Résultat | Conséquence |
+|---|---|---|
+| Taille de page Meetup | `first: 100` → 93 reçus, `first: 200` → 185 (et 200 avec mot-clé), `first: 500` → **0 sans erreur** | Pages de 200 : Paris sur 30 jours en 2 requêtes au lieu de 8. Ne pas dépasser 200 : au-delà, l'API renvoie une liste vide **sans signaler d'erreur** (panne silencieuse à surveiller) |
+| Tri Meetup | Tri possible seulement par date de l'événement ou par pertinence (`DATETIME`, `RELEVANCE`), pas par date de publication | **Collecte incrémentale impossible sur Meetup** : chaque mise à jour relit la fenêtre entière |
+| Point d'accès Eventbrite `/v3/destination/search/` | **401** : « An OAuth token is required for all requests » | Demande un jeton personnel, à créer depuis un compte Eventbrite. Taille des pages, recherche par ville et tri non testables sans lui |
+| Accès depuis un serveur Vercel | **Non testé** | Demande d'exécuter le test sur l'infrastructure Vercel : déploiement d'une route temporaire ou bac à sable Vercel, à décider |
+
+Ce que l'introspection de Meetup montre aussi (filtres disponibles, utiles plus tard) : `categoryId`, `city`, `country`, `isHappeningNow`, `isStartingSoon`, `rsvpCountRange`, `groupJoinMode`. L'introspection GraphQL de Meetup est ouverte.
+
+Luma et la page de recherche Eventbrite ne proposent pas, à notre connaissance, de tri par date de publication : la collecte incrémentale ne serait possible, au mieux, que par le point d'accès Eventbrite à jeton, à vérifier.
 
 ### Géocodage
 
