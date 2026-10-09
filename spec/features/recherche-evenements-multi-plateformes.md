@@ -248,14 +248,14 @@ Ces totaux sont **avant regroupement en piles** et **avant tout filtre de thème
 
 ### Test d'accès aux plateformes (2026-10-09)
 
-Depuis le poste de Dragos, avec l'en-tête qui nous nomme, ~15 requêtes.
+Depuis le poste de Dragos (~21 requêtes) puis depuis un bac à sable Vercel (3 requêtes), avec l'en-tête qui nous nomme.
 
 | Point testé | Résultat | Conséquence |
 |---|---|---|
 | Taille de page Meetup | `first: 100` → 93 reçus, `first: 200` → 185 (et 200 avec mot-clé), `first: 500` → **0 sans erreur** | Pages de 200 : Paris sur 30 jours en 2 requêtes au lieu de 8. Ne pas dépasser 200 : au-delà, l'API renvoie une liste vide **sans signaler d'erreur** (panne silencieuse à surveiller) |
 | Tri Meetup | Tri possible seulement par date de l'événement ou par pertinence (`DATETIME`, `RELEVANCE`), pas par date de publication | **Collecte incrémentale impossible sur Meetup** : chaque mise à jour relit la fenêtre entière |
 | Point d'accès Eventbrite `/v3/destination/search/` | **401** : « An OAuth token is required for all requests » | Demande un jeton personnel, à créer depuis un compte Eventbrite. Taille des pages, recherche par ville et tri non testables sans lui |
-| Accès depuis un serveur Vercel | **Non testé** | Demande d'exécuter le test sur l'infrastructure Vercel : déploiement d'une route temporaire ou bac à sable Vercel, à décider |
+| Accès depuis l'infrastructure Vercel | Bac à sable Vercel, région Paris (`cdg1`), adresse AWS `13.38.88.51`, en-tête qui nous nomme : **les trois plateformes répondent normalement**. Luma 48 événements (Paris et proche banlieue), Meetup 47, Eventbrite 612 annoncés sur 7 jours | Pas de blocage des adresses de centre de données ni de l'en-tête honnête. Réserve : un bac à sable n'a pas forcément les mêmes adresses que les fonctions de production ; un blocage reste possible plus tard, à surveiller (principe d'accès) |
 
 Ce que l'introspection de Meetup montre aussi (filtres disponibles, utiles plus tard) : `categoryId`, `city`, `country`, `isHappeningNow`, `isStartingSoon`, `rsvpCountRange`, `groupJoinMode`. L'introspection GraphQL de Meetup est ouverte.
 
