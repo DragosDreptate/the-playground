@@ -132,6 +132,17 @@ Défauts à ne pas reproduire :
   3. Les réseaux d'adresses résidentielles passent souvent par des appareils de particuliers enrôlés sans réel consentement : incompatible avec l'image de The Playground.
   4. Le code de The Playground est public : tout mécanisme de contournement serait visible des plateformes concernées.
 - **Brainberg fait de même** : un en-tête `Brainberg/1.0 (https://brainberg.eu)`, des pauses de 0,5 à 2,5 s selon la source, une attente de 30 s sur une réponse 429 d'Eventbrite (par son API officielle avec jeton), aucun proxy ni rotation d'adresses, hébergé sur un seul serveur (conteneur Docker).
+- **Écart à corriger dans notre code** : le Radar actuel envoie un en-tête de navigateur Chrome à Meetup et Eventbrite (`src/lib/events-radar.ts`). À remplacer par un en-tête qui nous nomme dans le cadre de #630.
+
+## Architecture retenue : une base cachée, exposée seulement par la recherche (B1, décidé le 2026-10-09)
+
+- **Une base d'événements tenue à jour par collecte planifiée**, par ville et par source, sans mot-clé, une à deux fois par jour, sur un horizon limité (30 à 60 jours). La recherche du visiteur interroge **notre base**, jamais les plateformes.
+- **La base n'est jamais exposée en entier** : pas de liste complète, pas d'export, pas d'API publique. On n'en montre que les résultats d'une recherche.
+- **Recherche directe en secours** pour un lieu non couvert par la collecte, sur le même principe d'accès.
+- **Données minimales** : titre, date, lieu, coordonnées, plateforme, lien, adresse de l'image (sans copier l'image ni la description). Suppression des événements passés. Retrait d'un événement ou d'une source sur simple demande.
+- **Pourquoi plutôt que la recherche directe pour tout** : le volume reste fixe (environ 80 requêtes par jour pour Paris) quel que soit notre trafic, la réponse est instantanée, la recherche plein texte en français se fait chez nous (meilleure que la recherche floue d'Eventbrite et le plafond de 50 résultats de Luma par mot-clé), les piles et la surveillance des sources sont fiables.
+- **Cadre juridique, toujours à faire valider** : l'écart entre base cachée et recherche directe est faible. Le droit européen vise à la fois l'extraction (copier) et la réutilisation (afficher), et un métamoteur en temps réel a été jugé réutilisateur (arrêt Innoweb, CJUE, 2013). Le critère décisif est l'atteinte à l'investissement de la plateforme (arrêt CV-Online, CJUE, 2021) : on renvoie le trafic, on n'affiche qu'un résumé, on ne prend pas l'inscription. Une consultation d'un avocat en propriété intellectuelle est recommandée avant l'ouverture publique (Q1).
+- **Alternatives écartées** : recherche directe pour chaque requête (volume proportionnel au trafic, donc risque de blocage qui grandit avec le succès, réponse lente, pas de piles fiables) ; collecte pour les grandes villes et recherche directe ailleurs comme deux systèmes égaux (deux comportements à maintenir).
 
 ## Plateformes candidates
 
@@ -181,6 +192,37 @@ Travail fait sur le Radar organisateur et le lab (`/lab/events-radar`) en octobr
 
 Durée d'une recherche du lab sans mot-clé, Luma et Meetup réunis : environ 7 s. À l'échelle d'une grande ville, on parle de **plusieurs centaines à plus d'un millier d'événements par mois et par source**, ce qui plaide pour la collecte planifiée avec stockage (Q3) plutôt que pour une recherche à la volée.
 
+### Mesure de volume à Paris (2026-10-09)
+
+Mesure ponctuelle à partir du 09/10/2026, sur 7, 30 et 60 jours, depuis le poste de Dragos (adresse IP résidentielle). 32 requêtes au total, une toutes les 1,5 s, **avec un en-tête qui nous nomme** (`ThePlayground-mesure/0.1 (+https://the-playground.fr)`) : aucune plateforme n'a refusé. Reste à vérifier depuis un serveur Vercel (B11).
+
+**Sans mot-clé** (ce que ferait la collecte de la base) :
+
+| Source | 7 jours | 30 jours | 60 jours | Requêtes |
+|---|---|---|---|---|
+| Luma (découverte autour de Paris) | 115 | 256 | 305 | 7 pages de 50, fin naturelle des résultats |
+| Meetup (en présentiel, 25 km) | 166 | 387 | 439 | 10 pages de 50, fin naturelle (plafond de 500 possible, à vérifier) |
+| Eventbrite (page de recherche Paris) | 637 | 1 357 | 1 745 | compteur lu sur la première page |
+| **Total brut** | **~920** | **~2 000** | **~2 500** | |
+
+Ces totaux sont **avant regroupement en piles** et **avant tout filtre de thème** : Eventbrite inclut concerts, soirées, cours, salons. La courbe s'aplatit au-delà de 30 jours parce que les événements sont publiés tard (19 jours avant en médiane sur Meetup).
+
+**Avec mot-clé** (ce que ferait une recherche directe) :
+
+| Source | « IA » 7 / 30 / 60 j | « produit » 7 / 30 / 60 j | Constat |
+|---|---|---|---|
+| Luma | 23 / 40 / 48 | 20 / 43 / 49 | Plafond de 50 résultats. **Recherche mondiale** : seuls 24 (« IA ») et 25 (« produit ») sont à Paris, le reste à Mexico, Lima, Montréal, Genève… |
+| Meetup | 36 / 60 / 60 | 61 / 96 / 96 | Rien au-delà de 30 jours : la recherche par mot-clé semble limitée dans le temps (à vérifier) |
+| Eventbrite | 793 / 1 614 / 2 079 | 793 / 1 614 / 2 079 | **Chiffres identiques pour les deux mots-clés, et supérieurs à la recherche sans mot-clé** : le mot-clé ne filtre pas et semble élargir la recherche (en ligne, alentours ? non vérifié) |
+
+**Ce qu'on en tire**
+
+1. **Paris, c'est environ 2 000 événements par mois toutes sources confondues, avant thème et regroupement.** En base, c'est quelques milliers de lignes : négligeable.
+2. **La recherche par mot-clé des plateformes est inutilisable telle quelle** : Luma cherche dans le monde entier avec un plafond de 50, Eventbrite ignore le mot-clé, Meetup s'arrête à 30 jours. Ça confirme B1 : collecter sans mot-clé et chercher dans notre base.
+3. **Eventbrite ne laisse parcourir que 49 pages de 20, soit 980 événements par recherche.** Sur 30 jours, 1 357 annoncés : une partie est hors d'atteinte. La collecte doit découper la période en fenêtres d'une semaine (637 événements, 32 pages). C'est aussi la source la plus coûteuse en requêtes : environ 70 pages par mois pour Paris, d'où l'intérêt de son API officielle.
+4. **Luma ne renvoie vraisemblablement que les événements de sa page de découverte** (non vérifié). Ceux que leurs organisateurs n'y référencent pas n'apparaîtraient alors que via les calendriers suivis un par un (méthode Brainberg). Le volume réel de Luma à Paris serait donc plus élevé.
+5. **Coût de collecte estimé pour Paris, horizon 30 jours** : Luma ~6 pages, Meetup ~8 pages, Eventbrite ~70 pages, soit **environ 85 requêtes par collecte**.
+
 ### Géocodage
 
 - La position vient de la **recherche de lieux de Google Places** (`places:searchText`), avec la même clé que l'autocomplétion d'adresse, via l'adapter `createGooglePlacesService` du port `PlacesService`. `regionCode: "fr"` oriente les noms ambigus (Valence, Saint-Denis) vers la France sans exclure les autres pays.
@@ -213,7 +255,7 @@ Durée d'une recherche du lab sans mot-clé, Luma et Meetup réunis : environ 7 
 
 1. **Q1. Cadre juridique et conditions d'utilisation.** Chaque plateforme a ses conditions d'utilisation, et les bases de données sont protégées en droit européen. Ce qui passe pour un usage ponctuel et interne (le Radar) ne passe pas forcément pour une page publique à fort trafic. Priorité aux sources ouvertes ou disposant d'une API officielle, analyse plateforme par plateforme.
 2. **Q2. Cohérence avec le positionnement.** The Playground est centré sur les Communautés, sans marketplace ni flux d'événements. Afficher massivement des événements externes rapproche d'un agrégateur. Comment chaque recherche ramène-t-elle vers une Communauté ? Quelle place pour les événements The Playground ?
-3. **Q3. Recherche à la volée ou collecte planifiée.** Le Radar interroge les plateformes au moment de la demande, à moins d'une requête par mois. Une page publique multiplie le volume : collecte périodique avec stockage, fraîcheur des données, dédoublonnage entre plateformes, retrait des événements annulés.
+3. **Q3. Recherche à la volée ou collecte planifiée.** ✅ Tranchée le 2026-10-09 : base cachée tenue à jour par collecte planifiée, exposée seulement par la recherche, recherche directe en secours (voir « Architecture retenue »).
 4. **Q4. Image vis-à-vis des plateformes.** Se présenter comme l'alternative à Meetup et Luma tout en affichant leurs événements : vitrine qui leur envoie du trafic, ou concurrence frontale ?
 5. **Q5. Mesure du succès.** Visites de la page, clics sortants, et surtout conversions vers The Playground (inscriptions, adhésions, créations de Communauté). Quel seuil pour juger que la page amène du monde ?
 6. **Q6. Référencement.** Une page de recherche est une porte d'entrée naturelle depuis les moteurs de recherche (« événements tech Lyon cette semaine »). Pages indexables par ville et thème ?
@@ -226,3 +268,5 @@ Durée d'une recherche du lab sans mot-clé, Luma et Meetup réunis : environ 7 
 4. **Lot 4** : intégration dans l'Explorer.
 
 Chaque lot se décide au vu des mesures du précédent.
+
+> ⚠️ Découpage antérieur à la décision B1 (base cachée dès le départ) : à revoir lors du cadrage.
