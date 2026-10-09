@@ -144,6 +144,29 @@ Défauts à ne pas reproduire :
 - **Cadre juridique, toujours à faire valider** : l'écart entre base cachée et recherche directe est faible. Le droit européen vise à la fois l'extraction (copier) et la réutilisation (afficher), et un métamoteur en temps réel a été jugé réutilisateur (arrêt Innoweb, CJUE, 2013). Le critère décisif est l'atteinte à l'investissement de la plateforme (arrêt CV-Online, CJUE, 2021) : on renvoie le trafic, on n'affiche qu'un résumé, on ne prend pas l'inscription. Une consultation d'un avocat en propriété intellectuelle est recommandée avant l'ouverture publique (Q1).
 - **Alternatives écartées** : recherche directe pour chaque requête (volume proportionnel au trafic, donc risque de blocage qui grandit avec le succès, réponse lente, pas de piles fiables) ; collecte pour les grandes villes et recherche directe ailleurs comme deux systèmes égaux (deux comportements à maintenir).
 
+### Périmètre collecté : tous les types d'événements (décidé le 2026-10-09)
+
+On collecte **tout**, sans filtre de thème à la source : tech et pro, mais aussi sport, culture, social, ateliers, soirées. Raison (Dragos) : les Communautés créées sur The Playground couvrent déjà tous les registres, et la recherche doit leur ressembler. Les thèmes de recherche reprennent les thématiques des Communautés (`CircleCategory` : tech, design, business, sport et bien-être, art et culture, science et éducation, social, autre), attribuées à la collecte.
+
+Conséquence : on renonce au levier qui aurait le plus réduit les requêtes (ne collecter que certaines catégories Eventbrite). Eventbrite reste la source la plus lourde, environ 80 % des requêtes, d'où l'intérêt de tester son API officielle et une collecte incrémentale.
+
+### Fréquence de mise à jour modulée par horizon (décidé le 2026-10-09)
+
+Plus un événement est proche, plus il change (ajouts de dernière minute, annulations, complets). Au-delà de 30 jours, il y a peu d'événements et peu de changements, et une donnée un peu ancienne coûte peu : le clic mène à la page de la plateforme, qui affiche l'état réel.
+
+| Fenêtre | Fréquence |
+|---|---|
+| J0 à J7 | 2 fois par jour |
+| J8 à J30 | 1 fois par jour |
+| J31 à J60 | 1 fois par semaine |
+
+Estimation pour Paris d'après la mesure du 2026-10-09 : **environ 130 requêtes par jour**, contre environ 210 pour une mise à jour complète à 60 jours deux fois par jour (Luma ~13, Meetup ~13, Eventbrite ~103). Meetup et Eventbrite acceptent une période, donc chaque fenêtre s'interroge séparément. Luma se parcourt dans l'ordre des dates sans filtre de période : atteindre J31 oblige à repasser par J0 à J30, mais Luma ne pèse que 7 pages à 60 jours.
+
+Leviers complémentaires, à vérifier :
+1. **Collecte incrémentale** : si une source sait trier par date de publication, ne lire que les événements publiés depuis la dernière collecte. Gain potentiellement fort sur Eventbrite. À tester avec B11.
+2. **Fréquence ajustée à la demande** : espacer les fenêtres et les villes peu consultées, une fois la fréquentation connue.
+3. **Fréquence ajustée au rendement** : la surveillance par source dit combien de nouveautés chaque collecte apporte ; une fenêtre qui n'apporte presque rien s'espace.
+
 ## Plateformes candidates
 
 | Plateforme | État | Remarque |
