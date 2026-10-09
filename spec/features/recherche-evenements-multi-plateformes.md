@@ -60,7 +60,7 @@ Lecture du dépôt `Pwuts/brainberg` (dernier commit de juillet 2026), centrée 
 |---|---|---|---|
 | Luma | Ne lit que des **calendriers Luma ajoutés à la main** par l'admin (`scraperSources`), paginés en entier | Aucun événement hors de ces calendriers. Pas de découverte par ville | Recherche par coordonnées sur toute la ville (`discover/get-paginated-events`) |
 | Meetup | Lit la page HTML `meetup.com/find` par ville (données `__NEXT_DATA__`), **catégorie Tech uniquement**, **première page seulement** (aucune pagination) | Quelques dizaines d'événements par ville au mieux | API GraphQL du site, paginée par curseur |
-| Eventbrite | API Eventbrite avec jeton (`/v3/destination/search/`), mot-clé fixe `tech`, **par pays** (pas par ville), **10 pages au plus par pays** | Un plafond pour toute la France, quel que soit le volume réel | Page de recherche HTML par ville (JSON-LD) |
+| Eventbrite | Point d'accès `/v3/destination/search/` du domaine de l'API Eventbrite, avec un jeton personnel (probablement non documenté, voir ci-dessous), mot-clé fixe `tech`, **par pays** (pas par ville), **10 pages au plus par pays** | Un plafond pour toute la France, quel que soit le volume réel | Page de recherche HTML par ville (JSON-LD) |
 | Toutes | Filtre de mots exclus sur le titre (soirée, yoga, cocktail…), puis **modération par Claude Haiku** des nouveaux événements, qui peut rejeter ou mettre en attente | Le périmètre « tech » est voulu, mais des faux rejets sont possibles sans relecture | Pas de filtre éditorial au-delà du mot-clé |
 
 Leçon pour nous : **la couverture dépend d'abord de la façon d'interroger chaque source**, avant toute question de dédoublonnage ou d'affichage. Nos mesures du radar (voir « Volumes mesurés ») couvrent déjà beaucoup plus large.
@@ -92,7 +92,7 @@ Défauts à ne pas reproduire :
 2. **Journaliser chaque collecte par source**, comme `scraperRuns`, et y brancher l'alerte qui leur manque.
 3. **Prévoir dès le départ la disparition des événements annulés**, en s'appuyant sur la date de dernière vue.
 4. **Ne rien copier tel quel** tant qu'aucune licence n'est publiée dans le dépôt.
-5. **Piste à vérifier** : l'API Eventbrite `/v3/destination/search/` avec un jeton personnel et une pagination par `continuation`. Si elle accepte une recherche par ville, elle serait plus solide que notre lecture de la page HTML. Non testé.
+5. **Piste à vérifier** : le point d'accès Eventbrite `/v3/destination/search/`, avec un jeton personnel et une pagination par `continuation` (jeton de suite : il pagine comme la page de recherche). **Ce n'est probablement pas une API officielle de recherche** : Eventbrite a fermé sa recherche publique d'événements en 2020, son API documentée ne sert plus qu'à gérer ses propres événements. Ce serait alors un point d'accès interne, comme celui de Meetup. À vérifier : sa documentation, la recherche par ville, la taille de ses pages (plus de 20 ?) et l'absence de la limite de 49 pages. Il ne serait intéressant que pour sa stabilité (données structurées) et un nombre de requêtes réduit. Non testé.
 
 ## Solution envisagée
 
@@ -125,13 +125,13 @@ Défauts à ne pas reproduire :
   - des pauses entre les pages ;
   - l'arrêt immédiat sur une réponse « trop de requêtes » (429) ;
   - le volume le plus bas possible ;
-  - l'API officielle quand elle existe (Eventbrite).
+  - l'API officielle quand elle existe et qu'elle nous est accessible. Aujourd'hui, aucune ne l'est pour la recherche : Luma n'a pas d'API publique de recherche ; celle de Meetup serait réservée aux abonnés Meetup Pro (non vérifié) ; Eventbrite a fermé sa recherche publique en 2020 (son point d'accès `/v3/destination/search/` est probablement interne, à vérifier). Les trois sont donc interrogées par les points d'accès de leur site.
 - **Pourquoi** :
   1. Contourner une mesure technique fait passer d'une zone grise contractuelle (CGU) à un risque pénal : revenir après un blocage peut être qualifié d'accès ou de maintien frauduleux dans un système informatique (article 323-1 du Code pénal).
   2. Notre défense repose sur la bonne foi : on renvoie le trafic et on ne nuit pas à la plateforme, critère de l'arrêt CV-Online (CJUE, 2021). Se cacher la détruit.
   3. Les réseaux d'adresses résidentielles passent souvent par des appareils de particuliers enrôlés sans réel consentement : incompatible avec l'image de The Playground.
   4. Le code de The Playground est public : tout mécanisme de contournement serait visible des plateformes concernées.
-- **Brainberg fait de même** : un en-tête `Brainberg/1.0 (https://brainberg.eu)`, des pauses de 0,5 à 2,5 s selon la source, une attente de 30 s sur une réponse 429 d'Eventbrite (par son API officielle avec jeton), aucun proxy ni rotation d'adresses, hébergé sur un seul serveur (conteneur Docker).
+- **Brainberg fait de même** : un en-tête `Brainberg/1.0 (https://brainberg.eu)`, des pauses de 0,5 à 2,5 s selon la source, une attente de 30 s sur une réponse 429 d'Eventbrite (par le point d'accès `/v3/destination/search/`, avec jeton), aucun proxy ni rotation d'adresses, hébergé sur un seul serveur (conteneur Docker).
 - **Écart à corriger dans notre code** : le Radar actuel envoie un en-tête de navigateur Chrome à Meetup et Eventbrite (`src/lib/events-radar.ts`). À remplacer par un en-tête qui nous nomme dans le cadre de #630.
 
 ## Architecture retenue : une base cachée, exposée seulement par la recherche (B1, décidé le 2026-10-09)
@@ -148,7 +148,7 @@ Défauts à ne pas reproduire :
 
 On collecte **tout**, sans filtre de thème à la source : tech et pro, mais aussi sport, culture, social, ateliers, soirées. Raison (Dragos) : les Communautés créées sur The Playground couvrent déjà tous les registres, et la recherche doit leur ressembler. Les thèmes de recherche reprennent les thématiques des Communautés (`CircleCategory` : tech, design, business, sport et bien-être, art et culture, science et éducation, social, autre), attribuées à la collecte.
 
-Conséquence : on renonce au levier qui aurait le plus réduit les requêtes (ne collecter que certaines catégories Eventbrite). Eventbrite reste la source la plus lourde, environ 80 % des requêtes, d'où l'intérêt de tester son API officielle et une collecte incrémentale.
+Conséquence : on renonce au levier qui aurait le plus réduit les requêtes (ne collecter que certaines catégories Eventbrite). Eventbrite reste la source la plus lourde, environ 80 % des requêtes, d'où l'intérêt de tester son point d'accès `/v3/destination/search/` (taille des pages) et une collecte incrémentale.
 
 ### Fréquence de mise à jour modulée par horizon (décidé le 2026-10-09)
 
@@ -242,7 +242,7 @@ Ces totaux sont **avant regroupement en piles** et **avant tout filtre de thème
 
 1. **Paris, c'est environ 2 000 événements par mois toutes sources confondues, avant thème et regroupement.** En base, c'est quelques milliers de lignes : négligeable.
 2. **La recherche par mot-clé des plateformes est inutilisable telle quelle** : Luma cherche dans le monde entier avec un plafond de 50, Eventbrite ignore le mot-clé, Meetup s'arrête à 30 jours. Ça confirme B1 : collecter sans mot-clé et chercher dans notre base.
-3. **Eventbrite ne laisse parcourir que 49 pages de 20, soit 980 événements par recherche.** Sur 30 jours, 1 357 annoncés : une partie est hors d'atteinte. La collecte doit découper la période en fenêtres d'une semaine (637 événements, 32 pages). C'est aussi la source la plus coûteuse en requêtes : environ 70 pages par mois pour Paris, d'où l'intérêt de son API officielle.
+3. **Eventbrite ne laisse parcourir que 49 pages de 20, soit 980 événements par recherche.** Sur 30 jours, 1 357 annoncés : une partie est hors d'atteinte. La collecte doit découper la période en fenêtres d'une semaine (637 événements, 32 pages). C'est aussi la source la plus coûteuse en requêtes : environ 70 pages par mois pour Paris. Le point d'accès `/v3/destination/search/` pagine aussi ; il ne réduirait les requêtes que si ses pages dépassent 20 événements (à vérifier).
 4. **Luma ne renvoie vraisemblablement que les événements de sa page de découverte** (non vérifié). Ceux que leurs organisateurs n'y référencent pas n'apparaîtraient alors que via les calendriers suivis un par un (méthode Brainberg). Le volume réel de Luma à Paris serait donc plus élevé.
 5. **Coût de collecte estimé pour Paris, horizon 30 jours** : Luma ~6 pages, Meetup ~8 pages, Eventbrite ~70 pages, soit **environ 85 requêtes par collecte**.
 
