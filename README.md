@@ -66,29 +66,44 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 
 | | |
 | --- | --- |
-| **Framework** | Next.js 16 (App Router, SSR) |
+| **Framework** | Next.js 16 (App Router, SSR, Server Actions) · React 19 |
 | **Langage** | TypeScript strict, full-stack |
-| **Base de données** | PostgreSQL · Neon serverless (EU) |
+| **Base de données** | PostgreSQL · Neon serverless (EU), une branche par environnement |
 | **ORM** | Prisma 7 |
 | **Auth** | Auth.js v5 · Magic link + OAuth (Google, GitHub, LinkedIn) |
-| **UI** | Tailwind CSS 4 + shadcn/ui |
-| **Email** | Resend + react-email |
-| **IA** | Anthropic SDK (Claude) |
+| **UI** | Tailwind CSS 4 + shadcn/ui · éditeur Tiptap · PWA |
+| **i18n** | next-intl · FR / EN |
+| **Email** | Resend + react-email · invitations calendrier (.ics) |
+| **IA** | Anthropic SDK · Claude Haiku 5.5 (radar des événements concurrents) |
 | **Paiements** | Stripe Connect |
-| **Analytics** | PostHog |
+| **Stockage** | Vercel Blob |
+| **Analytics** | PostHog · Vercel Analytics · Speed Insights |
 | **Monitoring** | Sentry |
-| **Déploiement** | Vercel (EU) |
+| **Tests** | Vitest (BDD, spec by example) · Playwright (desktop + mobile) |
+| **CI/CD** | GitHub Actions · Release Please · scan DAST OWASP ZAP hebdomadaire |
+| **Déploiement** | Vercel (EU), 8 tâches planifiées |
 
 Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en Europe. Développé avec [Claude Code](https://claude.ai/claude-code) (Anthropic) — quelques jours pour le MVP, quelques semaines pour une plateforme complète en production.
 
 ## En chiffres
 
+Relevés sur `main` le 9 octobre 2026 (v2.18.2), premier commit le 19 février 2026.
+
 | | |
 | --- | --- |
-| **2 600+** | commits |
-| **550+** | pull requests |
-| **89** | cas d'usage (domain usecases) |
-| **1 700+** | tests (unit + integration) |
+| **61 500** | lignes de TypeScript en production (593 fichiers) |
+| **29 100** | lignes de tests |
+| **1 703** | tests unitaires (Vitest) |
+| **211** | tests E2E (Playwright, en CI) + 35 scénarios mobiles sur 3 appareils |
+| **89** | cas d'usage métier (domain usecases) |
+| **15** | ports, 10 repositories Prisma, 16 modèles en base |
+| **50** | pages, 22 routes API |
+| **1 672** | textes traduits, en FR et en EN |
+| **2 095** | commits (hors merges), dont 84 % co-écrits avec Claude |
+| **552** | pull requests mergées |
+| **42** | versions publiées |
+
+→ [Fiche technique illustrée](https://claude.ai/artifact/2FUB7fkvT9aRGqFGAesxai)
 
 ## Architecture
 
@@ -161,7 +176,7 @@ Quatre options, **au moins une** doit être configurée dans `.env.local` :
 
 ```bash
 pnpm dev              # serveur de développement
-pnpm test             # tests unitaires + intégration (Vitest)
+pnpm test             # tests Vitest
 pnpm test:e2e         # tests E2E (Playwright)
 pnpm typecheck        # vérification TypeScript
 pnpm db:push          # applique le schema sur la DB dev

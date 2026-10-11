@@ -244,7 +244,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - **Langage** : TypeScript (strict) — types partagés front/back
 - **ORM** : Prisma — schema déclaratif, migrations
 - **Base de données** : PostgreSQL — multi-tenant
-- **Auth** : Auth.js (NextAuth v5) — magic link + OAuth (Google, GitHub), self-hosted
+- **Auth** : Auth.js (NextAuth v5) — magic link (Resend) + OAuth (Google, GitHub, LinkedIn), self-hosted
 - **Paiements** : Stripe Connect — reversement aux Organisateurs
 
 ### UI / Design
@@ -261,8 +261,10 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 
 ### Infrastructure
 - **Hosting app** : Vercel (région EU)
-- **Hosting DB** : Neon PostgreSQL serverless (région EU), branching dev/prod
-- **Monorepo** : Turborepo si packages partagés nécessaires
+- **Hosting DB** : Neon PostgreSQL serverless (région EU), branching dev/staging/prod + une branche éphémère par run e2e en CI
+- **Crons** : 8 crons Vercel (`vercel.json`) — rappels, passage en PAST, scores Explorer, rapports PostHog, etc.
+- **Config à chaud** : Vercel Edge Config (mode maintenance, blocklist dynamique, état du quota Resend)
+- **Repo unique** : pas de monorepo ni de Turborepo
 
 ### Base de données — Branching Neon
 
@@ -280,10 +282,10 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 
 ### Dev tooling
 - **Package manager** : pnpm
-- **Linting** : ESLint + Prettier
+- **Linting** : aucun linter ni formateur configuré à ce jour (ni ESLint ni Prettier installés) ; le garde-fou est `pnpm typecheck` en CI
 - **Tests unitaires** : Vitest
-- **Tests E2E** : Playwright
-- **CI/CD** : GitHub Actions
+- **Tests E2E** : Playwright — CI en Chromium desktop uniquement ; la config mobile (`playwright.config.mobile.ts` : iPhone SE, iPhone 14 Pro, Galaxy S9+) ne tourne qu'en local
+- **CI/CD** : GitHub Actions — `ci.yml` (typecheck → test-unit → e2e sur build de prod), Release Please, DAST OWASP ZAP (baseline prod hebdo + full scan preview à la demande)
 
 ### Scripts (`pnpm <script>`)
 
@@ -474,6 +476,8 @@ src/
 | **Intégration** | Vitest + DB test | Repositories, services (adapters) | Vérifient le contrat ports/adapters avec une vraie DB PostgreSQL de test |
 | **E2E fonctionnel** | Playwright | Parcours utilisateur complets | Scénarios nommés en langage métier, couvrent les flux critiques |
 
+> **État réel (octobre 2026)** : le niveau Intégration est la cible, pas l'existant. Le projet Vitest `integration` (fichiers `*.integration.test.ts`) est configuré mais **vide** ; les tests sous `infrastructure/**/__tests__/` sont des tests unitaires avec mocks, sans base réelle. La règle 2 ci-dessous et la détection N+1 restent donc à mettre en place.
+
 #### Règles
 
 1. **Tout usecase a ses tests unitaires** — les ports sont mockés, la logique métier est testée en isolation
@@ -523,22 +527,22 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 
 ##### Dépendances (sécurité)
 
-- `pnpm audit` en CI — détection des vulnérabilités dans les dépendances
+- `pnpm audit` en CI — détection des vulnérabilités dans les dépendances (**pas encore en place** : aucun workflow ne le lance ; les vulnérabilités connues sont corrigées via `pnpm.overrides` dans `package.json`)
 
 ##### Performance pages
 
-- **Lighthouse CI** sur les pages événement (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
+- **Lighthouse CI** sur les pages événement (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E (**pas encore en place** ; mesure réelle aujourd'hui via Vercel Speed Insights)
 - **Détection N+1 queries** dans les tests d'intégration des repositories
 - **Load testing** (k6/Artillery) : uniquement en phase pré-lancement, pas dans le MVP
 
 ##### Accessibilité (a11y)
 
-- **axe-core** intégré dans les tests Playwright E2E — détecte les erreurs de contraste, labels manquants, navigation clavier
+- **axe-core** intégré dans les tests Playwright E2E — détecte les erreurs de contraste, labels manquants, navigation clavier (**pas encore en place**)
 
 ##### Hors scope MVP
 
 - Visual regression testing (Chromatic/Percy) → post-MVP si nécessaire
-- SAST/DAST complet (Snyk/SonarCloud) → quand CI en place
+- SAST complet (Snyk/SonarCloud) → plus tard. Le DAST, lui, est en place : OWASP ZAP (`dast-prod-baseline.yml`, `dast-preview-full.yml`)
 - Pentest externe → pré-lancement
 - Chaos engineering → sans objet (pas de microservices)
 
@@ -553,6 +557,8 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 | Performance pages | Lighthouse CI | Load testing basique | Monitoring APM |
 | Accessibilité | axe-core dans Playwright | Audit a11y manuel | — |
 | Pentest | — | Pentest externe | Récurrent |
+
+> Colonne MVP V1 : Vitest BDD, Playwright et tests d'autorisation sont en place. `pnpm audit` en CI, Lighthouse CI et axe-core ne le sont pas encore (octobre 2026).
 
 ## Data Model
 
