@@ -1,0 +1,143 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "timezone": "Europe/Paris",
+  "schedule": [
+    "before 9am on monday"
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "replace",
+  "packageRules": [
+    {
+      "description": "Automerge low-risk npm patch and minor updates after CI passes.",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "matchDepTypes": [
+        "dependencies",
+        "devDependencies"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Keep major updates manual.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Group GitHub Actions updates for supply-chain review.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github actions",
+      "commitMessageTopic": "GitHub Actions",
+      "labels": [
+        "dependencies",
+        "github-actions"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "Group Prisma packages together.",
+      "matchPackageNames": [
+        "prisma",
+        "/^@prisma\\//"
+      ],
+      "groupName": "prisma",
+      "labels": [
+        "dependencies",
+        "prisma"
+      ]
+    },
+    {
+      "description": "Group Next.js, React, and related runtime packages.",
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom",
+        "next-auth",
+        "next-intl",
+        "next-themes",
+        "/^@types\\/react/"
+      ],
+      "groupName": "next and react",
+      "labels": [
+        "dependencies",
+        "frontend"
+      ]
+    },
+    {
+      "description": "Group test and TypeScript tooling.",
+      "matchPackageNames": [
+        "@playwright/test",
+        "@types/node",
+        "typescript",
+        "tsx",
+        "vitest"
+      ],
+      "groupName": "test and build tooling",
+      "labels": [
+        "dependencies",
+        "tooling"
+      ]
+    },
+    {
+      "description": "Group Tailwind, shadcn, and UI helper packages.",
+      "matchPackageNames": [
+        "@tailwindcss/postcss",
+        "@tailwindcss/typography",
+        "tailwindcss",
+        "shadcn",
+        "radix-ui",
+        "lucide-react",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "tw-animate-css",
+        "sonner",
+        "react-day-picker"
+      ],
+      "groupName": "tailwind and ui",
+      "labels": [
+        "dependencies",
+        "frontend"
+      ]
+    },
+    {
+      "description": "Group observability and external service SDKs.",
+      "matchPackageNames": [
+        "@anthropic-ai/sdk",
+        "@neondatabase/serverless",
+        "@sentry/nextjs",
+        "@vercel/analytics",
+        "@vercel/blob",
+        "@vercel/speed-insights",
+        "posthog-js",
+        "resend",
+        "stripe"
+      ],
+      "groupName": "observability and service sdks",
+      "labels": [
+        "dependencies",
+        "services"
+      ]
+    }
+  ]
+}
