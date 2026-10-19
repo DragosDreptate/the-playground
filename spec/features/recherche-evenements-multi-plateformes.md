@@ -1,7 +1,79 @@
 # Trouver tous les événements de sa ville au même endroit
 
-> Statut : **Cadrage**, non implémenté. Ouvert le 2026-10-08.
+> Statut : **Cadrage en cours**, non implémenté. Ouvert le 2026-10-08, dernier point le 2026-10-19.
 > Base existante : le Radar organisateur ([local-events-watcher.md](local-events-watcher.md)), qui interroge déjà Luma, Eventbrite et Meetup.
+
+## État du cadrage (point de reprise au 2026-10-19)
+
+> **À lire en premier pour reprendre le sujet.** Le cadrage a deux axes, posés par Dragos : (A) intégrer la recherche dans The Playground existant, (B) l'implémentation concrète. S'y ajoute (C) le cadre (juridique, mesure, positionnement, découpage). Les identifiants A1, B3… sont ceux de la discussion de cadrage : les garder pour la suite.
+
+### Décidé
+
+| Sujet | Décision | Détail |
+|---|---|---|
+| Doublons entre plateformes | **Un événement, toutes ses plateformes, regroupées en pile** : toutes les occurrences gardées, à égalité, sans plateforme « officielle » | Étape 1 de « Solution envisagée » |
+| B1. Architecture | **Base cachée** tenue à jour par collecte planifiée, exposée seulement par la recherche ; recherche directe en secours pour un lieu non couvert | « Architecture retenue » |
+| B3 (en partie). Périmètre | **Tous les types d'événements**, thèmes de recherche = thématiques des Communautés (`CircleCategory`) | « Périmètre collecté » |
+| Fréquence de mise à jour | **J0-J7 deux fois par jour, J8-J30 une fois par jour, J31-J60 une fois par semaine** (~130 requêtes par jour pour Paris) | « Fréquence de mise à jour modulée » |
+| Accès aux plateformes | **Jamais de contournement d'un blocage** (ni rotation d'IP, ni proxy, ni en-tête déguisé) ; une plateforme qui bloque sort des sources | « Principe d'accès aux plateformes » |
+
+Toutes sont aussi dans [`spec/decisions.md`](../decisions.md) (entrées du 2026-10-09).
+
+### Établi par mesure (2026-10-09)
+
+- **Volume Paris** : ~2 000 événements par mois toutes sources confondues, avant thème et regroupement (Luma 256, Meetup 387, Eventbrite 1 357 sur 30 jours). Voir « Mesure de volume à Paris ».
+- **La recherche par mot-clé des plateformes est inutilisable** (Luma mondiale et plafonnée à 50, Eventbrite ignore le mot-clé, Meetup s'arrête à 30 jours) : confirme B1.
+- **Accès** : les trois plateformes répondent depuis Vercel (bac à sable, région Paris) avec un en-tête qui nous nomme. Meetup accepte des pages de 200 (0 sans erreur à 500). Pas de collecte incrémentale possible sur Meetup (pas de tri par date de publication). Voir « Test d'accès aux plateformes ».
+- **Eventbrite** : la page de recherche plafonne à 49 pages de 20 (collecter semaine par semaine) ; son point d'accès `/v3/destination/search/` exige un jeton et n'est probablement pas une API officielle.
+- **Concurrence** : aucun acteur établi en France. Brainberg (code lu) rate beaucoup d'événements par construction. Voir « Paysage concurrentiel ».
+- Scripts de mesure rejouables : [`spec/research/recherche-multi-plateformes/`](../research/recherche-multi-plateformes/).
+
+### Ouvert, avec ma recommandation
+
+**A. Intégration dans The Playground**
+
+| Id | Question | Recommandation |
+|---|---|---|
+| A1 | Accès sans compte | Oui, comme l'Explorer. Le compte sert seulement au suivi (alertes) : moment naturel pour le proposer |
+| A2 | Où placer la recherche | **Ouvrir l'onglet Événements de l'Explorer aux autres plateformes** (un seul concept « trouver », pas de 2ᵉ entrée qui concurrence l'Explorer) **+ des pages par ville et par thème** pour Google (« Événements IA à Paris cette semaine »), probable vrai moteur d'acquisition. Écarté : une entrée « Radar events » à côté de l'Explorer (deux portes pour un même besoin, crainte de Dragos) |
+| A3 | Landing | Ne pas toucher l'accroche (elle parle aux organisateurs). Au plus, une section « Cette semaine à Paris : N événements » plus bas, en preuve de vie |
+| A4 | Nom | « Radar » désigne déjà l'outil organisateur de conflits de créneaux : ne pas réutiliser. Avec A2, c'est l'Explorer ; un nom de communication reste à trouver |
+| A5 | Place des événements The Playground | Tri par date pour tous (règle « pas d'algorithme de classement »). Les nôtres se distinguent par le badge, l'inscription intégrée, le lien vers la Communauté, éventuellement un bloc « À la une » séparé |
+| A6 | Conversion d'un visiteur venu pour un événement externe | La question qui justifie le chantier. Pistes : alertes email (compte requis), Communautés du même thème proposées à côté des résultats, plus tard « C'est mon événement » pour inviter l'organisateur externe |
+| A7 | Organisateurs externes | Au minimum, signalement et retrait d'un événement sur demande |
+| A8 | Radar organisateur | Le faire lire la base au lieu d'interroger les plateformes (plus rapide, moins de requêtes) |
+
+**B. Implémentation**
+
+| Id | Question | Recommandation |
+|---|---|---|
+| B2 | Limiter les requêtes | Largement traité : collecte sans mot-clé, fréquence modulée, pauses, arrêt sur 429, pages Meetup de 200, en-tête honnête |
+| B3 | Types de recherche (reste) | Lieu (ville + rayon, en ligne oui/non), période (aujourd'hui, week-end, semaine, dates), mot-clé plein texte en français insensible aux accents, thématique attribuée à la collecte (catégories de la source, sinon Haiku 5.5). En option : gratuit/payant, format |
+| B4 | Interface | Pas celle du lab (outil d'analyse). Liste façon Explorer : barre de filtres, cartes groupées par jour dans le style de nos cartes, logo de plateforme, **piles** ; filtres dans l'adresse de la page ; mobile d'abord ; carte géographique plus tard. **Maquette desktop et mobile de la pile à montrer en premier** |
+| B5 | Villes couvertes par la collecte | Paris seule au lancement, puis les 5 plus grandes villes françaises si les chiffres suivent ; recherche directe en secours ailleurs |
+| B6 | Fraîcheur et annulations | Date de dernière vue par événement ; retiré s'il manque à deux collectes ; afficher « vu sur Meetup il y a 3 h » |
+| B7 | Surveillance | Alerte (Sentry ou Slack) quand une source chute ou tombe à zéro, **dès le lancement** (deux sources sont déjà tombées à zéro en silence) ; surveiller aussi la liste vide de Meetup au-delà de 200 par page |
+| B8 | Fiche événement chez nous ou lien direct | Lien direct ; pas de fiche par événement au départ (republication du contenu des autres). Images : adresse de la plateforme, sans copie |
+| B9 | Architecture | Port « source d'événements » + un adapter par plateforme ; usecases « collecter » et « rechercher » ; modèle événement + occurrences (pile) ; tâches planifiées Vercel découpées par source ; reprendre le code du Radar et de la branche en pause |
+| B10 | Coûts | Stockage et IA négligeables ; le vrai coût est la maintenance (les plateformes changent leurs pages) |
+| B11 | Tests techniques | ✅ Faits (accès Vercel, taille de page Meetup, tri). Reste, en option : le jeton Eventbrite pour `/v3/destination/search/` (déconseillé pour l'instant : gain hypothétique, point d'accès probablement non documenté, jeton au nom de Dragos) |
+| — | Écart de code à corriger | Le Radar actuel envoie un en-tête de navigateur Chrome à Meetup et Eventbrite (`src/lib/events-radar.ts`), contraire au principe d'accès |
+
+**C. Cadre**
+
+| Id | Question | Recommandation |
+|---|---|---|
+| C1 | Juridique et CGU | Lecture des CGU des trois plateformes, puis **une heure avec un avocat en propriété intellectuelle avant l'ouverture publique**. Arguments : pas de donnée personnelle, données minimales, renvoi du trafic (critère CV-Online, CJUE 2021). Risque : un métamoteur en temps réel a été jugé réutilisateur (Innoweb, CJUE 2013) |
+| C2 | Mesure du succès | Définir avant de construire : visites, clics sortants, comptes créés, inscriptions à nos événements, Communautés créées, et un seuil de décision après quelques semaines |
+| C3 | Positionnement | Les passerelles vers les Communautés (A6) doivent être visibles dans l'interface, sinon on devient un agenda de plus |
+| C4 | Découpage | Premier lot proposé : Paris, trois sources, base mise à jour selon la fréquence modulée, piles, onglet Événements de l'Explorer, alerte de surveillance. Ensuite : pages Google, alertes email, autres villes et sources. Le « Découpage proposé » en bas de page date d'avant B1 : à réécrire |
+
+### Pour reprendre
+
+1. **Faire arbitrer par Dragos les points ouverts**, en priorité ceux qui conditionnent le reste : **A2** (place dans l'Explorer, conditionne la maquette), **C1** (juridique), **A6** (conversion), **C4** (premier lot).
+2. Ensuite : maquette de l'onglet Événements et de la pile (desktop + mobile), puis réécriture du découpage.
+3. Code disponible : branche locale `feat/lab-radar-sans-plafond` (worktree `the-playground-feat-lab-radar-sans-plafond`, commit `7e117986`, **non poussée, non revue**) : pagination Luma et Meetup, base possible des adapters de collecte. Choix Eventbrite du lab en attente (voir « Code disponible »).
+4. Rien n'est implémenté côté produit. Issue de suivi : #630.
 
 ## Problème
 
