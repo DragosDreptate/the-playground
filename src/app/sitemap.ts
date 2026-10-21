@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/infrastructure/db/prisma";
 import { SYNTHETIC_EMAIL_SUFFIXES } from "@/lib/synthetic-accounts";
 import { getAllPosts } from "@/lib/blog";
-import { buildLocalizedUrls, isCircleIndexable, isMomentIndexable } from "@/lib/seo";
+import { buildLocalizedUrls, isMomentIndexable } from "@/lib/seo";
 
 // Sans revalidate, le sitemap est figé au build : les événements et Communautés
 // créés entre deux mises en ligne n'y apparaissaient pas. Une semaine suffit.
@@ -44,7 +44,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     withAlternates("/legal/cgu", { changeFrequency: "yearly", priority: 0.2 }),
   ];
 
-  // Exclude circles owned by synthetic accounts (test, demo, E2E)
+  // Exclude circles owned by synthetic accounts (test, demo, E2E). Règle propre
+  // au sitemap : les pages, elles, ne connaissent pas l'email de l'Organisateur
+  // et restent indexables.
   const testDemoMemberships = await prisma.circleMembership.findMany({
     where: {
       role: "HOST",
@@ -56,19 +58,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
   const excludeCircleIds = testDemoMemberships.map((m) => m.circleId);
 
-  // Le filtre Prisma dégrossit, isCircleIndexable / isMomentIndexable tranchent :
-  // même règle que le noindex des pages (Communauté publique, hors démo,
-  // événement avec description).
+  // Reproduit isCircleIndexable (lib/seo.ts) côté base : les deux sont à garder
+  // alignés. Pour les événements, isMomentIndexable tranche en plus la
+  // description vide, que la base ne sait pas tester après trim.
+  const indexableCircle = { visibility: "PUBLIC", isDemo: false } as const;
   const [circles, moments, networks] = await Promise.all([
     prisma.circle.findMany({
-      where: { visibility: "PUBLIC", isDemo: false, id: { notIn: excludeCircleIds } },
-      select: { slug: true, updatedAt: true, visibility: true, isDemo: true },
+      where: { ...indexableCircle, id: { notIn: excludeCircleIds } },
+      select: { slug: true, updatedAt: true },
     }),
     prisma.moment.findMany({
       where: {
         status: { in: ["PUBLISHED", "PAST"] },
         circleId: { notIn: excludeCircleIds },
-        circle: { visibility: "PUBLIC", isDemo: false },
+        circle: indexableCircle,
       },
       select: {
         slug: true,
@@ -80,15 +83,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.circleNetwork.findMany({ select: { slug: true, updatedAt: true } }),
   ]);
 
-  const circlePages = circles
-    .filter((circle) => isCircleIndexable(circle))
-    .map((circle) =>
-      frOnly(`/circles/${circle.slug}`, {
-        lastModified: circle.updatedAt,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      }),
-    );
+  const circlePages = circles.map((circle) =>
+    frOnly(`/circles/${circle.slug}`, {
+      lastModified: circle.updatedAt,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }),
+  );
 
   const momentPages = moments
     .filter((moment) => isMomentIndexable(moment, moment.circle))

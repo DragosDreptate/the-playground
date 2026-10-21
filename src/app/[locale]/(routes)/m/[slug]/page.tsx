@@ -10,7 +10,6 @@ import { collapseWhitespace } from "@/lib/text";
 import {
   buildSocialMetadata,
   buildUgcIndexing,
-  isCircleIndexable,
   isMomentIndexable,
 } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
@@ -250,12 +249,13 @@ export default async function PublicMomentPage({
       ? "https://schema.org/SoldOut"
       : "https://schema.org/InStock";
 
-  // Pas de données structurées schema.org pour un événement en Communauté privée :
-  // le noindex masque la page de l'index, mais le JSON-LD reste une surface
-  // exploitable par les crawlers / scrapers — on la ferme aussi (cf. generateMetadata).
+  // Pas de données structurées schema.org pour un événement non indexable
+  // (Communauté privée ou de démo, pas de description) : le noindex masque la
+  // page de l'index, mais le JSON-LD reste une surface exploitable par les
+  // crawlers / scrapers — on la ferme aussi (même règle que generateMetadata).
   const jsonLd =
     (moment.status === "PUBLISHED" || moment.status === "PAST") &&
-    isCircleIndexable(circle)
+    isMomentIndexable(moment, circle)
       ? {
           "@context": "https://schema.org",
           "@type": "Event",

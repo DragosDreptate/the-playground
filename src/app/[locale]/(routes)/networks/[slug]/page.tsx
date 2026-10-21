@@ -12,6 +12,7 @@ import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { stripProtocol } from "@/lib/url";
 import { isValidSlug } from "@/lib/slug";
 import { buildUgcIndexing } from "@/lib/seo";
+import { getAppUrl } from "@/lib/app-url";
 import { Link } from "@/i18n/navigation";
 
 export const revalidate = 300;
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const network = await getCachedNetwork(slug);
   if (!network) return {};
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getAppUrl();
 
   return {
     title: network.name,

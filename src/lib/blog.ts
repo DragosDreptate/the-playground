@@ -82,27 +82,33 @@ function keywordTerms(post: BlogPostMeta): Set<string> {
 }
 
 // Articles liés, pour le maillage interne : les plus proches par mots-clés
-// partagés, puis les plus récents à score égal (getAllPosts est déjà trié et
-// le tri de JS est stable).
+// partagés (les plus récents à score égal : getAllPosts est déjà trié et le tri
+// de JS est stable), plus l'article suivant dans l'ordre chronologique, en
+// boucle. Ce dernier garantit que chaque article est lié depuis au moins un
+// autre, même celui qui ne partage aucun mot-clé.
 export function getRelatedPosts(
   slug: string,
   locale: string,
   limit = 3,
 ): BlogPostMeta[] {
   const posts = getAllPosts(locale);
-  const current = posts.find((post) => post.slug === slug);
-  if (!current) return [];
+  const index = posts.findIndex((post) => post.slug === slug);
+  if (index === -1 || posts.length < 2) return [];
 
+  const current = posts[index];
+  const next = posts[(index + 1) % posts.length];
   const currentTerms = keywordTerms(current);
   const score = (post: BlogPostMeta) =>
     [...keywordTerms(post)].filter((term) => currentTerms.has(term)).length;
 
-  return posts
-    .filter((post) => post.slug !== slug)
+  const closest = posts
+    .filter((post) => post !== current && post !== next)
     .map((post) => ({ post, score: score(post) }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
+    .slice(0, limit - 1)
     .map(({ post }) => post);
+
+  return [...closest, next];
 }
 
 export async function getPostBySlug(
