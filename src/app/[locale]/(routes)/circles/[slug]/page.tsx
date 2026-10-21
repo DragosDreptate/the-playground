@@ -28,8 +28,8 @@ import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
 import {
-  buildAlternates,
   buildSocialMetadata,
+  buildUgcIndexing,
   isCircleIndexable,
 } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
@@ -92,7 +92,6 @@ export async function generateMetadata({
   try {
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
-    const isPrivate = !isCircleIndexable(circle);
 
     const [memberCount, t] = await Promise.all([
       getCachedMemberCount(circle.id),
@@ -111,13 +110,13 @@ export async function generateMetadata({
     return {
       title,
       description,
-      alternates: buildAlternates(locale, `/circles/${slug}`),
-      // Visibilité PRIVÉ → non indexable par les crawlers (robots). Mais l'aperçu
-      // social (Open Graph / Twitter + og:image via la convention opengraph-image)
-      // reste émis inconditionnellement : un lien privé partagé sur les réseaux
-      // doit afficher le même aperçu qu'un Circle public. On découple l'indexation
-      // de la génération de l'image de partage (même pattern que /m/[slug]).
-      ...(isPrivate && { robots: { index: false, follow: false } }),
+      // Visibilité PRIVÉ ou Communauté de démo → non indexable par les crawlers
+      // (robots). Mais l'aperçu social (Open Graph / Twitter + og:image via la
+      // convention opengraph-image) reste émis inconditionnellement : un lien
+      // privé partagé sur les réseaux doit afficher le même aperçu qu'un Circle
+      // public. On découple l'indexation de la génération de l'image de partage
+      // (même pattern que /m/[slug]).
+      ...buildUgcIndexing(locale, `/circles/${slug}`, isCircleIndexable(circle)),
       ...buildSocialMetadata(title, description),
     };
   } catch {
@@ -265,7 +264,7 @@ export default async function PublicCirclePage({
 
   const appUrl = getAppUrl();
   const jsonLd =
-    circle.visibility === "PUBLIC"
+    isCircleIndexable(circle)
       ? {
           "@context": "https://schema.org",
           "@type": "Organization",

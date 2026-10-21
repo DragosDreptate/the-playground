@@ -3,13 +3,16 @@ import { AGGRESSIVE_CRAWLERS, AI_TRAINING_BOTS } from "@/lib/blocked-bots";
 
 const PRIVATE_PATHS = ["/dashboard/", "/admin/", "/api/", "/auth/"];
 
-// User-generated content: Moments (/m/) and Circles (/circles/) in both
+// User-generated content: Moments (/m/), Circles (/circles/) and Networks
+// (/networks/, which list their Circles' names and descriptions) in both
 // locales, plus the embed widget. These belong to Hosts, not to the platform.
 const UGC_PATHS = [
   "/m/",
   "/circles/",
+  "/networks/",
   "/en/m/",
   "/en/circles/",
+  "/en/networks/",
   "/embed/m/",
 ];
 
