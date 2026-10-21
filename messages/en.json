@@ -1344,7 +1344,8 @@
     "ctaButton": "Get started",
     "noPosts": "No articles yet.",
     "readMore": "Read article",
-    "readingTime": "{minutes} min read"
+    "readingTime": "{minutes} min read",
+    "relatedTitle": "Keep reading"
   },
   "Legal": {
     "lastUpdated": "Last updated: {date}",

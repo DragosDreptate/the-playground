@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   buildAlternates,
+  buildUgcIndexing,
   buildSocialMetadata,
   isCircleIndexable,
+  isMomentIndexable,
 } from "@/lib/seo";
 
 const APP_URL = "https://the-playground.fr";
@@ -118,13 +120,19 @@ describe("buildSocialMetadata", () => {
 describe("isCircleIndexable", () => {
   describe("given a public Circle", () => {
     it("is indexable (noindex off, JSON-LD + sitemap allowed)", () => {
-      expect(isCircleIndexable({ visibility: "PUBLIC" })).toBe(true);
+      expect(isCircleIndexable({ visibility: "PUBLIC", isDemo: false })).toBe(true);
     });
   });
 
   describe("given a private Circle", () => {
     it("is NOT indexable (page reachable by direct link, hidden from crawlers)", () => {
-      expect(isCircleIndexable({ visibility: "PRIVATE" })).toBe(false);
+      expect(isCircleIndexable({ visibility: "PRIVATE", isDemo: false })).toBe(false);
+    });
+  });
+
+  describe("given a public demo Circle", () => {
+    it("is NOT indexable (showcase content, not a real community)", () => {
+      expect(isCircleIndexable({ visibility: "PUBLIC", isDemo: true })).toBe(false);
     });
   });
 
@@ -135,6 +143,71 @@ describe("isCircleIndexable", () => {
 
     it("is NOT indexable when undefined", () => {
       expect(isCircleIndexable(undefined)).toBe(false);
+    });
+  });
+});
+
+describe("isMomentIndexable", () => {
+  const publicCircle = { visibility: "PUBLIC" as const, isDemo: false };
+
+  describe.each([
+    { case: "a description", description: "Atelier aquarelle au parc", circle: publicCircle, expected: true },
+    { case: "an empty description", description: "", circle: publicCircle, expected: false },
+    { case: "a whitespace-only description", description: "  \n\t ", circle: publicCircle, expected: false },
+    { case: "a description but a private Circle", description: "Atelier", circle: { visibility: "PRIVATE" as const, isDemo: false }, expected: false },
+    { case: "a description but a demo Circle", description: "Atelier", circle: { visibility: "PUBLIC" as const, isDemo: true }, expected: false },
+    { case: "a description but no Circle", description: "Atelier", circle: null, expected: false },
+  ])("given a Moment with $case", ({ description, circle, expected }) => {
+    it(`is ${expected ? "" : "NOT "}indexable`, () => {
+      expect(isMomentIndexable({ description }, circle)).toBe(expected);
+    });
+  });
+});
+
+describe("buildUgcIndexing", () => {
+  let originalAppUrl: string | undefined;
+
+  beforeEach(() => {
+    originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+    process.env.NEXT_PUBLIC_APP_URL = APP_URL;
+  });
+
+  afterEach(() => {
+    if (originalAppUrl === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = originalAppUrl;
+  });
+
+  describe("given an indexable page on FR", () => {
+    it("is indexable, self-canonical, without hreflang to the EN version", () => {
+      expect(buildUgcIndexing("fr", "/m/abc", true)).toEqual({
+        alternates: { canonical: `${APP_URL}/m/abc` },
+      });
+    });
+  });
+
+  describe("given an indexable page on EN", () => {
+    it("is noindex but followed, so Google reaches the linked FR pages", () => {
+      expect(buildUgcIndexing("en", "/m/abc", true)).toEqual({
+        alternates: { canonical: `${APP_URL}/en/m/abc` },
+        robots: { index: false, follow: true },
+      });
+    });
+  });
+
+  describe.each(["fr", "en"])("given a non-indexable page on %s", (locale) => {
+    it("is noindex and nofollow", () => {
+      expect(buildUgcIndexing(locale, "/circles/xyz", false).robots).toEqual({
+        index: false,
+        follow: false,
+      });
+    });
+  });
+
+  describe("given an unknown locale string", () => {
+    it("falls back to FR (indexable, FR canonical)", () => {
+      expect(buildUgcIndexing("de", "/m/abc", true)).toEqual({
+        alternates: { canonical: `${APP_URL}/m/abc` },
+      });
     });
   });
 });

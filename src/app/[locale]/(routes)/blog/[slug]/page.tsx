@@ -7,6 +7,7 @@ import { getAppUrl } from "@/lib/app-url";
 import {
   getPostBySlug,
   getPostSlugs,
+  getRelatedPosts,
   formatBlogDate,
   estimateReadingTime,
 } from "@/lib/blog";
@@ -58,6 +59,7 @@ export default async function BlogPostPage({
   const post = await getPostBySlug(slug, locale);
   if (!post) notFound();
 
+  const relatedPosts = getRelatedPosts(slug, locale);
   const appUrl = getAppUrl();
 
   const jsonLd = {
@@ -136,6 +138,32 @@ export default async function BlogPostPage({
         className="prose dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
+
+      {/* Related posts : maillage interne, pour que chaque article soit lié
+          depuis les autres et pas seulement depuis l'index du blog */}
+      {relatedPosts.length > 0 && (
+        <nav aria-labelledby="related-posts" className="mt-12 border-t border-border pt-8">
+          <h2 id="related-posts" className="text-lg font-bold tracking-tight">
+            {t("relatedTitle")}
+          </h2>
+          <div className="mt-4 space-y-3">
+            {relatedPosts.map((related) => (
+              <Link
+                key={related.slug}
+                href={`/blog/${related.slug}`}
+                className="group block rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40"
+              >
+                <h3 className="font-semibold tracking-tight group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                  {related.title}
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {related.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
 
       {/* CTA block */}
       <aside className="mt-12 rounded-xl bg-muted/60 p-8 text-center">

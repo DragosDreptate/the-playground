@@ -8,9 +8,10 @@ import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import {
-  buildAlternates,
   buildSocialMetadata,
+  buildUgcIndexing,
   isCircleIndexable,
+  isMomentIndexable,
 } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 
@@ -62,21 +63,21 @@ export async function generateMetadata({
   const { slug, locale } = await params;
   const moment = await getMoment(slug);
   if (!moment || moment.status === "DRAFT") return {};
+  const path = `/m/${slug}`;
   // Événement annulé : la page reste accessible en direct (cf. page ci-dessous),
   // mais non indexable et sans aperçu social riche — on ne met pas en avant un
   // événement annulé, on permet juste d'atteindre la page via un lien existant.
   if (moment.status === "CANCELLED") {
     return {
       title: collapseWhitespace(moment.title),
-      alternates: buildAlternates(locale, `/m/${slug}`),
-      robots: { index: false, follow: false },
+      ...buildUgcIndexing(locale, path, false),
     };
   }
 
   const circle = await getCircle(moment.circleId);
-  // Événement rattaché à une Communauté privée : page accessible par lien direct
-  // (partage), mais jamais indexée par les crawlers (même pattern que /circles/[slug]).
-  const isInPrivateCircle = !isCircleIndexable(circle);
+  // Événement d'une Communauté privée ou de démo, ou sans description : page
+  // accessible par lien direct (partage), mais jamais indexée par les crawlers.
+  const indexable = isMomentIndexable(moment, circle);
   const t = await getTranslations({ locale, namespace: "Moment" });
   // Metadata (OG/SEO) : rendue côté serveur, sans visiteur → fuseau de l'événement.
   const date = formatLongDate(moment.startsAt, locale, moment.timezone);
@@ -94,8 +95,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: buildAlternates(locale, `/m/${slug}`),
-    ...(isInPrivateCircle && { robots: { index: false, follow: false } }),
+    ...buildUgcIndexing(locale, path, indexable),
     ...buildSocialMetadata(title, description),
   };
 }

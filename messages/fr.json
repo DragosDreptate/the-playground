@@ -1344,7 +1344,8 @@
     "ctaButton": "Commencer",
     "noPosts": "Aucun article pour le moment.",
     "readMore": "Lire l'article",
-    "readingTime": "{minutes} min de lecture"
+    "readingTime": "{minutes} min de lecture",
+    "relatedTitle": "À lire aussi"
   },
   "Legal": {
     "lastUpdated": "Dernière mise à jour : {date}",

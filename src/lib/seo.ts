@@ -5,15 +5,26 @@ import { getAppUrl } from "./app-url";
 
 type LocaleUrls = Record<Locale, string>;
 
-// Source unique de la règle SEO « Communauté privée = masquée des crawlers ».
-// Partagée par /m/[slug] (noindex + JSON-LD événement), /circles/[slug] (noindex)
-// : une page rattachée à une Communauté n'est indexable que si celle-ci est
-// publique. Fail-safe : un Circle absent (null/undefined) est non indexable.
-// Le sitemap applique la même règle via un filtre Prisma (circle.visibility).
+// Source unique de la règle SEO « Communauté privée ou de démo = masquée des
+// crawlers ». Partagée par /m/[slug] (noindex + JSON-LD événement),
+// /circles/[slug] (noindex + JSON-LD) : une page rattachée à une Communauté
+// n'est indexable que si celle-ci est publique et réelle (une Communauté de démo
+// est un faux contenu de vitrine). Fail-safe : un Circle absent (null/undefined)
+// est non indexable. Le sitemap applique la même règle via un filtre Prisma.
 export function isCircleIndexable(
-  circle: { visibility: CircleVisibility } | null | undefined,
+  circle: { visibility: CircleVisibility; isDemo: boolean } | null | undefined,
 ): boolean {
-  return circle?.visibility === "PUBLIC";
+  return circle?.visibility === "PUBLIC" && !circle.isDemo;
+}
+
+// Un événement sans description n'apporte rien à Google (titre et date seuls) et
+// pèse sur la qualité perçue du site : on ne l'indexe pas. Partagé par
+// /m/[slug] et le sitemap.
+export function isMomentIndexable(
+  moment: { description: string },
+  circle: Parameters<typeof isCircleIndexable>[0],
+): boolean {
+  return isCircleIndexable(circle) && moment.description.trim() !== "";
 }
 
 // Open Graph + Twitter Card pour l'aperçu social (unfurl Slack/WhatsApp/iMessage…).
@@ -58,4 +69,24 @@ export function buildAlternates(locale: string, path: string) {
       "x-default": urls.fr,
     },
   };
+}
+
+// Contenu écrit par les utilisateurs (événements, Communautés, Réseaux) : rédigé
+// une seule fois, dans la langue de son auteur ; /en n'en traduit que l'interface.
+// Indexer les deux URLs exposait à Google des doublons quasi identiques (cf.
+// spec/decisions.md, 2026-10-20). Seule l'URL FR est indexable, sans hreflang
+// vers une version EN qui ne l'est pas. La version EN reste suivie (follow) pour
+// que Google remonte vers les pages FR liées.
+export function buildUgcIndexing(
+  locale: string,
+  path: string,
+  indexable: boolean,
+): Pick<Metadata, "alternates" | "robots"> {
+  const safe = isSupportedLocale(locale) ? locale : routing.defaultLocale;
+  const alternates = { canonical: buildLocalizedUrls(path)[safe] };
+  if (!indexable) return { alternates, robots: { index: false, follow: false } };
+  if (safe !== routing.defaultLocale) {
+    return { alternates, robots: { index: false, follow: true } };
+  }
+  return { alternates };
 }
