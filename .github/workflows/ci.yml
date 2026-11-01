@@ -83,7 +83,11 @@ jobs:
           && startsWith(github.event.head_commit.message, 'Merge pull request #')
           && contains(github.event.head_commit.message, 'from DragosDreptate/release-please--branches--main--components--the-playground'))
       )
-    runs-on: ubuntu-latest
+    # Machine fixée sur Ubuntu 24.04 : GitHub a basculé `ubuntu-latest` sur
+    # Ubuntu 26.04 (constaté le 2026-11-01), que Playwright 1.58 ne prend pas en
+    # charge (installation des navigateurs refusée). Revenir à `ubuntu-latest`
+    # avec la montée de Playwright vers une version qui supporte 26.04.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
