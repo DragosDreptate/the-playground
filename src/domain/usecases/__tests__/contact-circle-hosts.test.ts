@@ -116,7 +116,7 @@ function makeDeps(overrides: {
     momentRepository,
     emailService,
     rateLimiter,
-    emailStrings,
+    localizeRecipients: async (userIds: string[]) => [{ userIds, emailStrings }],
     appUrl: "https://app.example.com",
     // Par défaut bien après le createdAt des users mockés (2026-01-01) : le gate
     // « compte trop récent » ne se déclenche pas, sauf override explicite.
@@ -349,6 +349,38 @@ describe("contactCircleHosts", () => {
         expect(data.aboutLine).toBe("About community My Circle");
         expect(data.appUrl).toBe("https://app.example.com");
       }
+    });
+  });
+
+  describe("given organizers with different email languages", () => {
+    it("should send each organizer the strings of their own language", async () => {
+      const organizers = [
+        makeOrganizer({ userId: "host-fr", email: "host-fr@example.com" }),
+        makeOrganizer({ userId: "host-en", email: "host-en@example.com", role: "CO_HOST" }),
+      ];
+      const deps = {
+        ...makeDeps({ organizers }),
+        localizeRecipients: async () => [
+          { userIds: ["host-fr"], emailStrings },
+          {
+            userIds: ["host-en"],
+            emailStrings: { ...emailStrings, aboutCircle: "EN about community {circleName}" },
+          },
+        ],
+      };
+
+      const result = await contactCircleHosts(
+        { senderId: SENDER_ID, circleId: CIRCLE_ID, message: "Hello there organisers!" },
+        deps
+      );
+
+      expect(result.recipientsCount).toBe(2);
+      const calls = (deps.emailService.sendHostContactMessage as ReturnType<typeof vi.fn>).mock.calls;
+      const aboutByRecipient = Object.fromEntries(calls.map(([d]) => [d.to, d.aboutLine]));
+      expect(aboutByRecipient).toEqual({
+        "host-fr@example.com": "About community My Circle",
+        "host-en@example.com": "EN about community My Circle",
+      });
     });
   });
 

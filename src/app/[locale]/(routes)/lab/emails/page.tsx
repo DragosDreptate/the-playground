@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { render } from "@react-email/components";
 import { getTranslations } from "next-intl/server";
 import { RegistrationConfirmationEmail } from "@/infrastructure/services/email/templates/registration-confirmation";
@@ -6,16 +7,19 @@ import { HostNewRegistrationEmail } from "@/infrastructure/services/email/templa
 import { HostNewCircleMemberEmail } from "@/infrastructure/services/email/templates/host-new-circle-member";
 import { HostMomentCreatedEmail } from "@/infrastructure/services/email/templates/host-moment-created";
 import { NewCommentEmail } from "@/infrastructure/services/email/templates/new-comment";
-import { HostNewCommentEmail } from "@/infrastructure/services/email/templates/host-new-comment";
 import { HostContactMessageEmail } from "@/infrastructure/services/email/templates/host-contact-message";
 import { MomentUpdateEmail } from "@/infrastructure/services/email/templates/moment-update";
 import { MomentCancelledEmail } from "@/infrastructure/services/email/templates/moment-cancelled";
 import { NewMomentNotificationEmail } from "@/infrastructure/services/email/templates/new-moment-notification";
 import { MomentHostMessageEmail } from "@/infrastructure/services/email/templates/moment-host-message";
 import { CircleInvitationEmail } from "@/infrastructure/services/email/templates/circle-invitation";
+import { ApprovalNotificationEmail } from "@/infrastructure/services/email/templates/approval-notification";
+import { CoHostPromotedEmail } from "@/infrastructure/services/email/templates/co-host-promoted";
+import { CoHostDemotedEmail } from "@/infrastructure/services/email/templates/co-host-demoted";
 import { AdminEntityCreatedEmail } from "@/infrastructure/services/email/templates/admin-entity-created";
 import { AdminMomentUpdatedEmail } from "@/infrastructure/services/email/templates/admin-moment-updated";
 import { AdminNewUserEmail } from "@/infrastructure/services/email/templates/admin-new-user";
+import { AdminCommentPendingEmail } from "@/infrastructure/services/email/templates/admin-comment-pending";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
 import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
@@ -23,439 +27,886 @@ import { CancellationConfirmationEmail } from "@/infrastructure/services/email/t
 import { HostCancellationEmail } from "@/infrastructure/services/email/templates/host-cancellation";
 import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
 import { OnboardingWelcomeEmail } from "@/infrastructure/services/email/templates/onboarding-welcome";
-import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
-import { EmailPreviewClient } from "./email-preview-client";
+import { getOnboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
+import { formatPrice } from "@/lib/format-price";
+import type { EmailTranslations } from "@/lib/email/email-locale";
+import {
+  EmailPreviewClient,
+  type EmailGroupId,
+  type EmailPreview,
+  type PreviewLocale,
+} from "./email-preview-client";
+
+/**
+ * Labo d'emails : aperçu de TOUS les emails envoyés par la plateforme, en FR et
+ * en EN. Les textes viennent des vrais fichiers de traduction (messages/*.json),
+ * avec les mêmes clés que le code d'envoi, et les dates/lieux du même module
+ * (`buildMomentEmailContext`) : l'aperçu montre ce qui part réellement.
+ * Seules les données d'exemple (noms, événement) sont fixées ici.
+ */
 
 const BASE_URL = "https://the-playground.fr";
-const FOOTER = "Powered by The Playground — Lancez votre communauté, gratuitement.";
+// URL de l'app pour que les aperçus chargent le logo local en dev.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-async function buildTemplates(): Promise<{ id: string; label: string; subject: string; html: string }[]> {
-  // Pour les templates dont le wording risque de dériver de messages/fr.json
-  // (ex: magic link, dont la copie suit la spec magic-link-reusable-token),
-  // on lit directement les clés i18n plutôt que de hardcoder ici.
-  const magicLinkT = await getTranslations({ locale: "fr", namespace: "Email.magicLink" });
+// --- Données d'exemple (contenu saisi par les utilisateurs : non traduit) ---
+const PLAYER = "Alice Martin";
+const HOST = "Bob Dupont";
+const COMMENTER = "Charlie Leroy";
+const MOMENT_TITLE = "Soirée JS & Pizza";
+const MOMENT_SLUG = "soiree-js-pizza";
+const CIRCLE_NAME = "Paris Creative Tech";
+const CIRCLE_SLUG = "paris-creative-tech";
+const CIRCLE_DESCRIPTION =
+  "Une communauté pour les développeurs, designers et product managers parisiens passionnés par les nouvelles technologies. On se retrouve chaque mois pour des talks, workshops et soirées networking.\n\nRejoignez-nous pour partager vos projets et découvrir ceux des autres !";
+const COMMENT = "Super événement, j'ai hâte d'y être ! Est-ce qu'on peut venir avec un ami ?";
+const SAMPLE_MOMENT = {
+  startsAt: new Date("2026-03-21T18:00:00.000Z"),
+  timezone: "Europe/Paris",
+  locationType: "IN_PERSON",
+  locationName: "Le Cargo",
+  locationAddress: "18 rue de la Paix, Paris",
+  videoLink: null,
+};
+const UPDATED_MOMENT = {
+  ...SAMPLE_MOMENT,
+  startsAt: new Date("2026-03-22T18:00:00.000Z"),
+  locationName: "Station F",
+  locationAddress: "5 parvis Alan Turing, Paris",
+};
+const PRICE_CENTS = 1500;
+const CURRENCY = "EUR";
 
-  const templates = [
+type EmailDef = {
+  id: string;
+  group: EmailGroupId;
+  label: string;
+  recipient: string;
+  subject: string;
+  element: ReactElement;
+};
+
+/** Emails envoyés aux utilisateurs : construits dans la langue demandée. */
+function localizedEmails(locale: PreviewLocale, t: EmailTranslations): EmailDef[] {
+  const ctx = buildMomentEmailContext(SAMPLE_MOMENT, locale);
+  const updatedCtx = buildMomentEmailContext(UPDATED_MOMENT, locale);
+  const amount = formatPrice(PRICE_CENTS, CURRENCY, locale);
+  const footer = t("common.footer");
+  const momentCard = {
+    momentTitle: MOMENT_TITLE,
+    momentSlug: MOMENT_SLUG,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
+    circleName: CIRCLE_NAME,
+    circleSlug: CIRCLE_SLUG,
+  };
+  const registrationStrings = (prefix: "registration" | "waitlist") => ({
+    subject: t(`${prefix}.subject`, { momentTitle: MOMENT_TITLE }),
+    heading: t(`${prefix}.heading`),
+    statusMessage: t(`${prefix}.statusMessage`, { momentTitle: MOMENT_TITLE }),
+    dateLabel: t("common.dateLabel"),
+    locationLabel: t("common.locationLabel"),
+    viewMomentCta: t("common.viewMomentCta"),
+    cancelLink: t("common.cancelLink"),
+    dashboardLink: t("common.dashboardLink"),
+    paymentConfirmed: t("common.paymentConfirmed"),
+    viewReceipt: t("common.viewReceipt"),
+    footer,
+  });
+  const momentUpdateEmail = (prefix: "momentUpdate" | "hostMomentUpdate", to: string, playerName: string) => {
+    const strings = {
+      subject: t("momentUpdate.subject", { momentTitle: MOMENT_TITLE }),
+      heading: t(`${prefix}.heading`),
+      intro: t(`${prefix}.intro`),
+      dateChangedLabel: t("momentUpdate.dateChangedLabel"),
+      locationChangedLabel: t("momentUpdate.locationChangedLabel"),
+      dateLabel: t("common.dateLabel"),
+      locationLabel: t("common.locationLabel"),
+      viewMomentCta: t("common.viewMomentCta"),
+      footer,
+    };
+    return {
+      subject: strings.subject,
+      element: MomentUpdateEmail({
+        to,
+        playerName,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        momentDate: updatedCtx.momentDate,
+        momentDateMonth: updatedCtx.momentDateMonth,
+        momentDateDay: updatedCtx.momentDateDay,
+        locationText: updatedCtx.locationText,
+        circleName: CIRCLE_NAME,
+        circleSlug: CIRCLE_SLUG,
+        dateChanged: true,
+        locationChanged: true,
+        strings,
+        baseUrl: BASE_URL,
+      }),
+    };
+  };
+  const approvalEmail = (
+    strings: { subject: string; heading: string; message: string; ctaLabel: string },
+    recipientName: string,
+    entitySlug: string
+  ) => ({
+    subject: strings.subject,
+    element: ApprovalNotificationEmail({
+      recipientName,
+      heading: strings.heading,
+      message: strings.message,
+      ctaLabel: strings.ctaLabel,
+      ctaUrl: `${BASE_URL}/${entitySlug}`,
+      footer,
+    }),
+  });
+  const cancellationEmail = (
+    prefix: "registered" | "waitlistLeft",
+    refundMessage: string | null
+  ) => {
+    const strings = {
+      subject: t(`cancellationConfirmation.${prefix}.subject`, { momentTitle: MOMENT_TITLE }),
+      heading: t(`cancellationConfirmation.${prefix}.heading`),
+      message: t(`cancellationConfirmation.${prefix}.message`, { momentTitle: MOMENT_TITLE }),
+      refundMessage,
+      ctaLabel: t("cancellationConfirmation.ctaLabel"),
+      footer,
+    };
+    return {
+      subject: strings.subject,
+      element: CancellationConfirmationEmail({
+        to: "alice@example.com",
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        momentDateMonth: ctx.momentDateMonth,
+        momentDateDay: ctx.momentDateDay,
+        strings,
+        baseUrl: BASE_URL,
+      }),
+    };
+  };
+  const hostNewRegistrationEmail = (registrationInfo: string) => {
+    const strings = {
+      subject: t("hostNotification.subject", { playerName: PLAYER, momentTitle: MOMENT_TITLE }),
+      heading: t("hostNotification.heading"),
+      message: t("hostNotification.message", { playerName: PLAYER, momentTitle: MOMENT_TITLE }),
+      manageRegistrationsCta: t("hostNotification.manageRegistrationsCta"),
+      footer,
+    };
+    return {
+      subject: strings.subject,
+      element: HostNewRegistrationEmail({
+        to: "bob@example.com",
+        hostName: HOST,
+        playerName: PLAYER,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        circleSlug: CIRCLE_SLUG,
+        registrationInfo,
+        strings,
+        baseUrl: BASE_URL,
+      }),
+    };
+  };
+  const hostCancellationEmail = (refunded: boolean) => {
+    const strings = {
+      subject: t("hostCancellation.subject", { playerName: PLAYER, momentTitle: MOMENT_TITLE }),
+      heading: t("hostCancellation.heading"),
+      message: t("hostCancellation.message", { playerName: PLAYER, momentTitle: MOMENT_TITLE }),
+      refundMessage: refunded ? t("hostCancellation.refunded", { amount }) : t("hostCancellation.notRefunded"),
+      manageRegistrationsCta: t("hostCancellation.manageCta"),
+      footer,
+    };
+    return {
+      subject: strings.subject,
+      element: HostCancellationEmail({
+        to: "bob@example.com",
+        hostName: HOST,
+        playerName: PLAYER,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        circleSlug: CIRCLE_SLUG,
+        amountRefunded: refunded ? amount : null,
+        strings,
+        baseUrl: BASE_URL,
+      }),
+    };
+  };
+  const welcome = getOnboardingWelcomeContent(locale);
+
+  return [
+    // ── Participant ─────────────────────────────────────────────
     {
       id: "registration-confirmation",
-      label: "Confirmation d'inscription",
-      subject: "Inscription confirmée : Soirée JS & Pizza",
+      group: "participant",
+      label: "Inscription confirmée",
+      recipient: "Participant qui s'inscrit (ou validé par l'Organisateur)",
+      subject: registrationStrings("registration").subject,
       element: RegistrationConfirmationEmail({
         to: "alice@example.com",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
+        playerName: PLAYER,
+        ...momentCard,
         status: "REGISTERED",
+        strings: registrationStrings("registration"),
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "registration-waitlisted",
+      group: "participant",
+      label: "Inscription en liste d'attente",
+      recipient: "Participant inscrit sur un événement complet",
+      subject: registrationStrings("waitlist").subject,
+      element: RegistrationConfirmationEmail({
+        to: "alice@example.com",
+        playerName: PLAYER,
+        ...momentCard,
+        status: "WAITLISTED",
+        strings: registrationStrings("waitlist"),
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "waitlist-promotion",
+      group: "participant",
+      label: "Place libérée (sortie de liste d'attente)",
+      recipient: "Participant promu depuis la liste d'attente",
+      subject: t("promotion.subject", { momentTitle: MOMENT_TITLE }),
+      element: WaitlistPromotionEmail({
+        to: "alice@example.com",
+        playerName: PLAYER,
+        ...momentCard,
         strings: {
-          subject: "Inscription confirmée : Soirée JS & Pizza",
-          heading: "Inscription confirmée !",
-          statusMessage: "Vous êtes inscrit(e) à Soirée JS & Pizza.",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          viewMomentCta: "Voir l'événement",
-          cancelLink: "Annuler mon inscription",
-          dashboardLink: "Retrouvez tous vos événements dans Mon espace →",
-          footer: FOOTER,
+          subject: t("promotion.subject", { momentTitle: MOMENT_TITLE }),
+          heading: t("promotion.heading"),
+          statusMessage: t("promotion.statusMessage", { momentTitle: MOMENT_TITLE }),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          viewMomentCta: t("common.viewMomentCta"),
+          footer,
         },
         baseUrl: BASE_URL,
       }),
     },
     {
-      id: "waitlist",
-      label: "Liste d'attente",
-      subject: "Votre place est confirmée : Soirée JS & Pizza",
-      element: WaitlistPromotionEmail({
+      id: "registration-reminder",
+      group: "participant",
+      label: "Rappel 24h avant l'événement",
+      recipient: "Chaque inscrit, la veille",
+      subject: t("reminder.subject", { momentTitle: MOMENT_TITLE }),
+      element: RegistrationReminderEmail({
         to: "alice@example.com",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
+        playerName: PLAYER,
+        ...momentCard,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
         strings: {
-          subject: "Votre place est confirmée : Soirée JS & Pizza",
-          heading: "Bonne nouvelle !",
-          statusMessage: "Une place s'est libérée ! Votre inscription à Soirée JS & Pizza est confirmée.",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          viewMomentCta: "Voir l'événement",
-          footer: FOOTER,
+          subject: t("reminder.subject", { momentTitle: MOMENT_TITLE }),
+          heading: t("reminder.heading"),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          viewMomentCta: t("common.viewMomentCta"),
+          footer: t("reminder.footer"),
         },
         baseUrl: BASE_URL,
       }),
     },
     {
       id: "cancellation-confirmation",
-      label: "Confirmation de désinscription",
-      subject: "Inscription annulée : Soirée JS & Pizza",
-      element: CancellationConfirmationEmail({
+      group: "participant",
+      label: "Désinscription confirmée (remboursée)",
+      recipient: "Participant qui annule son inscription",
+      ...cancellationEmail("registered", t("cancellationConfirmation.refunded", { amount })),
+    },
+    {
+      id: "cancellation-not-refunded",
+      group: "participant",
+      label: "Désinscription confirmée (événement payant non remboursable)",
+      recipient: "Participant qui annule son inscription",
+      ...cancellationEmail("registered", t("cancellationConfirmation.notRefunded")),
+    },
+    {
+      id: "waitlist-left",
+      group: "participant",
+      label: "Sortie de la liste d'attente",
+      recipient: "Participant qui quitte la liste d'attente",
+      ...cancellationEmail("waitlistLeft", null),
+    },
+    {
+      id: "registration-rejected",
+      group: "participant",
+      label: "Demande d'inscription refusée",
+      recipient: "Participant dont la demande est refusée",
+      ...approvalEmail(
+        {
+          subject: t("approvalNotification.registrationRejectedSubject", { momentTitle: MOMENT_TITLE }),
+          heading: t("approvalNotification.rejectedHeading"),
+          message: t("approvalNotification.registrationRejectedMessage", { momentTitle: MOMENT_TITLE }),
+          ctaLabel: t("approvalNotification.viewMomentCta"),
+        },
+        PLAYER,
+        `m/${MOMENT_SLUG}`
+      ),
+    },
+    {
+      id: "registration-removed-by-host",
+      group: "participant",
+      label: "Inscription invalidée par l'Organisateur",
+      recipient: "Participant retiré d'un événement",
+      subject: t("registrationRemovedByHost.subject", { momentTitle: MOMENT_TITLE }),
+      element: RegistrationRemovedByHostEmail({
         to: "alice@example.com",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
+        playerName: PLAYER,
+        ...momentCard,
         strings: {
-          subject: "Inscription annulée : Soirée JS & Pizza",
-          heading: "Votre inscription est annulée",
-          message:
-            "Votre inscription à Soirée JS & Pizza a bien été annulée. Si vous changez d'avis, l'événement reste accessible ci-dessous.",
-          refundMessage: "Un remboursement de 15,00 € a été effectué automatiquement.",
-          ctaLabel: "Voir l'événement",
-          footer: FOOTER,
+          subject: t("registrationRemovedByHost.subject", { momentTitle: MOMENT_TITLE }),
+          heading: t("registrationRemovedByHost.heading"),
+          message: t("registrationRemovedByHost.message", {
+            circleName: CIRCLE_NAME,
+            momentTitle: MOMENT_TITLE,
+          }),
+          ctaLabel: t("registrationRemovedByHost.ctaLabel"),
+          footer,
         },
         baseUrl: BASE_URL,
       }),
     },
+
+    // ── Membres de la Communauté ─────────────────────────────────
     {
-      id: "host-cancellation",
-      label: "Host — Désinscription d'un participant",
-      subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
-      element: HostCancellationEmail({
-        to: "bob@example.com",
-        hostName: "Bob Dupont",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        circleSlug: "paris-creative-tech",
-        amountRefunded: "15,00 €",
-        strings: {
-          subject: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza",
-          heading: "Désinscription d'un événement",
-          message: "Alice Martin s'est désinscrit(e) de Soirée JS & Pizza.",
-          refundMessage: "Un remboursement de 15,00 € a été effectué automatiquement.",
-          manageRegistrationsCta: "Gérer les inscriptions",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "host-new-registration",
-      label: "Host — Nouvelle inscription",
-      subject: "Alice Martin s'est inscrit(e) à Soirée JS & Pizza",
-      element: HostNewRegistrationEmail({
-        to: "bob@example.com",
-        hostName: "Bob Dupont",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        circleSlug: "paris-creative-tech",
-        registrationInfo: "12 inscrit(s) / 30 places",
-        strings: {
-          subject: "Alice Martin s'est inscrit(e) à Soirée JS & Pizza",
-          heading: "Nouvelle inscription",
-          message: "Alice Martin s'est inscrit(e) à Soirée JS & Pizza",
-          manageRegistrationsCta: "Gérer les inscriptions",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "host-new-circle-member",
-      label: "Host — Nouveau membre Communauté",
-      subject: "Alice Martin a rejoint Paris Creative Tech",
-      element: HostNewCircleMemberEmail({
-        to: "bob@example.com",
-        hostName: "Bob Dupont",
-        playerName: "Alice Martin",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
-        memberCount: 48,
-        strings: {
-          subject: "Alice Martin a rejoint Paris Creative Tech",
-          heading: "Nouveau membre",
-          message: "Alice Martin vient de rejoindre Paris Creative Tech.",
-          memberCountInfo: "48 membres au total",
-          manageMembersCta: "Voir les membres",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "host-moment-created",
-      label: "Host — Événement publié",
-      subject: "Votre événement est en ligne : Soirée JS & Pizza",
-      element: HostMomentCreatedEmail({
-        to: "bob@example.com",
-        hostName: "Bob Dupont",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        circleSlug: "paris-creative-tech",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        strings: {
-          subject: "Votre événement est en ligne : Soirée JS & Pizza",
-          heading: "Votre événement est publié !",
-          statusMessage: "Vous avez programmé Soirée JS & Pizza. Partagez le lien pour inviter vos participants.",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          manageMomentCta: "Gérer l'événement",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "new-comment",
-      label: "Participant — Nouveau commentaire",
-      subject: "Charlie Leroy a commenté Soirée JS & Pizza",
-      element: NewCommentEmail({
+      id: "new-moment-notification",
+      group: "members",
+      label: "Nouvel événement publié",
+      recipient: "Membres de la Communauté (sauf désabonnés)",
+      subject: t("newMomentNotification.subject", { circleName: CIRCLE_NAME }),
+      element: NewMomentNotificationEmail({
         to: "alice@example.com",
-        recipientName: "Alice Martin",
-        playerName: "Charlie Leroy",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        commentPreview: "Super événement, j'ai hâte d'y être ! Est-ce qu'on peut venir avec un ami ?",
+        recipientName: "Alice",
+        circleName: CIRCLE_NAME,
+        circleSlug: CIRCLE_SLUG,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        momentLocation: ctx.locationText,
         strings: {
-          subject: "Charlie Leroy a commenté Soirée JS & Pizza",
-          heading: "Nouveau commentaire",
-          message: "Charlie Leroy a commenté l'événement Soirée JS & Pizza",
-          commentPreviewLabel: "Commentaire",
-          viewCommentCta: "Voir le commentaire",
-          manageNotifications: "Gérer mes préférences de notification",
-          footer: FOOTER,
+          subject: t("newMomentNotification.subject", { circleName: CIRCLE_NAME }),
+          preheader: t("newMomentNotification.preheader"),
+          heading: t("newMomentNotification.heading", { circleName: CIRCLE_NAME }),
+          intro: t("newMomentNotification.intro"),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          ctaLabel: t("newMomentNotification.ctaLabel"),
+          unsubscribeText: t("newMomentNotification.unsubscribeText", { circleName: CIRCLE_NAME }),
+          unsubscribeLabel: t("newMomentNotification.unsubscribeLabel"),
         },
         baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "host-new-comment",
-      label: "Host — Nouveau commentaire",
-      subject: "Alice Martin a commenté Soirée JS & Pizza",
-      element: HostNewCommentEmail({
-        to: "bob@example.com",
-        recipientName: "Bob Dupont",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        commentPreview: "Super événement, j'ai hâte d'y être ! Est-ce qu'on peut venir avec un ami ?",
-        strings: {
-          subject: "Alice Martin a commenté Soirée JS & Pizza",
-          heading: "Nouveau commentaire",
-          message: "Alice Martin a commenté votre événement Soirée JS & Pizza",
-          commentPreviewLabel: "Commentaire",
-          viewCommentCta: "Voir le commentaire",
-          manageNotifications: "Gérer mes préférences de notification",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "host-contact-message",
-      label: "Host — Message d'un Participant (Contacter l'organisateur)",
-      subject: "Un membre vous contacte sur The Playground",
-      element: HostContactMessageEmail({
-        to: "bob@example.com",
-        replyTo: "alice@example.com",
-        recipientName: "Bob Dupont",
-        message:
-          "Bonjour Bob,\n\nUne question rapide sur l'événement : est-ce que les places sont en accès libre une fois sur place, ou y a-t-il un check-in à l'entrée ? Je risque d'arriver un peu en retard.\n\nMerci pour l'organisation, je suis vraiment ravie de pouvoir y assister !\n\nAlice",
-        aboutLine: "À propos de l'événement « Soirée JS & Pizza » · Paris Creative Tech",
-        appUrl: BASE_URL,
-        strings: {
-          subject: "Un membre vous contacte sur The Playground",
-          heading: "Vous avez un nouveau message",
-          intro: "Alice Martin vous a envoyé un message via The Playground.",
-          messageLabel: "Message",
-          replyHint:
-            "Pour répondre à Alice Martin, répondez simplement à cet email — ou écrivez à alice@example.com.",
-          footer: FOOTER,
-        },
       }),
     },
     {
       id: "moment-update",
-      label: "Mise à jour d'événement",
-      subject: "Mise à jour : Soirée JS & Pizza",
-      element: MomentUpdateEmail({
-        to: "alice@example.com",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "samedi 22 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "22",
-        locationText: "Station F, 5 parvis Alan Turing, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
-        dateChanged: true,
-        locationChanged: true,
-        strings: {
-          subject: "Mise à jour : Soirée JS & Pizza",
-          heading: "Un événement a été modifié",
-          intro: "L'organisateur a apporté des modifications à un événement auquel vous êtes inscrit(e).",
-          dateChangedLabel: "Nouvelle date",
-          locationChangedLabel: "Nouveau lieu",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          viewMomentCta: "Voir l'événement",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
+      group: "members",
+      label: "Événement modifié (date et lieu)",
+      recipient: "Inscrits de l'événement",
+      ...momentUpdateEmail("momentUpdate", "alice@example.com", PLAYER),
     },
     {
       id: "moment-cancelled",
+      group: "members",
       label: "Événement annulé",
-      subject: "Annulé : Soirée JS & Pizza",
+      recipient: "Inscrits de l'événement",
+      subject: t("momentCancelled.subject", { momentTitle: MOMENT_TITLE }),
       element: MomentCancelledEmail({
         to: "alice@example.com",
-        recipientName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        momentSlug: "soiree-js-pizza",
+        recipientName: PLAYER,
+        momentTitle: MOMENT_TITLE,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        locationText: ctx.locationText,
+        momentSlug: MOMENT_SLUG,
         hostMessage:
           "Désolé pour ce contretemps : le lieu s'est désisté à la dernière minute. On reprogramme très vite, merci de votre compréhension !",
         strings: {
-          subject: "Annulé : Soirée JS & Pizza",
-          heading: "Cet événement a été annulé",
-          message: "L'organisateur a annulé Soirée JS & Pizza. Nous espérons vous retrouver lors d'un prochain événement.",
-          hostMessageLabel: "Message de l'organisateur",
-          ctaLabel: "Voir l'événement",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "new-moment-notification",
-      label: "Nouvel événement (membres)",
-      subject: "🎉 Nouvel événement — Paris Creative Tech",
-      element: NewMomentNotificationEmail({
-        to: "alice@example.com",
-        recipientName: "Alice",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        momentLocation: "Le Cargo, 18 rue de la Paix, Paris",
-        strings: {
-          subject: "🎉 Nouvel événement — Paris Creative Tech",
-          preheader: "Un nouvel événement vient d'être publié dans votre Communauté",
-          heading: "Nouvel événement dans Paris Creative Tech",
-          intro: "Un nouvel événement vient d'être publié dans votre Communauté :",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          ctaLabel: "S'inscrire",
-          unsubscribeText: "Vous recevez cet email car vous êtes membre de Paris Creative Tech sur The Playground.",
-          unsubscribeLabel: "Voir la Communauté",
+          subject: t("momentCancelled.subject", { momentTitle: MOMENT_TITLE }),
+          heading: t("momentCancelled.heading"),
+          message: t("momentCancelled.message", { momentTitle: MOMENT_TITLE }),
+          hostMessageLabel: t("momentCancelled.hostMessageLabel"),
+          ctaLabel: t("momentCancelled.ctaLabel"),
+          footer,
         },
         baseUrl: BASE_URL,
       }),
     },
     {
       id: "moment-host-message",
-      label: "Message de l'Organisateur aux participants",
+      group: "members",
+      label: "Message de l'Organisateur aux inscrits",
+      recipient: "Inscrits de l'événement (segment choisi)",
       subject: "Changement de salle pour vendredi",
       element: MomentHostMessageEmail({
         to: "alice@example.com",
         replyTo: "bob@example.com",
-        hostName: "Bob Dupont",
+        hostName: HOST,
         hostFirstName: "Bob",
         hostAvatarUrl: null,
         subject: "Changement de salle pour vendredi",
-        // Placeholder {prénom} déjà résolu par destinataire (ici : Alice)
+        // Objet et corps rédigés par l'Organisateur (non traduits) ; placeholder prénom résolu.
         bodyHtml:
           "<p>Bonjour Alice,</p><p>Petit changement pour vendredi : nous serons finalement dans la <strong>salle Horizon, au 2e étage</strong> (même adresse).</p><ul><li>Accueil dès 18h30</li><li>Début des talks à 19h</li></ul><p>À vendredi !</p>",
-        momentTitle: "Soirée JS & Pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        momentLocation: "Le Cargo, 18 rue de la Paix, Paris",
-        momentSlug: "soiree-js-pizza",
+        momentTitle: MOMENT_TITLE,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        momentLocation: ctx.locationText,
+        momentSlug: MOMENT_SLUG,
         appUrl: BASE_URL,
         strings: {
-          preheader: "Message de Bob Dupont à propos de Soirée JS & Pizza",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          ctaLabel: "Voir l'événement",
-          footer: "Vous recevez cet email car vous êtes inscrit à Soirée JS & Pizza.",
+          preheader: t("momentHostMessage.preheader", { hostName: HOST, momentTitle: MOMENT_TITLE }),
+          dateLabel: t("momentHostMessage.dateLabel"),
+          locationLabel: t("momentHostMessage.locationLabel"),
+          ctaLabel: t("momentHostMessage.ctaLabel"),
+          footer: t("momentHostMessage.footer", { momentTitle: MOMENT_TITLE }),
         },
+      }),
+    },
+    {
+      id: "new-comment",
+      group: "members",
+      label: "Nouveau commentaire",
+      recipient: "Inscrits et Organisateurs (sauf l'auteur)",
+      subject: t("commentNotification.subject", { playerName: COMMENTER, momentTitle: MOMENT_TITLE }),
+      element: NewCommentEmail({
+        to: "alice@example.com",
+        recipientName: PLAYER,
+        playerName: COMMENTER,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        commentPreview: COMMENT,
+        strings: {
+          subject: t("commentNotification.subject", { playerName: COMMENTER, momentTitle: MOMENT_TITLE }),
+          heading: t("commentNotification.heading"),
+          message: t("commentNotification.message", { playerName: COMMENTER, momentTitle: MOMENT_TITLE }),
+          commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
+          viewCommentCta: t("commentNotification.viewCommentCta"),
+          manageNotifications: t("commentNotification.manageNotifications"),
+          footer,
+        },
+        baseUrl: BASE_URL,
       }),
     },
     {
       id: "circle-invitation",
-      label: "Invitation Communauté",
-      subject: "Bob Dupont vous invite à rejoindre Paris Creative Tech",
+      group: "members",
+      label: "Invitation à rejoindre la Communauté",
+      recipient: "Adresse invitée (langue de l'Organisateur qui invite)",
+      subject: t("circleInvitation.subject", { inviterName: HOST, circleName: CIRCLE_NAME }),
       element: CircleInvitationEmail({
         to: "alice@example.com",
-        inviterName: "Bob Dupont",
-        circleName: "Paris Creative Tech",
-        circleDescription: "Une communauté pour les développeurs, designers et product managers parisiens passionnés par les nouvelles technologies. On se retrouve chaque mois pour des talks, workshops et soirées networking.\n\nRejoignez-nous pour partager vos projets et découvrir ceux des autres !",
-        circleSlug: "paris-creative-tech",
+        inviterName: HOST,
+        circleName: CIRCLE_NAME,
+        circleDescription: CIRCLE_DESCRIPTION,
+        circleSlug: CIRCLE_SLUG,
         coverImageUrl: null,
         memberCount: 47,
         momentCount: 3,
-        circleUrl: `${BASE_URL}/circles/paris-creative-tech`,
+        circleUrl: `${BASE_URL}/circles/${CIRCLE_SLUG}`,
         strings: {
-          subject: "Bob Dupont vous invite à rejoindre Paris Creative Tech",
-          ctaLabel: "Rejoindre la Communauté",
-          footer: "Invitation envoyée par Bob Dupont via The Playground — the-playground.fr",
+          subject: t("circleInvitation.subject", { inviterName: HOST, circleName: CIRCLE_NAME }),
+          ctaLabel: t("circleInvitation.ctaLabel"),
+          footer: t("circleInvitation.footer", { inviterName: HOST }),
+          invitesYouToJoin: t("circleInvitation.invitesYouToJoin"),
+          seeMore: t("circleInvitation.seeMore"),
+          memberCountLabel: t("circleInvitation.memberCountLabel", { count: 47 }),
+          momentCountLabel: t("circleInvitation.momentCountLabel", { count: 3 }),
         },
       }),
     },
     {
+      id: "membership-approved",
+      group: "members",
+      label: "Adhésion acceptée",
+      recipient: "Membre dont la demande d'adhésion est acceptée",
+      ...approvalEmail(
+        {
+          subject: t("approvalNotification.membershipApprovedSubject", { circleName: CIRCLE_NAME }),
+          heading: t("approvalNotification.membershipApprovedHeading"),
+          message: t("approvalNotification.membershipApprovedMessage", { circleName: CIRCLE_NAME }),
+          ctaLabel: t("approvalNotification.viewCircleCta"),
+        },
+        PLAYER,
+        `circles/${CIRCLE_SLUG}`
+      ),
+    },
+    {
+      id: "membership-rejected",
+      group: "members",
+      label: "Adhésion refusée",
+      recipient: "Personne dont la demande d'adhésion est refusée",
+      ...approvalEmail(
+        {
+          subject: t("approvalNotification.membershipRejectedSubject", { circleName: CIRCLE_NAME }),
+          heading: t("approvalNotification.rejectedHeading"),
+          message: t("approvalNotification.membershipRejectedMessage", { circleName: CIRCLE_NAME }),
+          ctaLabel: t("approvalNotification.viewCircleCta"),
+        },
+        PLAYER,
+        `circles/${CIRCLE_SLUG}`
+      ),
+    },
+    {
+      id: "member-removed-from-circle",
+      group: "members",
+      label: "Retiré de la Communauté",
+      recipient: "Membre retiré par l'Organisateur",
+      subject: t("memberRemovedFromCircle.subject", { circleName: CIRCLE_NAME }),
+      element: MemberRemovedFromCircleEmail({
+        to: "alice@example.com",
+        memberName: PLAYER,
+        circleName: CIRCLE_NAME,
+        cancelledRegistrations: 2,
+        strings: {
+          subject: t("memberRemovedFromCircle.subject", { circleName: CIRCLE_NAME }),
+          heading: t("memberRemovedFromCircle.heading"),
+          message: t("memberRemovedFromCircle.message", { circleName: CIRCLE_NAME }),
+          cancelledRegistrationsMessage: t("memberRemovedFromCircle.cancelledRegistrationsMessage", {
+            count: 2,
+          }),
+          ctaLabel: t("memberRemovedFromCircle.ctaLabel"),
+          footer,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "co-host-promoted",
+      group: "members",
+      label: "Promu co-organisateur",
+      recipient: "Membre promu co-organisateur",
+      subject: t("coHostPromoted.subject", { circleName: CIRCLE_NAME }),
+      element: CoHostPromotedEmail({
+        to: "alice@example.com",
+        recipientName: PLAYER,
+        inviterName: HOST,
+        circleName: CIRCLE_NAME,
+        circleSlug: CIRCLE_SLUG,
+        circleCoverImage: null,
+        strings: {
+          subject: t("coHostPromoted.subject", { circleName: CIRCLE_NAME }),
+          heading: t("coHostPromoted.heading", { circleName: CIRCLE_NAME }),
+          intro: t("coHostPromoted.intro", { inviterName: HOST }),
+          rightsTitle: t("coHostPromoted.rightsTitle"),
+          rightCreateEvents: t("coHostPromoted.rightCreateEvents"),
+          rightManageRegistrations: t("coHostPromoted.rightManageRegistrations"),
+          rightUpdateCircle: t("coHostPromoted.rightUpdateCircle"),
+          rightBroadcast: t("coHostPromoted.rightBroadcast"),
+          rightReceiveNotifications: t("coHostPromoted.rightReceiveNotifications"),
+          limitsNote: t("coHostPromoted.limitsNote"),
+          ctaLabel: t("coHostPromoted.ctaLabel"),
+          footer: t("coHostPromoted.footer"),
+          leaveLink: t("coHostPromoted.leaveLink"),
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "co-host-demoted",
+      group: "members",
+      label: "Retiré des co-organisateurs",
+      recipient: "Co-organisateur rétrogradé en membre",
+      subject: t("coHostDemoted.subject", { circleName: CIRCLE_NAME }),
+      element: CoHostDemotedEmail({
+        to: "alice@example.com",
+        recipientName: PLAYER,
+        circleName: CIRCLE_NAME,
+        circleSlug: CIRCLE_SLUG,
+        circleCoverImage: null,
+        strings: {
+          subject: t("coHostDemoted.subject", { circleName: CIRCLE_NAME }),
+          heading: t("coHostDemoted.heading", { circleName: CIRCLE_NAME }),
+          intro: t("coHostDemoted.intro", { circleName: CIRCLE_NAME }),
+          newRoleLabel: t("coHostDemoted.newRoleLabel"),
+          registrationsNote: t("coHostDemoted.registrationsNote"),
+          ctaLabel: t("coHostDemoted.ctaLabel"),
+          footer: t("coHostDemoted.footer"),
+          preferencesLink: t("coHostDemoted.preferencesLink"),
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+
+    // ── Organisateur ────────────────────────────────────────────
+    {
+      id: "host-new-registration",
+      group: "host",
+      label: "Nouvelle inscription",
+      recipient: "Organisateurs de la Communauté",
+      ...hostNewRegistrationEmail(t("hostNotification.registrationInfo", { count: 12, capacity: 30 })),
+    },
+    {
+      id: "host-new-registration-unlimited",
+      group: "host",
+      label: "Nouvelle inscription (places illimitées)",
+      recipient: "Organisateurs de la Communauté",
+      ...hostNewRegistrationEmail(t("hostNotification.registrationInfoUnlimited", { count: 12 })),
+    },
+    {
+      id: "host-pending-registration",
+      group: "host",
+      label: "Demande d'inscription à valider",
+      recipient: "Organisateurs (événement avec validation)",
+      ...approvalEmail(
+        {
+          subject: t("approvalNotification.hostPendingRegistrationSubject", {
+            playerName: PLAYER,
+            momentTitle: MOMENT_TITLE,
+          }),
+          heading: t("approvalNotification.hostPendingRegistrationHeading"),
+          message: t("approvalNotification.hostPendingRegistrationMessage", {
+            playerName: PLAYER,
+            momentTitle: MOMENT_TITLE,
+          }),
+          ctaLabel: t("approvalNotification.manageCta"),
+        },
+        HOST,
+        `dashboard/circles/${CIRCLE_SLUG}/moments/${MOMENT_SLUG}`
+      ),
+    },
+    {
+      id: "host-cancellation",
+      group: "host",
+      label: "Désinscription d'un participant (remboursée)",
+      recipient: "Organisateurs de la Communauté",
+      ...hostCancellationEmail(true),
+    },
+    {
+      id: "host-cancellation-not-refunded",
+      group: "host",
+      label: "Désinscription d'un participant (non remboursable)",
+      recipient: "Organisateurs de la Communauté",
+      ...hostCancellationEmail(false),
+    },
+    {
+      id: "host-new-circle-member",
+      group: "host",
+      label: "Nouveau membre dans la Communauté",
+      recipient: "Organisateurs de la Communauté",
+      subject: t("hostCircleMemberNotification.subject", { playerName: PLAYER, circleName: CIRCLE_NAME }),
+      element: HostNewCircleMemberEmail({
+        to: "bob@example.com",
+        hostName: HOST,
+        playerName: PLAYER,
+        circleName: CIRCLE_NAME,
+        circleSlug: CIRCLE_SLUG,
+        memberCount: 48,
+        strings: {
+          subject: t("hostCircleMemberNotification.subject", { playerName: PLAYER, circleName: CIRCLE_NAME }),
+          heading: t("hostCircleMemberNotification.heading"),
+          message: t("hostCircleMemberNotification.message", { playerName: PLAYER, circleName: CIRCLE_NAME }),
+          memberCountInfo: t("hostCircleMemberNotification.memberCountInfo", { count: 48 }),
+          manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
+          footer,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "host-pending-membership",
+      group: "host",
+      label: "Demande d'adhésion à valider",
+      recipient: "Organisateurs (Communauté avec validation)",
+      ...approvalEmail(
+        {
+          subject: t("approvalNotification.hostPendingMembershipSubject", {
+            playerName: PLAYER,
+            circleName: CIRCLE_NAME,
+          }),
+          heading: t("approvalNotification.hostPendingMembershipHeading"),
+          message: t("approvalNotification.hostPendingMembershipMessage", {
+            playerName: PLAYER,
+            circleName: CIRCLE_NAME,
+          }),
+          ctaLabel: t("approvalNotification.manageCta"),
+        },
+        HOST,
+        `dashboard/circles/${CIRCLE_SLUG}`
+      ),
+    },
+    {
+      id: "host-moment-created",
+      group: "host",
+      label: "Événement publié",
+      recipient: "Organisateur qui publie",
+      subject: t("hostMomentCreated.subject", { momentTitle: MOMENT_TITLE }),
+      element: HostMomentCreatedEmail({
+        to: "bob@example.com",
+        hostName: HOST,
+        momentTitle: MOMENT_TITLE,
+        momentSlug: MOMENT_SLUG,
+        circleSlug: CIRCLE_SLUG,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        locationText: ctx.locationText,
+        circleName: CIRCLE_NAME,
+        strings: {
+          subject: t("hostMomentCreated.subject", { momentTitle: MOMENT_TITLE }),
+          heading: t("hostMomentCreated.heading"),
+          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: MOMENT_TITLE }),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          manageMomentCta: t("hostMomentCreated.manageMomentCta"),
+          footer,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "host-moment-update",
+      group: "host",
+      label: "Événement modifié (version Organisateur)",
+      recipient: "Organisateurs de la Communauté",
+      ...momentUpdateEmail("hostMomentUpdate", "bob@example.com", HOST),
+    },
+    {
+      id: "host-contact-message",
+      group: "host",
+      label: "Message d'un membre (Contacter l'organisateur)",
+      recipient: "Organisateurs de la Communauté",
+      subject: t("hostContactMessage.subject"),
+      element: HostContactMessageEmail({
+        to: "bob@example.com",
+        replyTo: "alice@example.com",
+        recipientName: HOST,
+        message:
+          "Bonjour Bob,\n\nUne question rapide sur l'événement : est-ce que les places sont en accès libre une fois sur place, ou y a-t-il un check-in à l'entrée ? Je risque d'arriver un peu en retard.\n\nMerci pour l'organisation, je suis vraiment ravie de pouvoir y assister !\n\nAlice",
+        aboutLine: t("hostContactMessage.aboutEvent", { momentTitle: MOMENT_TITLE, circleName: CIRCLE_NAME }),
+        appUrl: BASE_URL,
+        strings: {
+          subject: t("hostContactMessage.subject"),
+          heading: t("hostContactMessage.heading"),
+          intro: t("hostContactMessage.intro", { senderName: PLAYER }),
+          messageLabel: t("hostContactMessage.messageLabel"),
+          replyHint: t("hostContactMessage.replyHint", {
+            senderName: PLAYER,
+            senderEmail: "alice@example.com",
+          }),
+          footer: t("hostContactMessage.footer"),
+        },
+      }),
+    },
+
+    // ── Connexion et compte ─────────────────────────────────────
+    {
+      id: "magic-link",
+      group: "account",
+      label: "Lien de connexion",
+      recipient: "Personne qui se connecte (langue de la page de connexion)",
+      subject: t("magicLink.subject"),
+      element: MagicLinkEmail({
+        url: `${BASE_URL}/auth/verify?token=abc123`,
+        baseUrl: BASE_URL,
+        strings: {
+          preview: t("magicLink.preview"),
+          heading: t("magicLink.heading"),
+          bodyText: t("magicLink.bodyText"),
+          ctaLabel: t("magicLink.ctaLabel"),
+          expiryText: t("magicLink.expiryText"),
+          securityText: t("magicLink.securityText"),
+          footer: t("magicLink.footer"),
+        },
+      }),
+    },
+    {
+      id: "onboarding-welcome",
+      group: "account",
+      label: "Lettre du fondateur (bienvenue)",
+      recipient: "Nouvel inscrit, le lendemain",
+      subject: welcome.subject,
+      element: OnboardingWelcomeEmail({ firstName: "Alice", baseUrl: APP_URL, locale }),
+    },
+  ];
+}
+
+/**
+ * Emails internes à l'équipe : en français uniquement. Textes recopiés de
+ * notify-admin-*.ts et profile.ts (non traduits, écrits dans le code d'envoi) :
+ * à tenir alignés à la main.
+ */
+function adminEmails(): EmailDef[] {
+  const ctx = buildMomentEmailContext(SAMPLE_MOMENT, "fr");
+  const adminFooter = "Vous recevez cet email car vous êtes administrateur de The Playground.";
+  return [
+    {
+      id: "admin-new-user",
+      group: "admin",
+      label: "Nouvel utilisateur",
+      recipient: "Admins plateforme",
+      subject: `[Admin] Nouvel utilisateur — ${PLAYER}`,
+      element: AdminNewUserEmail({
+        to: "admin@the-playground.fr",
+        userName: PLAYER,
+        userEmail: "alice@example.com",
+        registeredAt: "samedi 15 mars 2026",
+        adminUsersUrl: `${BASE_URL}/admin/users`,
+        strings: {
+          subject: `[Admin] Nouvel utilisateur — ${PLAYER}`,
+          heading: "Nouvel utilisateur sur The Playground",
+          message: `${PLAYER} vient de compléter son inscription.`,
+          ctaLabel: "Voir les utilisateurs dans l'admin",
+          footer: adminFooter,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
       id: "admin-entity-created",
-      label: "Admin — Nouvelle entité (Communauté)",
-      subject: "[Admin] Nouvelle Communauté créée — Paris Creative Tech",
+      group: "admin",
+      label: "Nouvelle Communauté",
+      recipient: "Admins plateforme",
+      subject: `[Admin] Nouvelle Communauté créée — ${CIRCLE_NAME}`,
       element: AdminEntityCreatedEmail({
         to: "admin@the-playground.fr",
         entityType: "circle",
-        entityName: "Paris Creative Tech",
-        creatorName: "Bob Dupont",
+        entityName: CIRCLE_NAME,
+        creatorName: HOST,
         creatorEmail: "bob@example.com",
-        entityUrl: `${BASE_URL}/admin/circles/paris-creative-tech`,
+        entityUrl: `${BASE_URL}/dashboard/circles/${CIRCLE_SLUG}`,
         strings: {
-          subject: "[Admin] Nouvelle Communauté créée — Paris Creative Tech",
+          subject: `[Admin] Nouvelle Communauté créée — ${CIRCLE_NAME}`,
           heading: "Nouvelle Communauté sur The Playground",
-          message: "Bob Dupont vient de créer une nouvelle Communauté.",
+          message: `${HOST} vient de créer une nouvelle Communauté.`,
           ctaLabel: "Voir la Communauté dans l'admin",
-          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+          footer: adminFooter,
         },
         baseUrl: BASE_URL,
       }),
     },
     {
       id: "admin-entity-created-moment",
-      label: "Admin — Nouvel événement",
-      subject: "[Admin] Nouvel événement créé — Soirée JS & Pizza",
+      group: "admin",
+      label: "Nouvel événement",
+      recipient: "Admins plateforme",
+      subject: `[Admin] Nouvel événement créé — ${MOMENT_TITLE}`,
       element: AdminEntityCreatedEmail({
         to: "admin@the-playground.fr",
         entityType: "moment",
-        entityName: "Soirée JS & Pizza",
-        creatorName: "Bob Dupont",
+        entityName: MOMENT_TITLE,
+        creatorName: HOST,
         creatorEmail: "bob@example.com",
-        circleName: "Paris Creative Tech",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        entityUrl: `${BASE_URL}/dashboard/circles/paris-creative-tech/moments/soiree-js-pizza`,
+        circleName: CIRCLE_NAME,
+        momentDate: ctx.momentDate,
+        locationText: ctx.locationText,
+        entityUrl: `${BASE_URL}/dashboard/circles/${CIRCLE_SLUG}/moments/${MOMENT_SLUG}`,
         strings: {
-          subject: "[Admin] Nouvel événement créé — Soirée JS & Pizza",
+          subject: `[Admin] Nouvel événement créé — ${MOMENT_TITLE}`,
           heading: "Nouvel événement sur The Playground",
-          message: "Bob Dupont vient de créer un nouvel événement.",
+          message: `${HOST} vient de créer un nouvel événement.`,
           ctaLabel: "Voir l'événement dans l'admin",
-          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+          footer: adminFooter,
           dateLabel: "Date",
           locationLabel: "Lieu",
         },
@@ -464,165 +915,80 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
     },
     {
       id: "admin-moment-updated",
-      label: "Admin — Événement modifié",
-      subject: "[Admin] Événement modifié — Soirée JS & Pizza",
+      group: "admin",
+      label: "Événement modifié",
+      recipient: "Admins plateforme",
+      subject: `[Admin] Événement modifié — ${MOMENT_TITLE}`,
       element: AdminMomentUpdatedEmail({
         to: "admin@the-playground.fr",
-        momentTitle: "Soirée JS & Pizza",
-        circleName: "Paris Creative Tech",
-        hostName: "Bob Dupont",
+        momentTitle: MOMENT_TITLE,
+        circleName: CIRCLE_NAME,
+        hostName: HOST,
         hostEmail: "bob@example.com",
-        momentUrl: `${BASE_URL}/dashboard/circles/paris-creative-tech/moments/soiree-js-pizza`,
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
+        momentUrl: `${BASE_URL}/dashboard/circles/${CIRCLE_SLUG}/moments/${MOMENT_SLUG}`,
+        momentDate: ctx.momentDate,
+        locationText: ctx.locationText,
         changedFields: ["Date", "Lieu", "Capacité"],
         strings: {
-          subject: "[Admin] Événement modifié — Soirée JS & Pizza",
-          heading: "Événement modifié",
-          message: "Bob Dupont vient de modifier un événement publié.",
+          subject: `[Admin] Événement modifié — ${MOMENT_TITLE}`,
+          heading: "Événement modifié sur The Playground",
+          message: `${HOST} vient de modifier un événement publié.`,
           changesLabel: "Champs modifiés",
           dateLabel: "Date",
           locationLabel: "Lieu",
-          ctaLabel: "Voir dans l'admin",
-          footer: FOOTER,
+          ctaLabel: "Voir l'événement dans l'admin",
+          footer: adminFooter,
         },
         baseUrl: BASE_URL,
       }),
     },
     {
-      id: "admin-new-user",
-      label: "Admin — Nouvel utilisateur",
-      subject: "[Admin] Nouvel utilisateur — Alice Martin",
-      element: AdminNewUserEmail({
+      id: "admin-comment-pending",
+      group: "admin",
+      label: "Commentaire à modérer",
+      recipient: "Admins plateforme",
+      subject: `[Admin] Commentaire à valider — ${MOMENT_TITLE}`,
+      element: AdminCommentPendingEmail({
         to: "admin@the-playground.fr",
-        userName: "Alice Martin",
-        userEmail: "alice@example.com",
-        registeredAt: "samedi 15 mars 2026",
-        adminUsersUrl: `${BASE_URL}/admin/users`,
+        playerName: COMMENTER,
+        momentTitle: MOMENT_TITLE,
+        commentPreview: COMMENT,
+        adminUrl: `${BASE_URL}/admin/insights/comments?status=pending`,
         strings: {
-          subject: "[Admin] Nouvel utilisateur — Alice Martin",
-          heading: "Nouvel utilisateur sur The Playground",
-          message: "Alice Martin vient de compléter son inscription.",
-          ctaLabel: "Voir les utilisateurs dans l'admin",
-          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "magic-link",
-      label: "Magic Link (connexion)",
-      subject: magicLinkT("subject"),
-      element: MagicLinkEmail({
-        url: `${BASE_URL}/auth/verify?token=abc123`,
-        baseUrl: BASE_URL,
-        strings: {
-          preview: magicLinkT("preview"),
-          heading: magicLinkT("heading"),
-          bodyText: magicLinkT("bodyText"),
-          ctaLabel: magicLinkT("ctaLabel"),
-          expiryText: magicLinkT("expiryText"),
-          securityText: magicLinkT("securityText"),
-          footer: magicLinkT("footer"),
-        },
-      }),
-    },
-    {
-      id: "registration-removed-by-host",
-      label: "Inscription invalidée par l'Organisateur",
-      subject: "Inscription invalidée : Soirée JS & Pizza",
-      element: RegistrationRemovedByHostEmail({
-        to: "alice@example.com",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
-        strings: {
-          subject: "Inscription invalidée : Soirée JS & Pizza",
-          heading: "Votre inscription a été invalidée",
-          message: "L'organisateur de Paris Creative Tech a invalidé votre inscription à Soirée JS & Pizza.",
-          ctaLabel: "Voir la Communauté",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "member-removed-from-circle",
-      label: "Membre retiré de la Communauté",
-      subject: "Votre inscription à Paris Creative Tech a été invalidée",
-      element: MemberRemovedFromCircleEmail({
-        to: "alice@example.com",
-        memberName: "Alice Martin",
-        circleName: "Paris Creative Tech",
-        cancelledRegistrations: 2,
-        strings: {
-          subject: "Votre inscription à Paris Creative Tech a été invalidée",
-          heading: "Votre inscription a été invalidée",
-          message: "L'organisateur de Paris Creative Tech a invalidé votre inscription à cette Communauté.",
-          cancelledRegistrationsMessage: "Vos 2 inscription(s) à venir dans cette Communauté ont également été annulées.",
-          ctaLabel: "Découvrir d'autres Communautés",
-          footer: FOOTER,
-        },
-        baseUrl: BASE_URL,
-      }),
-    },
-    {
-      id: "onboarding-welcome",
-      label: "Onboarding — Lettre du fondateur",
-      subject: onboardingWelcomeContent.subject,
-      element: OnboardingWelcomeEmail({
-        firstName: "Alice",
-        // Utilise l'URL de l'app pour que la preview charge le logo local en dev
-        baseUrl: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-      }),
-    },
-    {
-      id: "registration-reminder",
-      label: "Rappel 24h avant événement",
-      subject: "Rappel : Soirée JS & Pizza — demain",
-      element: RegistrationReminderEmail({
-        to: "alice@example.com",
-        playerName: "Alice Martin",
-        momentTitle: "Soirée JS & Pizza",
-        momentSlug: "soiree-js-pizza",
-        momentDate: "vendredi 21 mars 2026, 19:00",
-        momentDateMonth: "MAR",
-        momentDateDay: "21",
-        locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
-        strings: {
-          subject: "Rappel : Soirée JS & Pizza — demain",
-          heading: "C'est demain ! Voici un rappel pour votre événement.",
-          dateLabel: "Date",
-          locationLabel: "Lieu",
-          viewMomentCta: "Voir l'événement",
-          footer: FOOTER,
+          subject: `[Admin] Commentaire à valider — ${MOMENT_TITLE}`,
+          heading: "Commentaire en attente de validation",
+          message: `${COMMENTER} (compte récent) a commenté un événement. Le commentaire n'est pas visible tant que vous ne l'avez pas validé.`,
+          commentLabel: "Commentaire",
+          ctaLabel: "Modérer le commentaire",
+          footer: adminFooter,
         },
         baseUrl: BASE_URL,
       }),
     },
   ];
+}
 
-  const rendered = await Promise.all(
-    templates.map(async ({ id, label, subject, element }) => ({
-      id,
-      label,
-      subject,
+async function renderAll(defs: EmailDef[], locale: PreviewLocale | "fr-only"): Promise<EmailPreview[]> {
+  return Promise.all(
+    defs.map(async ({ element, ...meta }) => ({
+      ...meta,
+      locale,
       html: await render(element),
     }))
   );
+}
 
-  return rendered;
+async function buildPreviews(): Promise<EmailPreview[]> {
+  const locales: PreviewLocale[] = ["fr", "en"];
+  const localized = await Promise.all(
+    locales.map(async (locale) => {
+      const t = await getTranslations({ locale, namespace: "Email" });
+      return renderAll(localizedEmails(locale, t), locale);
+    })
+  );
+  return [...localized.flat(), ...(await renderAll(adminEmails(), "fr-only"))];
 }
 
 export default async function EmailPreviewPage() {
-  const templates = await buildTemplates();
-  return <EmailPreviewClient templates={templates} />;
+  return <EmailPreviewClient previews={await buildPreviews()} />;
 }

@@ -8,7 +8,7 @@ import {
 import { createStripePaymentService } from "@/infrastructure/services";
 import { handlePaymentWebhook } from "@/domain/usecases/handle-payment-webhook";
 import { sendRegistrationEmails } from "@/app/actions/registration";
-import { buildEmailLocaleResolver } from "@/lib/email/email-locale";
+import { buildEmailLocaleResolver } from "@/app/actions/helpers/email-locale-resolver";
 
 const paymentService = createStripePaymentService();
 
@@ -37,10 +37,10 @@ export async function POST(request: Request) {
 
     if (result.handled) {
       const { registration } = result;
-      // Webhook : pas de contexte i18n côté requête → resolver retombe sur la
-      // locale par défaut FR pour tous les destinataires (comportement
-      // historique préservé).
-      const resolver = await buildEmailLocaleResolver(registration.userId);
+      // Webhook : appelé par Stripe, sans page ni langue d'interface. Aucun
+      // déclencheur → chaque destinataire (Participant payeur compris) reçoit
+      // l'email dans la langue mémorisée sur son compte.
+      const resolver = await buildEmailLocaleResolver(null);
       // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
       // du route handler. Une promesse fire-and-forget nue serait larguée au gel
       // de l'instance (emails + Slack perdus par intermittence).

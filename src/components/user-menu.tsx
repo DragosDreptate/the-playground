@@ -29,7 +29,7 @@ import {
 import { UserAvatar } from "@/components/user-avatar";
 import { avatarGradientSeed } from "@/lib/avatar";
 import { cn } from "@/lib/utils";
-import { useLocaleSwitcher } from "@/lib/use-locale-switcher";
+import { useLocaleSwitcher } from "@/hooks/use-locale-switcher";
 
 type UserMenuProps = {
   user: {

@@ -85,6 +85,12 @@ const embedHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Les lettres de bienvenue (FR, EN) sont lues à l'exécution via `fs` : on les
+  // embarque explicitement dans la fonction du cron plutôt que de compter sur la
+  // détection automatique du build. Sans elles, le cron s'arrête en erreur.
+  outputFileTracingIncludes: {
+    "/api/cron/send-onboarding-welcome": ["./src/content/emails/*.md"],
+  },
   experimental: {
     serverActions: {
       // 12 MB : couvre les pièces jointes Moment (10 MB max par fichier,

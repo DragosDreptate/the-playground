@@ -4,6 +4,8 @@ import { prisma } from "@/infrastructure/db/prisma";
 import { SYNTHETIC_EMAIL_SUFFIXES } from "@/lib/synthetic-accounts";
 import { createResendEmailService } from "@/infrastructure/services";
 import { prismaUserRepository } from "@/infrastructure/repositories";
+import { toRecipientLocale } from "@/lib/email/email-locale";
+import { getOnboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 
 /**
  * GET /api/cron/send-onboarding-welcome
@@ -40,6 +42,12 @@ async function handler(request: NextRequest) {
   const cutoff = new Date(Date.now() - DELAY_HOURS * 60 * 60 * 1000);
 
   try {
+    // Charge les lettres AVANT de marquer qui que ce soit comme servi : un fichier
+    // absent ou invalide arrête le cron (500) au lieu de marquer des utilisateurs
+    // dont l'envoi échouerait ensuite, et qui ne recevraient jamais leur lettre.
+    getOnboardingWelcomeContent("fr");
+    getOnboardingWelcomeContent("en");
+
     const users = await prisma.user.findMany({
       where: {
         onboardingCompleted: true,
@@ -54,6 +62,7 @@ async function handler(request: NextRequest) {
         id: true,
         email: true,
         firstName: true,
+        preferredLocale: true,
       },
     });
 
@@ -66,6 +75,7 @@ async function handler(request: NextRequest) {
         await emailService.sendOnboardingWelcome({
           to: user.email,
           firstName: user.firstName,
+          locale: toRecipientLocale(user.preferredLocale),
         });
         sent++;
       } catch (e) {

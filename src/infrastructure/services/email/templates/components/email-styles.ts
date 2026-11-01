@@ -107,7 +107,7 @@ export const infoValue: React.CSSProperties = {
 };
 
 // ---------------------------------------------------------------------------
-// Section commentaire — templates new-comment, host-new-comment
+// Section commentaire — template new-comment
 // ---------------------------------------------------------------------------
 export const commentSection: React.CSSProperties = {
   backgroundColor: "#f4f4f5",

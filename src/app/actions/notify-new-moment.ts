@@ -1,90 +1,64 @@
-"use server";
-
-import { formatInTimeZone } from "date-fns-tz";
-import { fr } from "date-fns/locale/fr";
-
 import { prismaCircleRepository, prismaUserRepository } from "@/infrastructure/repositories";
-import { formatTimezoneMention } from "@/lib/timezone";
 import { createResendEmailService } from "@/infrastructure/services";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
+import type { EmailLocaleResolver } from "@/lib/email/email-locale";
 import type { Moment } from "@/domain/models/moment";
-import type { NewMomentNotificationStrings } from "@/domain/ports/services/email-service";
+import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 
 const emailService = createResendEmailService();
-
-// Notification serveur (email membres + Slack) : pas de visiteur, donc heure de
-// l'événement avec sa mention. Voir ADR-0008.
-function formatMomentDate(moment: Moment): string {
-  const time = formatInTimeZone(moment.startsAt, moment.timezone, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
-  return `${time} (${formatTimezoneMention(moment.timezone, "fr")})`;
-}
-
-function formatMomentLocation(moment: Moment): string {
-  if (moment.locationType === "ONLINE") return "En ligne";
-  if (moment.locationType === "HYBRID") return "Hybride";
-  return (
-    [moment.locationName, moment.locationAddress].filter(Boolean).join(", ") ||
-    "Lieu à confirmer"
-  );
-}
-
-function formatMomentDateMonth(moment: Moment): string {
-  return formatInTimeZone(moment.startsAt, moment.timezone, "MMM", { locale: fr }).toUpperCase();
-}
-
-function formatMomentDateDay(moment: Moment): string {
-  return formatInTimeZone(moment.startsAt, moment.timezone, "d");
-}
-
-function buildMemberStrings(circleName: string): NewMomentNotificationStrings {
-  return {
-    subject: `🎉 Nouvel événement — ${circleName}`,
-    preheader: `Un nouvel événement vient d'être publié dans votre Communauté`,
-    heading: `Nouvel événement dans ${circleName}`,
-    intro: "Un nouvel événement vient d'être publié dans votre Communauté :",
-    dateLabel: "Date",
-    locationLabel: "Lieu",
-    ctaLabel: "S'inscrire",
-    unsubscribeText: `Vous recevez cet email car vous êtes membre de ${circleName} sur The Playground.`,
-    unsubscribeLabel: "Voir la Communauté",
-  };
-}
 
 export async function notifyNewMoment(
   moment: Moment,
   creatorId: string,
   circleName: string,
-  circleSlug: string
+  circleSlug: string,
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const members = await prismaCircleRepository.findPlayersForNewMomentNotification(
     moment.circleId,
     creatorId
   );
 
-  const momentDate = formatMomentDate(moment);
-  const momentDateMonth = formatMomentDateMonth(moment);
-  const momentDateDay = formatMomentDateDay(moment);
-  const momentLocation = formatMomentLocation(moment);
-  const memberStrings = buildMemberStrings(circleName);
-
   const allUserIds = members.map((m) => m.userId);
-  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
+  // Préférences et langues lues en parallèle (le regroupement ci-dessous
+  // réutilise ensuite les langues préchargées, sans nouvelle requête).
+  const [prefsMap] = await Promise.all([
+    prismaUserRepository.findNotificationPreferencesByIds(allUserIds),
+    resolver.preload(allUserIds),
+  ]);
+  const optedIn = members.filter(
+    (m) => prefsMap.get(m.userId)?.notifyNewMomentInCircle !== false
+  );
 
-  const recipients = members
-    .filter((m) => prefsMap.get(m.userId)?.notifyNewMomentInCircle !== false)
-    .map((m) => ({ to: m.email, recipientName: m.firstName ?? m.email }));
-
-  if (recipients.length === 0) return;
-
-  await emailService.sendNewMomentToMembers({
-    recipients,
-    circleName,
-    circleSlug,
-    momentTitle: moment.title,
-    momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    momentLocation,
-    strings: memberStrings,
-  });
+  // Un lot par langue : chaque membre reçoit l'annonce dans la langue mémorisée
+  // sur son compte.
+  const groups = await resolver.groupByLocale(optedIn, (m) => m.userId);
+  await sendEachLocaleGroup(groups, async ({ locale, t, items }) => {
+    // Heure de l'événement avec sa mention (pas de visiteur, voir ADR-0008).
+    // videoLink omis : les membres ne sont pas encore inscrits, le lien visio
+    // reste sur la page événement.
+    const ctx = buildMomentEmailContext({ ...moment, videoLink: null }, locale);
+    await emailService.sendNewMomentToMembers({
+      recipients: items.map((m) => ({ to: m.email, recipientName: m.firstName ?? m.email })),
+      circleName,
+      circleSlug,
+      momentTitle: moment.title,
+      momentSlug: moment.slug,
+      momentDate: ctx.momentDate,
+      momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+      momentDateDay: ctx.momentDateDay,
+      momentLocation: ctx.locationText,
+      strings: {
+        subject: t("newMomentNotification.subject", { circleName }),
+        preheader: t("newMomentNotification.preheader"),
+        heading: t("newMomentNotification.heading", { circleName }),
+        intro: t("newMomentNotification.intro"),
+        dateLabel: t("common.dateLabel"),
+        locationLabel: t("common.locationLabel"),
+        ctaLabel: t("newMomentNotification.ctaLabel"),
+        unsubscribeText: t("newMomentNotification.unsubscribeText", { circleName }),
+        unsubscribeLabel: t("newMomentNotification.unsubscribeLabel"),
+      },
+    });
+  }, "new_moment_notification");
 }

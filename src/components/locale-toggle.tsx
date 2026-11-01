@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLocaleSwitcher } from "@/lib/use-locale-switcher";
+import { useLocaleSwitcher } from "@/hooks/use-locale-switcher";
 
 const localeLabels: Record<string, { short: string; full: string }> = {
   fr: { short: "FR", full: "Français" },

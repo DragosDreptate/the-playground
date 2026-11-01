@@ -361,11 +361,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         onboardingCompleted: boolean;
         role: "USER" | "ADMIN";
         dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+        preferredLocale: string | null;
         createdAt: Date;
       };
       session.user.onboardingCompleted = dbUser.onboardingCompleted;
       session.user.role = dbUser.role;
       session.user.dashboardMode = dbUser.dashboardMode ?? null;
+      session.user.preferredLocale = dbUser.preferredLocale ?? null;
       session.user.createdAt = new Date(dbUser.createdAt).getTime();
       const ageMs = Date.now() - new Date(dbUser.createdAt).getTime();
       session.user.isNewUser = ageMs < NEW_USER_WINDOW_MS;

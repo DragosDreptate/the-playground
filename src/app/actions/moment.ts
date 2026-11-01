@@ -40,10 +40,11 @@ import { notifyAdminMomentUpdated } from "./notify-admin-moment-updated";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import {
-  buildEmailLocaleResolver,
   DEFAULT_RECIPIENT_LOCALE,
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
@@ -334,12 +335,16 @@ export async function updateMomentAction(
         );
         if (allowed) {
           const resolver = await buildEmailLocaleResolver(userId);
-          sendMomentUpdateEmails(
-            result.moment,
-            Boolean(dateChanged),
-            Boolean(locationChanged),
-            resolver
-          ).catch((err) => Sentry.captureException(err));
+          // Différé via after() pour survivre au teardown serverless (plusieurs
+          // lots par langue, espacés).
+          after(() =>
+            sendMomentUpdateEmails(
+              result.moment,
+              Boolean(dateChanged),
+              Boolean(locationChanged),
+              resolver
+            ).catch((err) => Sentry.captureException(err))
+          );
         }
       }
 
@@ -421,67 +426,74 @@ async function sendMomentUpdateEmails(
 
   const { participants: participantRecipients, hosts: hostRecipients } =
     partitionMomentUpdateRecipients(confirmed, hosts);
-
-  // Tous les destinataires d'un batch update sont des "tiers" (≠ déclencheur Host)
-  // → locale par défaut FR pour rester cohérent et formaté en français.
-  const t = await resolver.defaultTranslations();
-  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
+  // Langues des deux audiences chargées en une seule requête.
+  await resolver.preload(
+    [...participantRecipients, ...hostRecipients].map((r) => r.userId)
+  );
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const icsContent = generateIcs({
-    uid: moment.id,
-    title: moment.title,
-    description: moment.description,
-    startsAt: moment.startsAt,
-    endsAt: moment.endsAt,
-    location: ctx.locationText,
-    videoLink: moment.videoLink,
-    url: `${baseUrl}/m/${moment.slug}`,
-    organizerName: circle.name,
-    method: "REQUEST",
-  });
 
-  const updateStrings = {
-    subject: t("momentUpdate.subject", { momentTitle: moment.title }),
-    dateChangedLabel: t("momentUpdate.dateChangedLabel"),
-    locationChangedLabel: t("momentUpdate.locationChangedLabel"),
-    dateLabel: t("common.dateLabel"),
-    locationLabel: t("common.locationLabel"),
-    viewMomentCta: t("common.viewMomentCta"),
-    footer: t("common.footer"),
-  };
+  // Participants (les HOSTs inscrits sont exclus, ils reçoivent la version
+  // Organisateur) puis Organisateurs, chacun découpé en un lot par langue.
+  // Chaque lot part indépendamment : un échec ne bloque pas les autres.
+  const audiences = [
+    { recipients: participantRecipients, prefix: "momentUpdate" },
+    { recipients: hostRecipients, prefix: "hostMomentUpdate" },
+  ] as const;
+  const lots = (
+    await Promise.all(
+      audiences.map(async ({ recipients, prefix }) =>
+        (await resolver.groupByLocale(recipients, (r) => r.userId)).map((group) => ({
+          ...group,
+          prefix,
+        }))
+      )
+    )
+  ).flat();
 
-  const commonFields = {
-    momentTitle: moment.title,
-    momentSlug: moment.slug,
-    momentDate: ctx.momentDate,
-    momentDateMonth: ctx.momentDateMonth,
-    momentDateDay: ctx.momentDateDay,
-    locationText: ctx.locationText,
-    circleName: circle.name,
-    circleSlug: circle.slug,
-    dateChanged,
-    locationChanged,
-    icsContent,
-  };
-
-  // Notifier les participants (les HOSTs inscrits sont exclus, ils reçoivent la version Organisateur)
-  if (participantRecipients.length > 0) {
-    await emailService.sendMomentUpdateBatch({
-      ...commonFields,
-      recipients: participantRecipients,
-      strings: { ...updateStrings, heading: t("momentUpdate.heading"), intro: t("momentUpdate.intro") },
-    });
-  }
-
-  // Notifier les Organisateurs
-  if (hostRecipients.length > 0) {
-    await emailService.sendMomentUpdateBatch({
-      ...commonFields,
-      recipients: hostRecipients,
-      strings: { ...updateStrings, heading: t("hostMomentUpdate.heading"), intro: t("hostMomentUpdate.intro") },
-    });
-  }
+  await sendEachLocaleGroup(
+    lots,
+    async ({ locale, t, items, prefix }) => {
+      const ctx = buildMomentEmailContext(moment, locale);
+      await emailService.sendMomentUpdateBatch({
+        momentTitle: moment.title,
+        momentSlug: moment.slug,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth,
+        momentDateDay: ctx.momentDateDay,
+        locationText: ctx.locationText,
+        circleName: circle.name,
+        circleSlug: circle.slug,
+        dateChanged,
+        locationChanged,
+        icsContent: generateIcs({
+          uid: moment.id,
+          title: moment.title,
+          description: moment.description,
+          startsAt: moment.startsAt,
+          endsAt: moment.endsAt,
+          location: ctx.locationText,
+          videoLink: moment.videoLink,
+          url: `${baseUrl}/m/${moment.slug}`,
+          organizerName: circle.name,
+          method: "REQUEST",
+        }),
+        recipients: items.map(({ to, playerName }) => ({ to, playerName })),
+        strings: {
+          subject: t("momentUpdate.subject", { momentTitle: moment.title }),
+          heading: t(`${prefix}.heading`),
+          intro: t(`${prefix}.intro`),
+          dateChangedLabel: t("momentUpdate.dateChangedLabel"),
+          locationChangedLabel: t("momentUpdate.locationChangedLabel"),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          viewMomentCta: t("common.viewMomentCta"),
+          footer: t("common.footer"),
+        },
+      });
+    },
+    "moment_update_email"
+  );
 }
 
 export async function deleteMomentAction(
@@ -560,29 +572,17 @@ async function sendMomentCancelledEmails(
   resolver: EmailLocaleResolver,
   hostMessage?: string
 ): Promise<void> {
-  // Tous les destinataires sont des participants ≠ déclencheur Host → FR par défaut.
-  const t = await resolver.defaultTranslations();
-  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
+  // Un lot par langue : chaque inscrit reçoit l'annulation dans sa langue.
+  const withEmail = registrations.filter((r) => r.user?.email);
+  const groups = await resolver.groupByLocale(withEmail, (r) => r.userId);
 
-  const strings = {
-    subject: t("momentCancelled.subject", { momentTitle: moment.title }),
-    heading: t("momentCancelled.heading"),
-    message: t("momentCancelled.message", { momentTitle: moment.title }),
-    hostMessageLabel: t("momentCancelled.hostMessageLabel"),
-    ctaLabel: t("momentCancelled.ctaLabel"),
-    footer: t("common.footer"),
-  };
-
-  const recipients = registrations
-    .filter((r) => r.user?.email)
-    .map((r) => ({
-      to: r.user!.email!,
-      recipientName: getDisplayName(r.user!.firstName, r.user!.lastName, r.user!.email!),
-    }));
-
-  if (recipients.length > 0) {
+  await sendEachLocaleGroup(groups, async ({ locale, t, items }) => {
+    const ctx = buildMomentEmailContext(moment, locale);
     await emailService.sendMomentCancelledBatch({
-      recipients,
+      recipients: items.map((r) => ({
+        to: r.user.email,
+        recipientName: getDisplayName(r.user.firstName, r.user.lastName, r.user.email),
+      })),
       momentTitle: moment.title,
       momentDate: ctx.momentDate,
       momentDateMonth: ctx.momentDateMonth.toUpperCase(),
@@ -590,9 +590,16 @@ async function sendMomentCancelledEmails(
       locationText: ctx.locationText,
       momentSlug: moment.slug,
       hostMessage: hostMessage || undefined,
-      strings,
+      strings: {
+        subject: t("momentCancelled.subject", { momentTitle: moment.title }),
+        heading: t("momentCancelled.heading"),
+        message: t("momentCancelled.message", { momentTitle: moment.title }),
+        hostMessageLabel: t("momentCancelled.hostMessageLabel"),
+        ctaLabel: t("momentCancelled.ctaLabel"),
+        footer: t("common.footer"),
+      },
     });
-  }
+  }, "moment_cancelled_email");
 }
 
 export async function publishMomentAction(
@@ -740,66 +747,85 @@ function sendMomentPublishedNotifications(
   userId: string,
   resolver: EmailLocaleResolver,
 ): void {
-  prismaCircleRepository
-    .findById(moment.circleId)
-    .then(async (circle) => {
+  // Différé via after() pour survivre au teardown serverless : l'annonce part en
+  // plusieurs lots (un par langue, espacés), elle ne doit pas être coupée au gel
+  // de l'instance après la réponse.
+  after(async () => {
+    try {
+      const circle = await prismaCircleRepository.findById(moment.circleId);
       if (!circle) return;
 
-      notifyNewMoment(moment, userId, circle.name, circle.slug).catch((err) => {
-        console.error("[notifyNewMoment] Erreur:", err);
-        Sentry.captureException(err);
-      });
-
-      const host = await prismaUserRepository.findById(userId);
-      if (!host?.email) return;
-
-      // Le Host est le déclencheur : il garde la locale de la requête.
-      const t = await resolver.translationsFor(userId);
-      const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
-      const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-      const icsContent = generateIcs({
-        uid: moment.id,
-        title: moment.title,
-        description: moment.description,
-        startsAt: moment.startsAt,
-        endsAt: moment.endsAt,
-        location: ctx.locationText,
-        videoLink: moment.videoLink,
-        url: `${appUrl}/m/${moment.slug}`,
-        organizerName: circle.name,
-        method: "REQUEST",
-        attendeeEmail: host.email,
-      });
-
-      await emailService.sendHostMomentCreated({
-        to: host.email,
-        hostName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        circleSlug: circle.slug,
-        momentDate: ctx.momentDate,
-        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
-        momentDateDay: ctx.momentDateDay,
-        locationText: ctx.locationText,
-        circleName: circle.name,
-        icsContent,
-        strings: {
-          subject: t("hostMomentCreated.subject", { momentTitle: moment.title }),
-          heading: t("hostMomentCreated.heading"),
-          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: moment.title }),
-          dateLabel: t("common.dateLabel"),
-          locationLabel: t("common.locationLabel"),
-          manageMomentCta: t("hostMomentCreated.manageMomentCta"),
-          footer: t("common.footer"),
-        },
-      });
-    })
-    .catch((err) => {
+      // Chaque envoi capte sa propre erreur : un échec de l'un ne doit pas
+      // terminer le after() pendant que l'autre est encore en cours.
+      await Promise.all([
+        notifyNewMoment(moment, userId, circle.name, circle.slug, resolver).catch((err) => {
+          console.error("[notifyNewMoment] Erreur:", err);
+          Sentry.captureException(err);
+        }),
+        sendHostMomentCreatedEmail(moment, userId, circle, resolver).catch((err) => {
+          console.error(err);
+          Sentry.captureException(err);
+        }),
+      ]);
+    } catch (err) {
       console.error(err);
       Sentry.captureException(err);
-    });
+    }
+  });
+}
+
+/** Confirmation « événement publié » à l'Organisateur (déclencheur : langue de sa page). */
+async function sendHostMomentCreatedEmail(
+  moment: Moment,
+  userId: string,
+  circle: { name: string; slug: string },
+  resolver: EmailLocaleResolver,
+): Promise<void> {
+  const host = await prismaUserRepository.findById(userId);
+  if (!host?.email) return;
+
+  // Le Host est le déclencheur : il garde la locale de la requête.
+  const t = await resolver.translationsFor(userId);
+  const ctx = buildMomentEmailContext(moment, await resolver.resolveFor(userId));
+  const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+  const icsContent = generateIcs({
+    uid: moment.id,
+    title: moment.title,
+    description: moment.description,
+    startsAt: moment.startsAt,
+    endsAt: moment.endsAt,
+    location: ctx.locationText,
+    videoLink: moment.videoLink,
+    url: `${appUrl}/m/${moment.slug}`,
+    organizerName: circle.name,
+    method: "REQUEST",
+    attendeeEmail: host.email,
+  });
+
+  await emailService.sendHostMomentCreated({
+    to: host.email,
+    hostName,
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    circleSlug: circle.slug,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
+    circleName: circle.name,
+    icsContent,
+    strings: {
+      subject: t("hostMomentCreated.subject", { momentTitle: moment.title }),
+      heading: t("hostMomentCreated.heading"),
+      statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: moment.title }),
+      dateLabel: t("common.dateLabel"),
+      locationLabel: t("common.locationLabel"),
+      manageMomentCta: t("hostMomentCreated.manageMomentCta"),
+      footer: t("common.footer"),
+    },
+  });
 }
 
 async function sendAdminMomentUpdatedNotification(

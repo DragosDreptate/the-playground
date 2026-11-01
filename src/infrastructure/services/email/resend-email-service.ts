@@ -99,9 +99,7 @@ export function formatFromWithDisplayName(
   return `${quoted} <${address}>`;
 }
 
-// Contenu centralisé — re-exporté pour le script de backfill one-shot.
-export { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
-import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
+import { getOnboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 
 /** Comptes synthétiques (test, démo, E2E) : jamais de vrai envoi. */
 const isDemoEmail = isSyntheticEmail;
@@ -491,12 +489,17 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void> {
+      const content = getOnboardingWelcomeContent(data.locale);
       await send({
         from: getOnboardingSender(),
         to: data.to,
-        replyTo: onboardingWelcomeContent.replyTo,
-        subject: onboardingWelcomeContent.subject,
-        react: OnboardingWelcomeEmail({ firstName: data.firstName, baseUrl }),
+        replyTo: content.replyTo,
+        subject: content.subject,
+        react: OnboardingWelcomeEmail({
+          firstName: data.firstName,
+          baseUrl,
+          locale: data.locale,
+        }),
       });
     },
 

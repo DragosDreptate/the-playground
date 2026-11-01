@@ -27,10 +27,9 @@ import {
 import type { Comment } from "@/domain/models/comment";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
-import {
-  buildEmailLocaleResolver,
-  type EmailLocaleResolver,
-} from "@/lib/email/email-locale";
+import type { EmailLocaleResolver } from "@/lib/email/email-locale";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 
 const emailService = createResendEmailService();
 
@@ -321,26 +320,26 @@ async function sendCommentNotifications(
 
   if (recipientMap.size === 0) return;
 
-  // Batch fetch des préférences (évite le N+1)
+  // Batch fetch des préférences et des langues en parallèle (évite le N+1 ;
+  // le regroupement par langue réutilise ensuite les langues préchargées).
   const recipientIds = [...recipientMap.keys()];
-  const prefsMap =
-    await prismaUserRepository.findNotificationPreferencesByIds(recipientIds);
+  const [prefsMap] = await Promise.all([
+    prismaUserRepository.findNotificationPreferencesByIds(recipientIds),
+    resolver.preload(recipientIds),
+  ]);
 
   // Filtre opt-in AVANT le batch — n'envoie qu'aux destinataires qui ont
   // activé `notifyNewComment`.
-  const recipients = [...recipientMap.values()]
-    .filter((r) => prefsMap.get(r.userId)?.notifyNewComment)
-    .map((r) => ({ to: r.email, recipientName: r.name }));
+  const recipients = [...recipientMap.values()].filter(
+    (r) => prefsMap.get(r.userId)?.notifyNewComment
+  );
 
-  if (recipients.length > 0) {
-    // Le commenter (=trigger) est exclu du recipientMap (cf. delete ci-dessus),
-    // donc tous les destinataires sont ≠ trigger → buildEmailLocaleResolver
-    // retourne toujours DEFAULT_RECIPIENT_LOCALE pour eux. Les strings sont
-    // donc identiques pour tous → précalcul une seule fois.
-    const t = await resolver.defaultTranslations();
-
+  // Un lot par langue : chaque destinataire reçoit l'email dans la langue
+  // mémorisée sur son compte (le commenter, déclencheur, est exclu ci-dessus).
+  const groups = await resolver.groupByLocale(recipients, (r) => r.userId);
+  await sendEachLocaleGroup(groups, async ({ t, items }) => {
     await emailService.sendNewCommentBatch({
-      recipients,
+      recipients: items.map((r) => ({ to: r.email, recipientName: r.name })),
       playerName,
       momentTitle: moment.title,
       momentSlug: moment.slug,
@@ -361,7 +360,7 @@ async function sendCommentNotifications(
         footer: t("common.footer"),
       },
     });
-  }
+  }, "comment_notification");
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   await notifySlackNewComment({

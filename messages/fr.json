@@ -1204,7 +1204,11 @@
     "circleInvitation": {
       "subject": "{inviterName} vous invite à rejoindre {circleName}",
       "ctaLabel": "Rejoindre la communauté",
-      "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr"
+      "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr",
+      "invitesYouToJoin": "vous invite à rejoindre",
+      "seeMore": "Voir plus →",
+      "memberCountLabel": "{count, plural, one {membre} other {membres}}",
+      "momentCountLabel": "{count, plural, one {événement} other {événements}}"
     },
     "registrationRemovedByHost": {
       "subject": "Inscription invalidée : {momentTitle}",
@@ -1280,6 +1284,20 @@
       "expiryText": "Expire dans 15 minutes",
       "securityText": "Vous n'avez pas demandé ce lien ? Ignorez cet email, il deviendra inactif dans 15 minutes. Ne le transférez à personne : il permet la connexion à votre compte.",
       "footer": "The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
+    },
+    "newMomentNotification": {
+      "subject": "🎉 Nouvel événement — {circleName}",
+      "preheader": "Un nouvel événement vient d'être publié dans votre Communauté",
+      "heading": "Nouvel événement dans {circleName}",
+      "intro": "Un nouvel événement vient d'être publié dans votre Communauté :",
+      "ctaLabel": "S'inscrire",
+      "unsubscribeText": "Vous recevez cet email car vous êtes membre de {circleName} sur The Playground.",
+      "unsubscribeLabel": "Voir la Communauté"
+    },
+    "reminder": {
+      "subject": "Rappel : {momentTitle} — demain",
+      "heading": "C'est demain ! Voici un rappel pour votre événement.",
+      "footer": "Vous recevez ce rappel car vous êtes inscrit(e) à cet événement sur The Playground."
     },
     "common": {
       "dateLabel": "Date",

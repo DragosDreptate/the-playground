@@ -23,10 +23,8 @@ import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { getDisplayName } from "@/lib/display-name";
 import { formatPrice } from "@/lib/format-price";
 import { notifySlackNewRegistration } from "@/infrastructure/services/slack/slack-notification-service";
-import {
-  buildEmailLocaleResolver,
-  type EmailLocaleResolver,
-} from "@/lib/email/email-locale";
+import type { EmailLocaleResolver } from "@/lib/email/email-locale";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
@@ -267,17 +265,20 @@ async function sendCancellationEmails(
   // organisateur peut désormais annuler sa propre participation : le filtre garantit
   // qu'il n'est pas notifié de son propre départ (les autres organisateurs le sont).
   const notifiedHosts = hosts.filter((host) => host.userId !== cancellingUserId);
-  const prefsMap =
+  // Préférences et langues lues en parallèle.
+  const [prefsMap] = await Promise.all([
     isPaid || notifiedHosts.length === 0
       ? null
-      : await prismaUserRepository.findNotificationPreferencesByIds(
+      : prismaUserRepository.findNotificationPreferencesByIds(
           notifiedHosts.map((h) => h.userId)
-        );
+        ),
+    resolver.preload([cancellingUserId, ...notifiedHosts.map((h) => h.userId)]),
+  ]);
 
   // Toutes les lectures DB sont faites : les envois peuvent démarrer ensemble,
   // aucune promesse ne reste flottante pendant un await susceptible de rejeter.
   const playerT = await resolver.translationsFor(cancellingUserId);
-  const playerLocale = resolver.resolveFor(cancellingUserId);
+  const playerLocale = await resolver.resolveFor(cancellingUserId);
   const playerCtx = buildMomentEmailContext(moment, playerLocale);
   // Même pattern de préfixe que sendRegistrationEmails (waitlist vs registration).
   const playerPrefix = wasWaitlisted
@@ -305,7 +306,7 @@ async function sendCancellationEmails(
 
     const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
     const t = await resolver.translationsFor(host.userId);
-    const hostLocale = resolver.resolveFor(host.userId);
+    const hostLocale = await resolver.resolveFor(host.userId);
 
     return emailService.sendHostCancellation({
       to: host.user.email,
@@ -353,7 +354,7 @@ export async function sendRegistrationEmails(
 
   // Le Player peut être le déclencheur (self-join) ou non (Host qui approuve) — resolveFor() arbitre.
   const playerT = await resolver.translationsFor(userId);
-  const playerLocale = resolver.resolveFor(userId);
+  const playerLocale = await resolver.resolveFor(userId);
   const playerCtx = buildMomentEmailContext(moment, playerLocale);
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -415,10 +416,13 @@ export async function sendRegistrationEmails(
 
   const filteredHosts = hosts.filter((host) => host.userId !== userId);
   const hostUserIds = filteredHosts.map((h) => h.userId);
-  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+  const [prefsMap] = await Promise.all([
+    prismaUserRepository.findNotificationPreferencesByIds(hostUserIds),
+    resolver.preload(hostUserIds),
+  ]);
 
   // registrationInfo dans la locale par défaut, réutilisé pour Slack et pour les
-  // destinataires non-déclencheur (cas typique : tous les Hosts).
+  // Organisateurs qui reçoivent leurs emails dans cette langue.
   const formatRegistrationInfo = (t: typeof defaultT) =>
     moment.capacity
       ? t("hostNotification.registrationInfo", { count: registeredCount, capacity: moment.capacity })
@@ -479,7 +483,7 @@ async function sendPromotionEmail(
   if (!circle) return;
 
   const t = await resolver.translationsFor(promotedRegistration.userId);
-  const locale = resolver.resolveFor(promotedRegistration.userId);
+  const locale = await resolver.resolveFor(promotedRegistration.userId);
   const ctx = buildMomentEmailContext(moment, locale);
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
@@ -595,7 +599,7 @@ async function sendRemovedByHostEmail(
   if (!circle) return;
 
   const t = await resolver.translationsFor(userId);
-  const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
+  const ctx = buildMomentEmailContext(moment, await resolver.resolveFor(userId));
   const playerName = getDisplayName(user.firstName, user.lastName, user.email);
 
   await emailService.sendRegistrationRemovedByHost({
@@ -713,7 +717,10 @@ async function notifyHostsPendingApproval(
 
   const playerName = getDisplayName(user.firstName, user.lastName, user.email);
   const hostUserIds = hosts.map((h) => h.userId);
-  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+  const [prefsMap] = await Promise.all([
+    prismaUserRepository.findNotificationPreferencesByIds(hostUserIds),
+    resolver.preload(hostUserIds),
+  ]);
 
   await Promise.all(
     hosts.map(async (host) => {

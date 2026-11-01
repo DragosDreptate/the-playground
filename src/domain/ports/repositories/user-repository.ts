@@ -41,4 +41,13 @@ export interface UserRepository {
   ensurePublicId(userId: string, firstName: string | null, lastName: string | null): Promise<string>;
   /** Marque l'utilisateur comme ayant reçu l'email de bienvenue onboarding. */
   setWelcomeEmailSent(userId: string): Promise<void>;
+  /** Mémorise la langue d'interface choisie par l'utilisateur (utilisée pour ses emails). */
+  updatePreferredLocale(userId: string, locale: string): Promise<void>;
+  /** Mémorise la langue uniquement si aucune n'est encore connue (rattrapage des comptes existants). */
+  setPreferredLocaleIfMissing(userId: string, locale: string): Promise<void>;
+  /**
+   * Langues mémorisées de plusieurs utilisateurs en une seule requête (envois groupés).
+   * Les utilisateurs sans langue connue sont absents de la Map ou associés à null.
+   */
+  findPreferredLocalesByIds(userIds: string[]): Promise<Map<string, string | null>>;
 }

@@ -2,11 +2,25 @@ import { describe, it, expect } from "vitest";
 import {
   buildMomentIcs,
   buildReminderEmailData,
-  formatLocationText,
+  type ReminderStrings,
 } from "../build-reminder-email-data";
 import type { MomentForReminder } from "@/domain/ports/repositories/moment-repository";
 
 const APP_URL = "https://the-playground.fr";
+
+const FR_STRINGS: ReminderStrings = {
+  subject: "Rappel : Weekly Meetup — demain",
+  heading: "C'est demain ! Voici un rappel pour votre événement.",
+  dateLabel: "Date",
+  locationLabel: "Lieu",
+  viewMomentCta: "Voir l'événement",
+  footer: "Vous recevez ce rappel car vous êtes inscrit(e) à cet événement sur The Playground.",
+};
+
+const EN_STRINGS: ReminderStrings = {
+  ...FR_STRINGS,
+  subject: "Reminder: Weekly Meetup is tomorrow",
+};
 
 function makeMomentForReminder(
   overrides: Partial<MomentForReminder> = {}
@@ -21,6 +35,7 @@ function makeMomentForReminder(
     timezone: "Europe/Paris",
     locationType: "IN_PERSON",
     locationName: "Café Central",
+    locationAddress: null,
     videoLink: null,
     circle: { name: "Tech Paris", slug: "tech-paris" },
     registeredUsers: [],
@@ -28,45 +43,11 @@ function makeMomentForReminder(
   };
 }
 
-describe("formatLocationText", () => {
-  it("should return videoLink for ONLINE event with video link", () => {
-    const moment = makeMomentForReminder({
-      locationType: "ONLINE",
-      videoLink: "https://meet.google.com/abc",
-    });
-    expect(formatLocationText(moment)).toBe("https://meet.google.com/abc");
-  });
-
-  it("should return 'En ligne' for ONLINE event without video link", () => {
-    const moment = makeMomentForReminder({ locationType: "ONLINE", videoLink: null });
-    expect(formatLocationText(moment)).toBe("En ligne");
-  });
-
-  it("should return locationName for HYBRID event", () => {
-    const moment = makeMomentForReminder({ locationType: "HYBRID", locationName: "Station F" });
-    expect(formatLocationText(moment)).toBe("Station F");
-  });
-
-  it("should return 'Hybride' for HYBRID event without locationName", () => {
-    const moment = makeMomentForReminder({ locationType: "HYBRID", locationName: null });
-    expect(formatLocationText(moment)).toBe("Hybride");
-  });
-
-  it("should return locationName for IN_PERSON event", () => {
-    const moment = makeMomentForReminder({ locationType: "IN_PERSON", locationName: "Café Central" });
-    expect(formatLocationText(moment)).toBe("Café Central");
-  });
-
-  it("should return 'Lieu à confirmer' for IN_PERSON event without locationName", () => {
-    const moment = makeMomentForReminder({ locationType: "IN_PERSON", locationName: null });
-    expect(formatLocationText(moment)).toBe("Lieu à confirmer");
-  });
-});
+const user = { email: "alice@example.com", name: "Alice Dupont" };
 
 describe("buildMomentIcs", () => {
   it("should generate valid ICS content with moment description", () => {
-    const moment = makeMomentForReminder();
-    const ics = buildMomentIcs(moment, APP_URL);
+    const ics = buildMomentIcs(makeMomentForReminder(), APP_URL, "fr");
     expect(ics).toContain("BEGIN:VCALENDAR");
     expect(ics).toContain("Weekly Meetup");
     expect(ics).toContain("A weekly community meetup.");
@@ -74,87 +55,79 @@ describe("buildMomentIcs", () => {
   });
 
   it("should include moment URL", () => {
-    const moment = makeMomentForReminder();
-    const ics = buildMomentIcs(moment, APP_URL);
+    const ics = buildMomentIcs(makeMomentForReminder(), APP_URL, "fr");
     expect(ics).toContain(`${APP_URL}/m/weekly-meetup`);
+  });
+
+  it("should localize the calendar location", () => {
+    const moment = makeMomentForReminder({ locationType: "ONLINE", videoLink: null });
+    expect(buildMomentIcs(moment, APP_URL, "en")).toContain("LOCATION:Online");
+    expect(buildMomentIcs(moment, APP_URL, "fr")).toContain("LOCATION:En ligne");
   });
 });
 
 describe("buildReminderEmailData", () => {
   const moment = makeMomentForReminder();
-  const user = { email: "alice@example.com", name: "Alice Dupont" };
-  const icsContent = buildMomentIcs(moment, APP_URL);
+  const icsContent = buildMomentIcs(moment, APP_URL, "fr");
 
   it("should set recipient email and name", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
+    const data = buildReminderEmailData(moment, user, icsContent, "fr", FR_STRINGS);
     expect(data.to).toBe("alice@example.com");
     expect(data.playerName).toBe("Alice Dupont");
   });
 
   it("should fall back to email when user has no name", () => {
-    const data = buildReminderEmailData(moment, { email: "bob@example.com", name: null }, icsContent);
+    const data = buildReminderEmailData(
+      moment,
+      { email: "bob@example.com", name: null },
+      icsContent,
+      "fr",
+      FR_STRINGS
+    );
     expect(data.playerName).toBe("bob@example.com");
   });
 
-  it("should include moment title and slug", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
+  it("should include moment and circle identifiers, strings and ICS", () => {
+    const data = buildReminderEmailData(moment, user, icsContent, "fr", FR_STRINGS);
     expect(data.momentTitle).toBe("Weekly Meetup");
     expect(data.momentSlug).toBe("weekly-meetup");
-  });
-
-  it("should include circle name and slug", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
     expect(data.circleName).toBe("Tech Paris");
     expect(data.circleSlug).toBe("tech-paris");
-  });
-
-  it("should generate a subject containing the moment title", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
-    expect(data.strings.subject).toContain("Weekly Meetup");
-  });
-
-  it("should include the provided icsContent", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
+    expect(data.strings).toBe(FR_STRINGS);
     expect(data.icsContent).toBe(icsContent);
-    expect(data.icsContent).toContain("BEGIN:VCALENDAR");
   });
 
-  it("should include calendar badge fields (month and day)", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
-    expect(data.momentDateMonth).toBeTruthy();
-    expect(data.momentDateDay).toBeTruthy();
-  });
-
-  it("should render the reminder in the event timezone, with its mention", () => {
+  describe("given an event in Dublin, recipients in each language", () => {
     // 15:30 UTC = 16:30 à Dublin en août, 17:30 à Paris.
-    const moment = makeMomentForReminder({
+    const dublin = makeMomentForReminder({
       startsAt: new Date("2026-08-25T15:30:00.000Z"),
       timezone: "Europe/Dublin",
     });
 
-    const data = buildReminderEmailData(
-      moment,
-      { email: "player@example.com", name: "Player" },
-      "ICS"
-    );
-
-    expect(data.momentDate).toContain("16:30");
-    expect(data.momentDate).not.toContain("17:30");
-    expect(data.momentDate).toContain("heure de Dublin");
-  });
-
-  it("should format IN_PERSON location correctly", () => {
-    const data = buildReminderEmailData(moment, user, icsContent);
-    expect(data.locationText).toBe("Café Central");
-  });
-
-  it("should format ONLINE location with video link", () => {
-    const onlineMoment = makeMomentForReminder({
-      locationType: "ONLINE",
-      videoLink: "https://zoom.us/j/123",
+    it.each([
+      ["fr", "mardi 25 août 2026, 16:30 (heure de Dublin)", "AOÛT"],
+      ["en", "Tuesday 25 August 2026, 16:30 (Dublin time)", "AUG"],
+    ])("should render the date in the event timezone, in %s", (locale, date, month) => {
+      const data = buildReminderEmailData(dublin, user, "ICS", locale, EN_STRINGS);
+      expect(data.momentDate).toBe(date);
+      expect(data.momentDateMonth).toBe(month);
+      expect(data.momentDateDay).toBe("25");
     });
-    const ics = buildMomentIcs(onlineMoment, APP_URL);
-    const data = buildReminderEmailData(onlineMoment, user, ics);
-    expect(data.locationText).toBe("https://zoom.us/j/123");
+  });
+
+  // Même mise en forme du lieu que les autres emails (buildMomentEmailContext).
+  describe.each([
+    ["IN_PERSON with name and address", { locationName: "Café Central", locationAddress: "1 rue de Paris" }, "Café Central, 1 rue de Paris", "Café Central, 1 rue de Paris"],
+    ["IN_PERSON without place", { locationName: null }, "À définir", "TBD"],
+    ["ONLINE with video link", { locationType: "ONLINE" as const, videoLink: "https://zoom.us/j/123" }, "https://zoom.us/j/123", "https://zoom.us/j/123"],
+    ["ONLINE without video link", { locationType: "ONLINE" as const }, "En ligne", "Online"],
+    ["HYBRID with name and address", { locationType: "HYBRID" as const, locationName: "Station F", locationAddress: "5 parvis" }, "Station F, 5 parvis", "Station F, 5 parvis"],
+    ["HYBRID without place", { locationType: "HYBRID" as const, locationName: null }, "Hybride", "Hybrid"],
+  ])("given a location %s", (_label, overrides, fr, en) => {
+    it("should render it like the other emails, in each language", () => {
+      const m = makeMomentForReminder(overrides);
+      expect(buildReminderEmailData(m, user, "ICS", "fr", FR_STRINGS).locationText).toBe(fr);
+      expect(buildReminderEmailData(m, user, "ICS", "en", EN_STRINGS).locationText).toBe(en);
+    });
   });
 });
