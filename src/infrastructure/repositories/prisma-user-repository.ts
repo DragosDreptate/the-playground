@@ -272,4 +272,27 @@ export const prismaUserRepository: UserRepository = {
       data: { welcomeEmailSentAt: new Date() },
     });
   },
+
+  async updatePreferredLocale(userId: string, locale: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { preferredLocale: locale },
+    });
+  },
+
+  async setPreferredLocaleIfMissing(userId: string, locale: string): Promise<void> {
+    await prisma.user.updateMany({
+      where: { id: userId, preferredLocale: null },
+      data: { preferredLocale: locale },
+    });
+  },
+
+  async findPreferredLocalesByIds(userIds: string[]): Promise<Map<string, string | null>> {
+    if (userIds.length === 0) return new Map();
+    const records = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, preferredLocale: true },
+    });
+    return new Map(records.map((r) => [r.id, r.preferredLocale]));
+  },
 };

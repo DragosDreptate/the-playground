@@ -2,7 +2,7 @@
 
 import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { prisma } from "@/infrastructure/db/prisma";
@@ -45,11 +45,8 @@ import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import { isValidUrl } from "@/lib/url";
 import { invalidateDashboardCache, updateDashboardCache } from "@/lib/dashboard-cache";
-import {
-  buildEmailLocaleResolver,
-  DEFAULT_RECIPIENT_LOCALE,
-  type EmailLocaleResolver,
-} from "@/lib/email/email-locale";
+import type { EmailLocaleResolver } from "@/lib/email/email-locale";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
 
 export async function createCircleAction(
   formData: FormData
@@ -407,10 +404,10 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const circleUrl = `${baseUrl}/circles/${circle.slug}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
-    // Invités = adresses email seules → impossible de les rattacher à un userId.
-    // Tous traités comme "tiers" → locale par défaut FR.
+    // Invités = adresses email seules, langue inconnue → l'invitation part dans
+    // la langue de l'Organisateur qui invite (locale de sa page).
     const t = await getTranslations({
-      locale: DEFAULT_RECIPIENT_LOCALE,
+      locale: await getLocale(),
       namespace: "Email.circleInvitation",
     });
 
@@ -434,6 +431,10 @@ export async function inviteToCircleByEmailAction(
             subject: t("subject", { inviterName, circleName: circle.name }),
             ctaLabel: t("ctaLabel"),
             footer: t("footer", { inviterName }),
+            invitesYouToJoin: t("invitesYouToJoin"),
+            seeMore: t("seeMore"),
+            memberCountLabel: t("memberCountLabel", { count: memberCount }),
+            momentCountLabel: t("momentCountLabel", { count: momentCount }),
           },
         });
       } catch (e) {
@@ -571,7 +572,10 @@ async function notifyHostCircleJoin(
     // Demande d'adhésion en attente → notifier les HOSTs
     const hosts = await prismaCircleRepository.findOrganizers(circleId);
     const hostUserIds = hosts.map((h) => h.userId);
-    const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+    const [prefsMap] = await Promise.all([
+      prismaUserRepository.findNotificationPreferencesByIds(hostUserIds),
+      resolver.preload(hostUserIds),
+    ]);
 
     await Promise.allSettled(
       hosts.map(async (host) => {
@@ -607,8 +611,7 @@ async function notifyHostCircleJoin(
       pendingApproval: false,
     });
 
-    // Les Hosts ne sont pas le déclencheur ici → tous reçoivent en locale par défaut.
-    const t = await resolver.defaultTranslations();
+    // Chaque Organisateur reçoit l'email dans la langue mémorisée sur son compte.
     await notifyHostNewCircleMember(
       circleId,
       circle.slug,
@@ -616,14 +619,7 @@ async function notifyHostCircleJoin(
       userId,
       playerName,
       memberCount,
-      (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
-      {
-        subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
-        heading: t("hostCircleMemberNotification.heading"),
-        message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
-        manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
-        footer: t("common.footer"),
-      }
+      resolver
     );
   }
 }

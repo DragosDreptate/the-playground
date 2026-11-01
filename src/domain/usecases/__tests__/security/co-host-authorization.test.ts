@@ -411,19 +411,24 @@ describe("CO_HOST security — message aux participants", () => {
         findById: vi.fn().mockResolvedValue(makeUser()),
       }),
       emailService: createMockEmailService(),
-      emailStrings: {
-        preheader: "p",
-        dateLabel: "Date",
-        locationLabel: "Lieu",
-        ctaLabel: "Voir",
-        footer: "f",
-      },
-      buildEmailContext: () => ({
-        momentDate: "d",
-        momentDateMonth: "M",
-        momentDateDay: "1",
-        momentLocation: null,
-      }),
+      localizeRecipients: async (userIds: string[]) => [
+        {
+          userIds,
+          emailStrings: {
+            preheader: "p",
+            dateLabel: "Date",
+            locationLabel: "Lieu",
+            ctaLabel: "Voir",
+            footer: "f",
+          },
+          buildEmailContext: () => ({
+            momentDate: "d",
+            momentDateMonth: "M",
+            momentDateDay: "1",
+            momentLocation: null,
+          }),
+        },
+      ],
       appUrl: "https://the-playground.fr",
     };
   }

@@ -32,6 +32,17 @@ export type ContactCircleHostsInput = {
   momentId?: string;
 };
 
+export type ContactHostsEmailStrings = {
+  subject: string;
+  heading: string;
+  intro: string;
+  messageLabel: string;
+  replyHint: string;
+  aboutEvent: string;
+  aboutCircle: string;
+  footer: string;
+};
+
 export type ContactCircleHostsDeps = {
   userRepository: UserRepository;
   circleRepository: CircleRepository;
@@ -39,20 +50,14 @@ export type ContactCircleHostsDeps = {
   emailService: EmailService;
   rateLimiter: RateLimiter;
   /**
-   * Strings i18n résolus côté app (le domaine reste pur).
+   * Regroupe les Organisateurs destinataires par langue d'email et fournit les
+   * strings i18n de chaque groupe, résolus côté app (le domaine reste pur).
    * `aboutEvent` et `aboutCircle` sont des templates avec placeholders
    * `{momentTitle}` et `{circleName}` interpolés ici.
    */
-  emailStrings: {
-    subject: string;
-    heading: string;
-    intro: string;
-    messageLabel: string;
-    replyHint: string;
-    aboutEvent: string;
-    aboutCircle: string;
-    footer: string;
-  };
+  localizeRecipients: (
+    recipientUserIds: string[]
+  ) => Promise<Array<{ userIds: string[]; emailStrings: ContactHostsEmailStrings }>>;
   /** URL de base utilisée par le template pour charger le logo. */
   appUrl: string;
   /** Horloge injectée (déterminisme/tests) pour le gate « compte trop récent ». */
@@ -73,7 +78,6 @@ export async function contactCircleHosts(
     momentRepository,
     emailService,
     rateLimiter,
-    emailStrings,
     appUrl,
   } = deps;
 
@@ -128,25 +132,33 @@ export async function contactCircleHosts(
   }
 
   const senderName = getDisplayName(sender.firstName, sender.lastName, sender.email);
-  const aboutLine = moment
-    ? emailStrings.aboutEvent
-        .replace("{momentTitle}", moment.title)
-        .replace("{circleName}", circle.name)
-    : emailStrings.aboutCircle.replace("{circleName}", circle.name);
+  const senderEmail = sender.email;
+  const localeGroups = await deps.localizeRecipients(activeHosts.map((m) => m.user.id));
 
-  // next-intl ne court-circuite pas les placeholders quand on appelle `t(key)` sans
-  // variables côté action — on les résout ici pour garder le template purement
-  // déclaratif (zéro logique de templating dans le rendu).
-  const resolvedStrings = {
-    ...emailStrings,
-    intro: emailStrings.intro.replace("{senderName}", senderName),
-    replyHint: emailStrings.replyHint
-      .replace("{senderName}", senderName)
-      .replace("{senderEmail}", sender.email),
-  };
+  // Chaque Organisateur reçoit l'email dans sa langue. next-intl ne court-circuite
+  // pas les placeholders quand on appelle `t(key)` sans variables côté action —
+  // on les résout ici pour garder le template purement déclaratif.
+  const deliveries = localeGroups.flatMap(({ userIds, emailStrings }) => {
+    const aboutLine = moment
+      ? emailStrings.aboutEvent
+          .replace("{momentTitle}", moment.title)
+          .replace("{circleName}", circle.name)
+      : emailStrings.aboutCircle.replace("{circleName}", circle.name);
+    const strings = {
+      ...emailStrings,
+      intro: emailStrings.intro.replace("{senderName}", senderName),
+      replyHint: emailStrings.replyHint
+        .replace("{senderName}", senderName)
+        .replace("{senderEmail}", senderEmail),
+    };
+    const ids = new Set(userIds);
+    return activeHosts
+      .filter((m) => ids.has(m.user.id))
+      .map((organizer) => ({ organizer, aboutLine, strings }));
+  });
 
   const results = await Promise.allSettled(
-    activeHosts.map((organizer) =>
+    deliveries.map(({ organizer, aboutLine, strings }) =>
       emailService.sendHostContactMessage({
         to: organizer.user.email,
         replyTo: sender.email!,
@@ -158,7 +170,7 @@ export async function contactCircleHosts(
         message: trimmed,
         aboutLine,
         appUrl,
-        strings: resolvedStrings,
+        strings,
       })
     )
   );

@@ -106,9 +106,11 @@ export type MomentForReminder = {
   timezone: string;
   locationType: LocationType;
   locationName: string | null;
+  locationAddress: string | null;
   videoLink: string | null;
   circle: { name: string; slug: string };
-  registeredUsers: Array<{ email: string; name: string | null }>;
+  /** `preferredLocale` : langue mémorisée sur le compte, choisit la langue du rappel. */
+  registeredUsers: Array<{ email: string; name: string | null; preferredLocale: string | null }>;
 };
 
 export interface MomentRepository {

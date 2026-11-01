@@ -3,6 +3,8 @@ import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { getDisplayName } from "@/lib/display-name";
 
 export type MomentUpdateRecipient = {
+  /** Sert à choisir la langue de l'email, pas transmis au service d'envoi. */
+  userId: string;
   to: string;
   playerName: string;
 };
@@ -24,6 +26,7 @@ export function partitionMomentUpdateRecipients(
   const participants = confirmedRegistrations
     .filter((r) => r.user?.email && !hostUserIds.has(r.userId))
     .map((r) => ({
+      userId: r.userId,
       to: r.user!.email!,
       playerName: getDisplayName(r.user!.firstName, r.user!.lastName, r.user!.email!),
     }));
@@ -31,6 +34,7 @@ export function partitionMomentUpdateRecipients(
   const hostRecipients = hosts
     .filter((h) => h.user?.email)
     .map((h) => ({
+      userId: h.userId,
       to: h.user!.email!,
       playerName: getDisplayName(h.user!.firstName, h.user!.lastName, h.user!.email!),
     }));

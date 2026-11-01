@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   sendMomentHostMessage,
+  type HostMessageEmailLocalization,
   type SendMomentHostMessageDeps,
   type SendMomentHostMessageInput,
 } from "@/domain/usecases/send-moment-host-message";
@@ -62,6 +63,38 @@ function makeInput(
   };
 }
 
+const frLocalization: HostMessageEmailLocalization = {
+  emailStrings: {
+    preheader: "Message",
+    dateLabel: "Date",
+    locationLabel: "Lieu",
+    ctaLabel: "Voir l'événement",
+    footer: "Vous recevez cet email car vous êtes inscrit.",
+  },
+  buildEmailContext: () => ({
+    momentDate: "vendredi 21 mars 2026, 19:00",
+    momentDateMonth: "MAR",
+    momentDateDay: "21",
+    momentLocation: "Cafe Central, Paris",
+  }),
+};
+
+const enLocalization: HostMessageEmailLocalization = {
+  emailStrings: {
+    preheader: "Message",
+    dateLabel: "Date",
+    locationLabel: "Location",
+    ctaLabel: "View Event",
+    footer: "You're receiving this email because you're registered.",
+  },
+  buildEmailContext: () => ({
+    momentDate: "Friday 21 March 2026, 19:00",
+    momentDateMonth: "MAR",
+    momentDateDay: "21",
+    momentLocation: "Cafe Central, Paris",
+  }),
+};
+
 function makeDeps(
   overrides: Partial<SendMomentHostMessageDeps> = {}
 ): SendMomentHostMessageDeps {
@@ -88,25 +121,91 @@ function makeDeps(
         .mockResolvedValue(makeUser({ id: HOST_ID, email: "host@example.com" })),
     }),
     emailService: createMockEmailService(),
-    emailStrings: {
-      preheader: "Message",
-      dateLabel: "Date",
-      locationLabel: "Lieu",
-      ctaLabel: "Voir l'événement",
-      footer: "Vous recevez cet email car vous êtes inscrit.",
-    },
-    buildEmailContext: () => ({
-      momentDate: "vendredi 21 mars 2026, 19:00",
-      momentDateMonth: "MAR",
-      momentDateDay: "21",
-      momentLocation: "Cafe Central, Paris",
-    }),
+    localizeRecipients: async (userIds) => [{ userIds, ...frLocalization }],
     appUrl: "https://the-playground.fr",
     ...overrides,
   };
 }
 
 describe("SendMomentHostMessage", () => {
+  describe("given recipients with different email languages", () => {
+    it("should send one batch per language, each with its own strings", async () => {
+      const deps = makeDeps({
+        localizeRecipients: async () => [
+          { userIds: ["user-2"], ...frLocalization },
+          { userIds: ["user-3"], ...enLocalization },
+        ],
+      });
+
+      const result = await sendMomentHostMessage(makeInput({ segment: "ALL" }), deps);
+
+      expect(result.recipientCount).toBe(2);
+      const calls = vi.mocked(deps.emailService.sendMomentHostMessages).mock.calls;
+      expect(calls).toHaveLength(2);
+      expect(calls[0][0].recipients.map((r) => r.to)).toEqual(["user-2@example.com"]);
+      expect(calls[0][0].strings.locationLabel).toBe("Lieu");
+      expect(calls[1][0].recipients.map((r) => r.to)).toEqual(["user-3@example.com"]);
+      expect(calls[1][0].strings.locationLabel).toBe("Location");
+      expect(calls[1][0].momentDate).toBe("Friday 21 March 2026, 19:00");
+    });
+
+    it("should still send the other batches when one fails, and count only delivered recipients", async () => {
+      const deps = makeDeps({
+        localizeRecipients: async () => [
+          { userIds: ["user-2"], ...frLocalization },
+          { userIds: ["user-3"], ...enLocalization },
+        ],
+      });
+      vi.mocked(deps.emailService.sendMomentHostMessages)
+        .mockRejectedValueOnce(new Error("Resend down"))
+        .mockResolvedValueOnce(undefined);
+
+      const result = await sendMomentHostMessage(makeInput({ segment: "ALL" }), deps);
+
+      expect(deps.emailService.sendMomentHostMessages).toHaveBeenCalledTimes(2);
+      expect(result.recipientCount).toBe(1);
+      expect(result.failures).toHaveLength(1);
+    });
+
+    it("should not double-send when preparing a later batch fails after an earlier one left", async () => {
+      const deps = makeDeps({
+        localizeRecipients: async () => [
+          { userIds: ["user-2"], ...frLocalization },
+          {
+            userIds: ["user-3"],
+            ...enLocalization,
+            buildEmailContext: () => {
+              throw new RangeError("Invalid time value");
+            },
+          },
+        ],
+      });
+
+      const result = await sendMomentHostMessage(makeInput({ segment: "ALL" }), deps);
+
+      expect(deps.emailService.sendMomentHostMessages).toHaveBeenCalledTimes(1);
+      expect(result.recipientCount).toBe(1);
+      expect(result.failures).toHaveLength(1);
+    });
+
+    it("should report zero recipients and every failure when all batches fail", async () => {
+      const deps = makeDeps({
+        localizeRecipients: async () => [
+          { userIds: ["user-2"], ...frLocalization },
+          { userIds: ["user-3"], ...enLocalization },
+        ],
+      });
+      vi.mocked(deps.emailService.sendMomentHostMessages)
+        .mockRejectedValueOnce(new Error("FR down"))
+        .mockRejectedValueOnce(new Error("EN down"));
+
+      const result = await sendMomentHostMessage(makeInput({ segment: "ALL" }), deps);
+
+      expect(result.recipientCount).toBe(0);
+      expect(result.failures.map((e) => (e as Error).message)).toEqual(["FR down", "EN down"]);
+    });
+  });
+
   describe("given a Host of the Circle", () => {
     it("should send the message to the REGISTERED segment and return the recipient count", async () => {
       const deps = makeDeps();
@@ -328,16 +427,18 @@ describe("SendMomentHostMessage", () => {
   });
 
   describe("given the email batch fails", () => {
-    it("should propagate the error instead of returning a false success", async () => {
+    it("should never report a false success: zero recipients and the failure returned", async () => {
       const deps = makeDeps({
         emailService: createMockEmailService({
           sendMomentHostMessages: vi.fn().mockRejectedValue(new Error("resend down")),
         }),
       });
 
-      await expect(sendMomentHostMessage(makeInput(), deps)).rejects.toThrow(
-        "resend down"
-      );
+      const result = await sendMomentHostMessage(makeInput(), deps);
+
+      // L'action transforme « rien n'est parti » en erreur (handleLocaleGroupFailures).
+      expect(result.recipientCount).toBe(0);
+      expect(result.failures).toHaveLength(1);
     });
   });
 });

@@ -1,9 +1,8 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import { getCachedSession } from "@/lib/auth-cache";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { DashboardContent } from "./_components/dashboard-content";
 import { DashboardCommunitiesSkeleton } from "./_components/dashboard-communities-skeleton";
 import { DashboardTimelineSkeleton } from "./_components/dashboard-timeline-skeleton";
@@ -31,7 +30,9 @@ export default async function DashboardPage({
 
   // Redirect vers welcome si le mode n'a jamais été choisi (= nouvel utilisateur)
   if (session.user.dashboardMode === null) {
-    redirect("/dashboard/welcome");
+    // Redirection dans la langue courante (sans préfixe, un visiteur de /en
+    // retombait sur la version FR, et sa langue d'email avec).
+    redirect({ href: "/dashboard/welcome", locale: await getLocale() });
   }
 
   const firstName = session.user.name?.split(" ")[0];

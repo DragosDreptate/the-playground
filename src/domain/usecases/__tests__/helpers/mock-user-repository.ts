@@ -31,6 +31,15 @@ export function createMockUserRepository(
     setWelcomeEmailSent: vi
       .fn<UserRepository["setWelcomeEmailSent"]>()
       .mockResolvedValue(undefined),
+    updatePreferredLocale: vi
+      .fn<UserRepository["updatePreferredLocale"]>()
+      .mockResolvedValue(undefined),
+    setPreferredLocaleIfMissing: vi
+      .fn<UserRepository["setPreferredLocaleIfMissing"]>()
+      .mockResolvedValue(undefined),
+    findPreferredLocalesByIds: vi
+      .fn<UserRepository["findPreferredLocalesByIds"]>()
+      .mockResolvedValue(new Map()),
     ...overrides,
   };
 }

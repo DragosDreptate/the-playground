@@ -2,7 +2,16 @@ import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaMomentRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
-import { buildMomentIcs, buildReminderEmailData } from "./build-reminder-email-data";
+import { getTranslations } from "next-intl/server";
+import { toRecipientLocale } from "@/lib/email/email-locale";
+import type { Locale } from "@/i18n/routing";
+import type { MomentForReminder } from "@/domain/ports/repositories/moment-repository";
+import type { RegistrationReminderEmailData } from "@/domain/ports/services/email-service";
+import {
+  buildMomentIcs,
+  buildReminderEmailData,
+  type ReminderStrings,
+} from "./build-reminder-email-data";
 
 /**
  * GET /api/cron/send-reminders
@@ -19,6 +28,44 @@ import { buildMomentIcs, buildReminderEmailData } from "./build-reminder-email-d
 
 const emailService = createResendEmailService();
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+async function buildReminderStrings(locale: Locale, momentTitle: string): Promise<ReminderStrings> {
+  const t = await getTranslations({ locale, namespace: "Email" });
+  return {
+    subject: t("reminder.subject", { momentTitle }),
+    heading: t("reminder.heading"),
+    dateLabel: t("common.dateLabel"),
+    locationLabel: t("common.locationLabel"),
+    viewMomentCta: t("common.viewMomentCta"),
+    footer: t("reminder.footer"),
+  };
+}
+
+/**
+ * Un email par inscrit, dans la langue mémorisée sur son compte. Textes et ICS
+ * calculés une fois par langue présente parmi les inscrits.
+ */
+async function buildMomentReminders(
+  moment: MomentForReminder
+): Promise<RegistrationReminderEmailData[]> {
+  const perLocale = new Map<Locale, { strings: ReminderStrings; icsContent: string }>();
+  const reminders: RegistrationReminderEmailData[] = [];
+  for (const user of moment.registeredUsers) {
+    const locale = toRecipientLocale(user.preferredLocale);
+    let localized = perLocale.get(locale);
+    if (!localized) {
+      localized = {
+        strings: await buildReminderStrings(locale, moment.title),
+        icsContent: buildMomentIcs(moment, APP_URL, locale),
+      };
+      perLocale.set(locale, localized);
+    }
+    reminders.push(
+      buildReminderEmailData(moment, user, localized.icsContent, locale, localized.strings)
+    );
+  }
+  return reminders;
+}
 
 async function handler(request: NextRequest) {
   // 1. Auth check
@@ -43,11 +90,7 @@ async function handler(request: NextRequest) {
 
     for (const moment of moments) {
       if (moment.registeredUsers.length > 0) {
-        // ICS généré une fois par événement (METHOD:PUBLISH, invariant pour tous les inscrits)
-        const icsContent = buildMomentIcs(moment, APP_URL);
-        const emailDataList = moment.registeredUsers.map((user) =>
-          buildReminderEmailData(moment, user, icsContent)
-        );
+        const emailDataList = await buildMomentReminders(moment);
         await emailService.sendRegistrationReminderBatch(emailDataList);
         totalSent += emailDataList.length;
       }

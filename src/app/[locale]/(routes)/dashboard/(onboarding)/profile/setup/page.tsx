@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
+import * as Sentry from "@sentry/nextjs";
 import { cookies } from "next/headers";
 import { getCachedSession } from "@/lib/auth-cache";
 import { getProfile } from "@/domain/usecases/get-profile";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { shouldRedirectFromSetup } from "@/lib/onboarding";
 import { safeCallbackUrl } from "@/lib/url";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { setPreferredLocale } from "@/domain/usecases/set-preferred-locale";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { completeOnboardingAction } from "@/app/actions/profile";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
@@ -37,6 +39,20 @@ export default async function ProfileSetupPage({
   const cookieCallbackUrl = cookieStore.get("auth-callback-url")?.value;
   const callbackUrl =
     safeCallbackUrl(queryCallbackUrl) ?? safeCallbackUrl(cookieCallbackUrl);
+
+  // Toute connexion (lien magique comme OAuth) passe par cette page, dont l'URL
+  // porte la langue de l'interface : elle devient celle des emails. Best-effort :
+  // un échec d'écriture ne doit jamais empêcher d'arriver dans son espace.
+  const locale = await getLocale();
+  if (session.user.preferredLocale !== locale) {
+    try {
+      await setPreferredLocale(session.user.id, locale, {
+        userRepository: prismaUserRepository,
+      });
+    } catch (error) {
+      Sentry.captureException(error, { tags: { context: "preferred_locale_sign_in" } });
+    }
+  }
 
   if (shouldRedirectFromSetup(session.user)) {
     redirect(callbackUrl ?? "/dashboard");

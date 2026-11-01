@@ -1,6 +1,5 @@
 "use server";
 
-import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
@@ -15,7 +14,6 @@ import {
   type HostMessageSegment,
 } from "@/domain/usecases/send-moment-host-message";
 import { isAdminInHostMode } from "@/lib/admin-host-mode";
-import { DEFAULT_RECIPIENT_LOCALE } from "@/lib/email/email-locale";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import {
   extractHostMessageTextLength,
@@ -25,6 +23,8 @@ import { getAppUrl } from "@/lib/app-url";
 import { captureServerEvent } from "@/lib/posthog-server";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { handleLocaleGroupFailures } from "./helpers/send-each-locale-group";
 
 const emailService = createResendEmailService();
 
@@ -55,10 +55,9 @@ export async function sendMomentHostMessageAction(input: {
 
   const skipAuthorization = await isAdminInHostMode(session);
 
-  // Destinataires ≠ déclencheur → strings dans la locale plateforme par défaut
-  // (le corps du message est de toute façon rédigé par l'Organisateur).
-  const locale = DEFAULT_RECIPIENT_LOCALE;
-  const t = await getTranslations({ locale, namespace: "Email.momentHostMessage" });
+  // Habillage de l'email (titres, boutons, dates) dans la langue de chaque
+  // destinataire ; le corps reste celui rédigé par l'Organisateur.
+  const resolver = await buildEmailLocaleResolver(senderId);
 
   return toActionResult(async () => {
     const result = await sendMomentHostMessage(
@@ -77,28 +76,42 @@ export async function sendMomentHostMessageAction(input: {
         registrationRepository: prismaRegistrationRepository,
         userRepository: prismaUserRepository,
         emailService,
-        // Templates bruts : {hostName} et {momentTitle} sont résolus par le
-        // usecase, qui détient le sender et le moment (pattern contact-circle-hosts).
-        emailStrings: {
-          preheader: t("preheader"),
-          dateLabel: t("dateLabel"),
-          locationLabel: t("locationLabel"),
-          ctaLabel: t("ctaLabel"),
-          footer: t("footer"),
-        },
-        buildEmailContext: (moment) => {
-          // videoLink omis : le lien visio n'apparaît pas dans l'email, la page
-          // événement le porte.
-          const ctx = buildMomentEmailContext({ ...moment, videoLink: null }, locale);
-          return {
-            momentDate: ctx.momentDate,
-            momentDateMonth: ctx.momentDateMonth.toUpperCase(),
-            momentDateDay: ctx.momentDateDay,
-            momentLocation: ctx.locationText,
-          };
+        localizeRecipients: async (recipientUserIds) => {
+          const groups = await resolver.groupByLocale(recipientUserIds, (id) => id);
+          return groups.map(({ locale, t, items }) => ({
+            userIds: items,
+            // Templates bruts : {hostName} et {momentTitle} sont résolus par le
+            // usecase, qui détient le sender et le moment (pattern contact-circle-hosts).
+            emailStrings: {
+              preheader: t("momentHostMessage.preheader"),
+              dateLabel: t("momentHostMessage.dateLabel"),
+              locationLabel: t("momentHostMessage.locationLabel"),
+              ctaLabel: t("momentHostMessage.ctaLabel"),
+              footer: t("momentHostMessage.footer"),
+            },
+            buildEmailContext: (moment) => {
+              // videoLink omis : le lien visio n'apparaît pas dans l'email, la page
+              // événement le porte.
+              const ctx = buildMomentEmailContext({ ...moment, videoLink: null }, locale);
+              return {
+                momentDate: ctx.momentDate,
+                momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+                momentDateDay: ctx.momentDateDay,
+                momentLocation: ctx.locationText,
+              };
+            },
+          }));
         },
         appUrl: getAppUrl(),
       }
+    );
+
+    // Lots de langue en échec : signalés à Sentry. Si rien n'est parti,
+    // l'Organisateur voit une erreur ; sinon il voit le nombre réellement atteint.
+    handleLocaleGroupFailures(
+      result.failures,
+      result.recipientCount === 0,
+      "moment_host_message"
     );
 
     void captureServerEvent(senderId, "moment_host_message_sent", {
@@ -111,6 +124,7 @@ export async function sendMomentHostMessageAction(input: {
       `/dashboard/circles/${input.circleSlug}/moments/${input.momentSlug}`
     );
 
-    return result;
+    // Uniquement le compteur : les erreurs internes ne partent jamais au navigateur.
+    return { recipientCount: result.recipientCount };
   });
 }

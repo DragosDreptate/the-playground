@@ -11,13 +11,15 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-import { onboardingWelcomeContent as content } from "@/content/emails/onboarding-welcome.content";
+import { getOnboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 import { CenteredLogo } from "./components/centered-logo";
 
 type Props = {
   firstName: string | null;
   /** Défaut prod pour le backfill one-shot ; la resend-email-service injecte `getBaseUrl()`. */
   baseUrl?: string;
+  /** Langue du destinataire ("fr" | "en"), repli sur le français. */
+  locale?: string;
 };
 
 /**
@@ -28,14 +30,16 @@ type Props = {
 export function OnboardingWelcomeEmail({
   firstName,
   baseUrl = "https://the-playground.fr",
+  locale = "fr",
 }: Props) {
+  const content = getOnboardingWelcomeContent(locale);
   const logoUrl = `${baseUrl}/brand/logo-light.png`;
   const greeting = firstName
     ? content.greeting.replace("{firstName}", firstName)
     : content.greetingFallback;
 
   return (
-    <Html lang="fr">
+    <Html lang={locale === "en" ? "en" : "fr"}>
       <Head>
         <meta name="color-scheme" content="light" />
         <meta name="supported-color-schemes" content="light" />

@@ -10,6 +10,8 @@ declare module "next-auth" {
       onboardingCompleted: boolean;
       role: "USER" | "ADMIN";
       dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+      /** Langue mémorisée pour les emails (null tant qu'aucune n'est connue). */
+      preferredLocale: string | null;
       isNewUser?: boolean;
       /** Epoch millis (sérialisable, contrairement à un Date qui devient string en RSC). */
       createdAt: number;

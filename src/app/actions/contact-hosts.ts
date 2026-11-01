@@ -1,6 +1,5 @@
 "use server";
 
-import { getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
@@ -14,6 +13,7 @@ import { captureServerEvent } from "@/lib/posthog-server";
 import { getAppUrl } from "@/lib/app-url";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
+import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
 
 const emailService = createResendEmailService();
 
@@ -28,7 +28,8 @@ export async function contactCircleHostsAction(input: {
   }
   const senderId = session.user.id;
 
-  const t = await getTranslations("Email.hostContactMessage");
+  // Chaque Organisateur reçoit le message dans sa langue (pas celle du membre).
+  const resolver = await buildEmailLocaleResolver(senderId);
 
   return toActionResult(async () => {
     const result = await contactCircleHosts(
@@ -41,15 +42,21 @@ export async function contactCircleHostsAction(input: {
         rateLimiter: prismaRateLimiter,
         appUrl: getAppUrl(),
         now: new Date(),
-        emailStrings: {
-          subject: t("subject"),
-          heading: t("heading"),
-          intro: t("intro"),
-          messageLabel: t("messageLabel"),
-          replyHint: t("replyHint"),
-          aboutEvent: t("aboutEvent"),
-          aboutCircle: t("aboutCircle"),
-          footer: t("footer"),
+        localizeRecipients: async (recipientUserIds) => {
+          const groups = await resolver.groupByLocale(recipientUserIds, (id) => id);
+          return groups.map(({ t, items }) => ({
+            userIds: items,
+            emailStrings: {
+              subject: t("hostContactMessage.subject"),
+              heading: t("hostContactMessage.heading"),
+              intro: t("hostContactMessage.intro"),
+              messageLabel: t("hostContactMessage.messageLabel"),
+              replyHint: t("hostContactMessage.replyHint"),
+              aboutEvent: t("hostContactMessage.aboutEvent"),
+              aboutCircle: t("hostContactMessage.aboutCircle"),
+              footer: t("hostContactMessage.footer"),
+            },
+          }));
         },
       }
     );

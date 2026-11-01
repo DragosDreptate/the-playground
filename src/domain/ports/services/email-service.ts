@@ -274,6 +274,11 @@ export type CircleInvitationEmailData = {
     subject: string;
     ctaLabel: string;
     footer: string;
+    invitesYouToJoin: string;
+    seeMore: string;
+    /** Libellés déjà accordés au nombre (ex. « membres », « événement »). */
+    memberCountLabel: string;
+    momentCountLabel: string;
   };
 };
 
@@ -472,6 +477,8 @@ export type ApprovalNotificationEmailData = {
 export type OnboardingWelcomeEmailData = {
   to: string;
   firstName: string | null;
+  /** Langue du destinataire ("fr" | "en"). */
+  locale: string;
 };
 
 // --- Contact organizers (issue #425) ---

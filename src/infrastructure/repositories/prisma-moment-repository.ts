@@ -476,11 +476,12 @@ export const prismaMomentRepository: MomentRepository = {
         locationType: true,
         locationName: true,
         videoLink: true,
+        locationAddress: true,
         circle: { select: { name: true, slug: true } },
         registrations: {
           where: { status: "REGISTERED" },
           select: {
-            user: { select: { email: true, name: true } },
+            user: { select: { email: true, name: true, preferredLocale: true } },
           },
         },
       },
@@ -497,10 +498,12 @@ export const prismaMomentRepository: MomentRepository = {
       locationType: m.locationType,
       videoLink: m.videoLink,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       circle: { name: m.circle.name, slug: m.circle.slug },
       registeredUsers: m.registrations.map((r) => ({
         email: r.user.email!,
         name: r.user.name,
+        preferredLocale: r.user.preferredLocale,
       })),
     }));
   },

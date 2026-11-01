@@ -12,6 +12,7 @@ import {
 } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import { getDisplayName } from "@/lib/display-name";
+import { LOCALE_GROUP_PAUSE_MS, runEachGroup } from "@/lib/run-each-group";
 import {
   HostMessageBodyEmptyError,
   HostMessageBodyTooLongError,
@@ -40,13 +41,9 @@ export type SendMomentHostMessageInput = {
   skipAuthorization?: boolean;
 };
 
-export type SendMomentHostMessageDeps = {
-  momentRepository: MomentRepository;
-  circleRepository: CircleRepository;
-  registrationRepository: RegistrationRepository;
-  userRepository: UserRepository;
-  emailService: EmailService;
-  /** Strings i18n résolus côté app (le domaine reste pur). */
+/** Textes et formatage d'une langue d'email, résolus côté app (le domaine reste pur). */
+export type HostMessageEmailLocalization = {
+  /** Strings i18n de la langue du groupe. */
   emailStrings: {
     preheader: string;
     dateLabel: string;
@@ -64,11 +61,33 @@ export type SendMomentHostMessageDeps = {
     momentDateDay: string;
     momentLocation: string | null;
   };
+};
+
+export type SendMomentHostMessageDeps = {
+  momentRepository: MomentRepository;
+  circleRepository: CircleRepository;
+  registrationRepository: RegistrationRepository;
+  userRepository: UserRepository;
+  emailService: EmailService;
+  /**
+   * Regroupe les destinataires par langue d'email : chaque groupe reçoit les
+   * textes de sa langue. Un destinataire absent de tous les groupes ne reçoit rien.
+   */
+  localizeRecipients: (
+    recipientUserIds: string[]
+  ) => Promise<Array<{ userIds: string[] } & HostMessageEmailLocalization>>;
   appUrl: string;
 };
 
 export type SendMomentHostMessageResult = {
+  /** Destinataires réellement atteints (lots en échec exclus). */
   recipientCount: number;
+  /**
+   * Erreurs des lots de langue en échec. Le usecase ne lève pas sur un échec
+   * d'envoi : l'app applique la règle commune (signaler, échouer si rien n'est
+   * parti), le domaine ne logge pas.
+   */
+  failures: unknown[];
 };
 
 function matchesSegment(
@@ -142,43 +161,64 @@ export async function sendMomentHostMessage(
     throw new HostMessageNoRecipientsError(input.momentId, input.segment);
   }
 
+  const localeGroups = await deps.localizeRecipients(recipients.map((r) => r.userId));
+
   // Mark avant l'envoi — anti race condition (écrase le timestamp à chaque envoi)
   await momentRepository.markHostMessageSent(input.momentId);
 
-  const emailContext = deps.buildEmailContext(moment);
   const hostName = getDisplayName(sender.firstName, sender.lastName, sender.email);
-  const resolvedStrings = {
-    ...deps.emailStrings,
-    preheader: fillPlaceholders(deps.emailStrings.preheader, {
+  const replyTo = sender.email;
+
+  // Un lot par langue. Envoi attendu avant le retour (pattern contact-circle-hosts) :
+  // une promesse flottante serait larguée au gel de l'instance Vercel après la
+  // réponse, et le succès retourné à l'Organisateur ne serait pas garanti.
+  // Chaque lot part indépendamment : un échec n'empêche pas les suivants, et
+  // l'action n'échoue que si rien n'est parti (sinon l'Organisateur renverrait
+  // le message et les lots déjà partis le recevraient deux fois). Lots espacés
+  // de 500 ms pour éviter la rafale d'appels.
+  const lots = localeGroups
+    .map((group) => {
+      const groupUserIds = new Set(group.userIds);
+      return {
+        ...group,
+        recipients: recipients.filter((r) => groupUserIds.has(r.userId)),
+      };
+    })
+    .filter((lot) => lot.recipients.length > 0);
+
+  const { succeeded, errors } = await runEachGroup(lots, async (lot) => {
+    const emailContext = lot.buildEmailContext(moment);
+    await emailService.sendMomentHostMessages({
+      recipients: lot.recipients.map((r) => ({
+        to: r.user.email,
+        firstName: r.user.firstName,
+      })),
+      replyTo,
       hostName,
+      hostFirstName: sender.firstName,
+      hostAvatarUrl: sender.image ?? null,
+      subject,
+      bodyHtml: input.bodyHtml,
+      strings: {
+        ...lot.emailStrings,
+        preheader: fillPlaceholders(lot.emailStrings.preheader, {
+          hostName,
+          momentTitle: moment.title,
+        }),
+        footer: fillPlaceholders(lot.emailStrings.footer, { momentTitle: moment.title }),
+      },
       momentTitle: moment.title,
-    }),
-    footer: fillPlaceholders(deps.emailStrings.footer, { momentTitle: moment.title }),
+      momentDate: emailContext.momentDate,
+      momentDateMonth: emailContext.momentDateMonth,
+      momentDateDay: emailContext.momentDateDay,
+      momentLocation: emailContext.momentLocation,
+      momentSlug: moment.slug,
+      appUrl: deps.appUrl,
+    });
+  }, { pauseBetweenMs: LOCALE_GROUP_PAUSE_MS });
+
+  return {
+    recipientCount: succeeded.reduce((sum, lot) => sum + lot.recipients.length, 0),
+    failures: errors,
   };
-
-  // Envoi attendu avant le retour (pattern contact-circle-hosts) : une promesse
-  // flottante serait larguée au gel de l'instance Vercel après la réponse, et le
-  // succès retourné à l'Organisateur ne serait pas garanti.
-  await emailService.sendMomentHostMessages({
-    recipients: recipients.map((r) => ({
-      to: r.user.email,
-      firstName: r.user.firstName,
-    })),
-    replyTo: sender.email,
-    hostName,
-    hostFirstName: sender.firstName,
-    hostAvatarUrl: sender.image ?? null,
-    subject,
-    bodyHtml: input.bodyHtml,
-    strings: resolvedStrings,
-    momentTitle: moment.title,
-    momentDate: emailContext.momentDate,
-    momentDateMonth: emailContext.momentDateMonth,
-    momentDateDay: emailContext.momentDateDay,
-    momentLocation: emailContext.momentLocation,
-    momentSlug: moment.slug,
-    appUrl: deps.appUrl,
-  });
-
-  return { recipientCount: recipients.length };
 }

@@ -1,8 +1,10 @@
 /**
  * Contenu de l'email d'onboarding — Lettre du fondateur.
  *
- * Pour modifier le texte, éditer `onboarding-welcome.md` (ce dossier).
- * Ce fichier le parse et exporte un objet typé consommé par le template React Email.
+ * Pour modifier le texte, éditer `onboarding-welcome.md` (FR) ou
+ * `onboarding-welcome.en.md` (EN) dans ce dossier. Ce fichier les parse et
+ * exporte un objet typé par langue, consommé par le template React Email.
+ * La dernière section (`## Clôture` ou `## Closing`) porte la fin de la lettre.
  */
 
 import fs from "node:fs";
@@ -25,15 +27,14 @@ export type OnboardingWelcomeContent = {
   closingParagraphs: string[];
 };
 
-function parse(): OnboardingWelcomeContent {
-  const raw = fs.readFileSync(
-    path.join(process.cwd(), "src/content/emails/onboarding-welcome.md"),
-    "utf-8",
-  );
+const CLOSING_LABELS = ["clôture", "closing"];
+
+function parse(filePath: string): OnboardingWelcomeContent {
+  const raw = fs.readFileSync(filePath, "utf-8");
 
   // --- Frontmatter ---
   const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
-  if (!fmMatch) throw new Error("Frontmatter manquant dans onboarding-welcome.md");
+  if (!fmMatch) throw new Error(`Frontmatter manquant dans ${path.basename(filePath)}`);
 
   const meta: Record<string, string> = {};
   for (const line of fmMatch[1].split("\n")) {
@@ -64,7 +65,7 @@ function parse(): OnboardingWelcomeContent {
     const label = block.slice(0, newlineIdx).trim();
     const content = block.slice(newlineIdx).trim();
 
-    if (label.toLowerCase() === "clôture") {
+    if (CLOSING_LABELS.includes(label.toLowerCase())) {
       closingParagraphs = splitParagraphs(content);
       continue;
     }
@@ -123,4 +124,27 @@ function splitParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-export const onboardingWelcomeContent = parse();
+// Chemins littéraux (pas de template) : le traçage des fichiers du build Vercel
+// doit pouvoir les détecter pour les embarquer dans la fonction serverless.
+const CONTENT_PATHS = {
+  fr: path.join(process.cwd(), "src/content/emails/onboarding-welcome.md"),
+  en: path.join(process.cwd(), "src/content/emails/onboarding-welcome.en.md"),
+} as const;
+
+const cache = new Map<keyof typeof CONTENT_PATHS, OnboardingWelcomeContent>();
+
+/**
+ * Lettre dans la langue du destinataire (toute autre langue → français).
+ * Lue au premier envoi puis mise en cache : un fichier absent échoue
+ * bruyamment, mais seulement pour la lettre de bienvenue, jamais pour le reste
+ * du service d'email (qui importe ce module), et sans repli silencieux.
+ */
+export function getOnboardingWelcomeContent(locale: string): OnboardingWelcomeContent {
+  const key = locale === "en" ? "en" : "fr";
+  let content = cache.get(key);
+  if (!content) {
+    content = parse(CONTENT_PATHS[key]);
+    cache.set(key, content);
+  }
+  return content;
+}

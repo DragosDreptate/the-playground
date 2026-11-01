@@ -64,7 +64,7 @@ export function CircleInvitationEmail({
               <td style={inviterAvatar(grad)}>{initials}</td>
               <td style={inviterText}>
                 <span style={inviterName_}>{inviterName}</span>
-                {" vous invite à rejoindre"}
+                {` ${strings.invitesYouToJoin}`}
               </td>
             </tr></tbody>
           </table>
@@ -81,7 +81,7 @@ export function CircleInvitationEmail({
         ))}
         {truncated && (
           <Link href={circleUrl} style={descLink}>
-            Voir plus →
+            {strings.seeMore}
           </Link>
         )}
       </Section>
@@ -93,14 +93,14 @@ export function CircleInvitationEmail({
             <tbody><tr>
               <td style={statEmoji}>👥</td>
               <td style={statCell}>
-                <strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
+                <strong>{memberCount}</strong>&nbsp;{strings.memberCountLabel}
               </td>
               {(momentCount ?? 0) > 0 && (
                 <>
                   <td style={statDivider}>|</td>
                   <td style={statEmoji}>📅</td>
                   <td style={statCell}>
-                    <strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
+                    <strong>{momentCount}</strong>&nbsp;{strings.momentCountLabel}
                   </td>
                 </>
               )}
