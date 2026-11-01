@@ -1869,7 +1869,8 @@
         "item2": "New comment on an event",
         "item3": "New event published in a community you belong to",
         "item4": "Some emails are sent automatically and cannot be disabled: registration confirmation, cancellation confirmation, event reminders, event update or cancellation notifications.",
-        "item5": "From comment notification emails, a \"Manage my preferences\" link takes you directly to the settings page, without going through Dashboard."
+        "item5": "From comment notification emails, a \"Manage my preferences\" link takes you directly to the settings page, without going through Dashboard.",
+        "item6": "Your emails arrive in the language you chose on the site (FR or EN). If you switch language, your next emails follow. Invitations sent by an Organizer go out in the Organizer's language."
       },
       "leave": {
         "title": "Leave a community",
