@@ -50,7 +50,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - **Profil public** avec bio, ville, liens sociaux
 - Ajout à son calendrier en un clic (Google Calendar, Apple Calendar, .ics)
 - **Fuseaux horaires** : horaires affichés dans le fuseau de l'appareil, emails à l'heure du lieu de l'événement
-- Notifications email (confirmation, rappel 24h avant, changements, annulations)
+- Notifications email (confirmation, rappel 24h avant, changements, annulations), **dans la langue choisie** sur le site (FR ou EN)
 - Page communauté : prochains événements, membres, historique
 - Fil de commentaires (avec photos) sur chaque événement
 
@@ -87,21 +87,21 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 
 ## En chiffres
 
-Relevés sur `main` le 9 octobre 2026 (v2.18.2), premier commit le 19 février 2026.
+Relevés sur `main` le 1er novembre 2026 (v2.19.0), premier commit le 19 février 2026.
 
 | | |
 | --- | --- |
-| **61 500** | lignes de TypeScript en production (593 fichiers) |
-| **29 100** | lignes de tests |
-| **1 703** | tests unitaires (Vitest) |
+| **62 400** | lignes de TypeScript en production (597 fichiers) |
+| **29 600** | lignes de tests |
+| **1 760** | tests unitaires (Vitest) |
 | **211** | tests E2E (Playwright, en CI) + 35 scénarios mobiles sur 3 appareils |
-| **89** | cas d'usage métier (domain usecases) |
+| **90** | cas d'usage métier (domain usecases) |
 | **15** | ports, 10 repositories Prisma, 16 modèles en base |
-| **50** | pages, 22 routes API |
-| **1 672** | textes traduits, en FR et en EN |
-| **2 095** | commits (hors merges), dont 84 % co-écrits avec Claude |
-| **552** | pull requests mergées |
-| **42** | versions publiées |
+| **50** | pages, 23 routes API |
+| **1 688** | textes traduits, en FR et en EN |
+| **2 111** | commits (hors merges), dont 84 % co-écrits avec Claude |
+| **555** | pull requests mergées |
+| **43** | versions publiées |
 
 → [Fiche technique illustrée](https://claude.ai/artifact/2FUB7fkvT9aRGqFGAesxai)
 

@@ -1869,7 +1869,8 @@
         "item2": "Nouveau commentaire sur un événement",
         "item3": "Nouvel événement publié dans une communauté dont vous êtes membre",
         "item4": "D'autres emails sont envoyés automatiquement et ne peuvent pas être désactivés : confirmation d'inscription, confirmation de désinscription, rappels avant l'événement, notifications de modification ou d'annulation.",
-        "item5": "Depuis les emails de notification de commentaire, un lien « Gérer mes préférences » vous amène directement à la page de réglages, sans passer par Mon espace."
+        "item5": "Depuis les emails de notification de commentaire, un lien « Gérer mes préférences » vous amène directement à la page de réglages, sans passer par Mon espace.",
+        "item6": "Vos emails arrivent dans la langue que vous avez choisie sur le site (FR ou EN). Si vous changez de langue, les prochains emails suivent. Les invitations envoyées par un Organisateur partent dans sa langue."
       },
       "leave": {
         "title": "Quitter une communauté",
