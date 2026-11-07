@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import Stripe from "stripe";
 import type {
   PaymentService,
@@ -29,11 +30,11 @@ export function toConnectAccountStatus(account: Stripe.Account): ConnectAccountS
   if (account.details_submitted && account.charges_enabled) {
     return "active";
   }
-  if (account.requirements?.disabled_reason === "requirements.pending_verification") {
-    return "verifying";
-  }
   if (!account.details_submitted) {
     return "pending";
+  }
+  if (account.requirements?.disabled_reason === "requirements.pending_verification") {
+    return "verifying";
   }
   if (account.requirements?.disabled_reason) {
     return "disabled";
@@ -41,7 +42,8 @@ export function toConnectAccountStatus(account: Stripe.Account): ConnectAccountS
   if (account.requirements?.currently_due?.length) {
     return "restricted";
   }
-  return "pending";
+  // Dossier envoyé, rien de manquant, encaissement pas encore ouvert.
+  return "verifying";
 }
 
 /**
@@ -267,6 +269,17 @@ export function createStripePaymentService(): PaymentService {
         return { status: toRefundStatus(refund.status) };
       } catch (error) {
         const status = refundStatusFromError(error);
+        if (status === "failed") {
+          // Seule trace du motif : le domaine ne connaît que le statut.
+          Sentry.captureException(error, {
+            tags: { stripeCode: (error as Stripe.errors.StripeError).code ?? "unknown" },
+            extra: {
+              accountId,
+              paymentIntentId,
+              requestId: (error as Stripe.errors.StripeError).requestId,
+            },
+          });
+        }
         if (status) return { status };
         throw error;
       }

@@ -558,8 +558,13 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     const record = await prisma.registration.findFirst({
       where: {
         paymentStatus: "PAID",
-        status: { in: ["REGISTERED", "CHECKED_IN"] },
         moment: { circleId, status: { not: "PAST" } },
+        OR: [
+          { status: { in: ["REGISTERED", "CHECKED_IN"] } },
+          // Désinscrit dont le remboursement a échoué. Sur un événement non remboursable,
+          // une inscription annulée et payée est normale.
+          { status: "CANCELLED", moment: { refundable: true } },
+        ],
       },
       select: { id: true },
     });

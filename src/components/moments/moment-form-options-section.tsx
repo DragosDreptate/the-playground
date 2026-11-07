@@ -62,6 +62,8 @@ export function MomentFormOptionsSection({
   const priceCents = Math.round((parseFloat(priceValue) || 0) * 100);
   const hasPaidPrice = priceCents > 0;
 
+  const showRefundableToggle = stripeConnectActive && hasPaidPrice && !priceOpen;
+
   return (
     <div className="space-y-1">
       <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wider">
@@ -286,8 +288,14 @@ export function MomentFormOptionsSection({
           </div>
         )}
 
+        {/* Un interrupteur absent ou désactivé n'est pas envoyé : sans ce champ, la
+            politique de remboursement passerait à « non » sans que l'Organisateur le voie. */}
+        {(!showRefundableToggle || priceLocked) && defaultRefundable && (
+          <input type="hidden" name="refundable" value="on" />
+        )}
+
         {/* Refundable toggle — visible only when price > 0, confirmed (not editing), and Stripe active */}
-        {stripeConnectActive && hasPaidPrice && !priceOpen && (
+        {showRefundableToggle && (
           <div className="flex items-center gap-3 py-1">
             <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
               <RefreshCw className="text-primary size-4" />
@@ -300,11 +308,6 @@ export function MomentFormOptionsSection({
                 {t("form.refundableDescription")}
               </p>
             </div>
-            {/* Prix verrouillé : la politique aussi. Un champ désactivé n'étant pas
-                envoyé, la valeur passe par un champ caché. */}
-            {priceLocked && defaultRefundable && (
-              <input type="hidden" name="refundable" value="on" />
-            )}
             <Switch
               id="refundable"
               name={priceLocked ? undefined : "refundable"}

@@ -372,8 +372,7 @@ describe("CO_HOST security — transition de rôle", () => {
         {
           momentRepository: momentRepo,
           circleRepository: circleRepo,
-          registrationRepository: createMockRegistrationRepository(),
-        }
+          registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       )
     ).rejects.toThrow(UnauthorizedMomentActionError);
   });

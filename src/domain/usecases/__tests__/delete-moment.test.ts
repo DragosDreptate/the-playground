@@ -37,8 +37,7 @@ describe("DeleteMoment", () => {
 
       await deleteMoment(defaultInput, {
         momentRepository: momentRepo,
-        circleRepository: circleRepo,
-      });
+        circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() });
 
       expect(momentRepo.delete).toHaveBeenCalledWith("moment-1");
     });
@@ -54,8 +53,7 @@ describe("DeleteMoment", () => {
 
       await deleteMoment(defaultInput, {
         momentRepository: momentRepo,
-        circleRepository: circleRepo,
-      });
+        circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() });
 
       expect(circleRepo.findMembership).toHaveBeenCalledWith(
         "circle-1",
@@ -72,8 +70,7 @@ describe("DeleteMoment", () => {
       await expect(
         deleteMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(MomentNotFoundError);
     });
   });
@@ -91,8 +88,7 @@ describe("DeleteMoment", () => {
       await expect(
         deleteMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(UnauthorizedMomentActionError);
     });
   });
@@ -112,8 +108,7 @@ describe("DeleteMoment", () => {
       await expect(
         deleteMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(UnauthorizedMomentActionError);
     });
   });

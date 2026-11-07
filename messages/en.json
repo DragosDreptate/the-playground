@@ -318,7 +318,7 @@
       "title": "Delete community",
       "description": "Are you sure you want to delete this community? This action cannot be undone. All Events and memberships will be permanently removed.",
       "confirm": "Yes, delete this community",
-      "blockedByPayments": "This Community can't be deleted: members have paid and have not been refunded. Cancel the events concerned first."
+      "blockedByPayments": "This Community can't be deleted: members have paid and have not been refunded. Refund them from \"View my payments\", or wait for their refunds to complete."
     },
     "detail": {
       "members": "Members",
@@ -566,7 +566,7 @@
       "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",
       "confirm": "Yes, delete this Event",
       "error": "The deletion could not be completed. Refresh the page and try again.",
-      "refundFailed": "Stripe refused at least one refund: the event was not deleted. The Community owner received the details by email."
+      "refundFailed": "At least one refund did not go through: the event was not deleted. Other members may have been refunded. The Community owner received by email the list of those still to refund."
     },
     "cancel": {
       "title": "Cancel this event",
@@ -780,7 +780,7 @@
       "PAID_MOMENT_REQUIRES_STRIPE": "Enable payments on your community to set a price.",
       "PRICE_LOCKED": "Price can no longer be changed as members have already paid.",
       "REFUNDABLE_LOCKED": "This event must stay refundable as members have already paid.",
-      "MOMENT_REFUNDS_FAILED": "Stripe refused at least one refund: the event was not changed. The Community owner received the details by email.",
+      "MOMENT_REFUNDS_FAILED": "At least one refund did not go through: the event was not changed. Other members may have been refunded. The Community owner received by email the list of those still to refund.",
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Cannot make this event paid: members are already registered.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Paid events cannot require registration approval.",
       "MOMENT_SLUG_EXISTS": "An event with a similar title already exists.",

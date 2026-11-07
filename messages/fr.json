@@ -318,7 +318,7 @@
       "title": "Supprimer la communauté",
       "description": "Êtes-vous sûr de vouloir supprimer cette communauté ? Cette action est irréversible. Tous les événements et adhésions seront définitivement supprimés.",
       "confirm": "Oui, supprimer cette communauté",
-      "blockedByPayments": "Impossible de supprimer cette Communauté : des participants ont payé et n'ont pas été remboursés. Annulez d'abord les événements concernés."
+      "blockedByPayments": "Impossible de supprimer cette Communauté : des participants ont payé et n'ont pas été remboursés. Remboursez-les depuis « Voir mes paiements », ou attendez la fin de leurs remboursements."
     },
     "detail": {
       "members": "Membres",
@@ -566,7 +566,7 @@
       "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
       "confirm": "Oui, supprimer cet événement",
       "error": "La suppression n'a pas pu aboutir. Recharge la page et réessaie.",
-      "refundFailed": "Stripe a refusé au moins un remboursement : l'événement n'a pas été supprimé. Le propriétaire de la Communauté a reçu le détail par email."
+      "refundFailed": "Au moins un remboursement n'a pas abouti : l'événement n'a pas été supprimé. D'autres participants ont pu être remboursés. Le propriétaire de la Communauté a reçu par email la liste de ceux qui restent à rembourser."
     },
     "cancel": {
       "title": "Annuler cet événement",
@@ -780,7 +780,7 @@
       "PAID_MOMENT_REQUIRES_STRIPE": "Activez les paiements sur votre communauté pour définir un prix.",
       "PRICE_LOCKED": "Le prix ne peut plus être modifié car des participants ont déjà payé.",
       "REFUNDABLE_LOCKED": "L'événement doit rester remboursable car des participants ont déjà payé.",
-      "MOMENT_REFUNDS_FAILED": "Stripe a refusé au moins un remboursement : l'événement n'a pas été modifié. Le propriétaire de la Communauté a reçu le détail par email.",
+      "MOMENT_REFUNDS_FAILED": "Au moins un remboursement n'a pas abouti : l'événement n'a pas été modifié. D'autres participants ont pu être remboursés. Le propriétaire de la Communauté a reçu par email la liste de ceux qui restent à rembourser.",
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des participants sont déjà inscrits.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Les événements payants ne peuvent pas avoir la validation des inscriptions.",
       "MOMENT_SLUG_EXISTS": "Un événement avec un titre similaire existe déjà.",

@@ -45,8 +45,8 @@ type UpdateMomentInput = {
 type UpdateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
-  registrationRepository?: RegistrationRepository;
-  paymentService?: PaymentService;
+  registrationRepository: RegistrationRepository;
+  paymentService: PaymentService;
 };
 
 type UpdateMomentResult = {
@@ -123,7 +123,8 @@ export async function updateMoment(
   // Price locking rules (only when price is being changed)
   // activeCount > 1 because the host is always auto-registered (count = 1 minimum).
   // Un Organisateur peut s'être désinscrit : un seul inscrit peut alors être un payant.
-  if (safeInput.price !== undefined && safeInput.price !== existing.price && deps.registrationRepository) {
+  let refundsBeforeUpdate = false;
+  if (safeInput.price !== undefined && safeInput.price !== existing.price) {
     const activeCount = await deps.registrationRepository.countActiveByMomentId(safeInput.momentId);
     const { paidCount } = await deps.registrationRepository.getPaymentSummary(safeInput.momentId);
     const hasRegistrations = activeCount > 1 || paidCount > 0;
@@ -146,23 +147,12 @@ export async function updateMoment(
       }
 
       // Payant → gratuit avec inscrits payants : autorisé, remboursement batch
-      if (wasPaid && becomingFree && deps.paymentService) {
-        const { failures } = await refundAllPaidRegistrations(existing, {
-          registrationRepository: deps.registrationRepository,
-          paymentService: deps.paymentService,
-        });
-        if (failures.length > 0) {
-          throw new MomentRefundsFailedError(
-            safeInput.momentId,
-            failures.map(({ registration }) => registration.userId)
-          );
-        }
-      }
+      refundsBeforeUpdate = wasPaid && becomingFree;
     }
   }
 
   // Le Participant a payé un événement annoncé remboursable : promesse non révocable.
-  if (safeInput.refundable === false && existing.refundable && deps.registrationRepository) {
+  if (safeInput.refundable === false && existing.refundable) {
     const { paidCount } = await deps.registrationRepository.getPaymentSummary(safeInput.momentId);
     if (paidCount > 0) {
       throw new RefundableLockedError();
@@ -179,6 +169,20 @@ export async function updateMoment(
 
   if (safeInput.startsAt !== undefined && safeInput.startsAt < new Date()) {
     throw new MomentPastDateError();
+  }
+
+  // En dernier : un remboursement ne se reprend pas, tous les contrôles doivent être passés.
+  if (refundsBeforeUpdate) {
+    const { failures } = await refundAllPaidRegistrations(existing, {
+      registrationRepository: deps.registrationRepository,
+      paymentService: deps.paymentService,
+    });
+    if (failures.length > 0) {
+      throw new MomentRefundsFailedError(
+        safeInput.momentId,
+        failures.map(({ registration }) => registration.userId)
+      );
+    }
   }
 
   const { momentId: _, userId: __, ...updates } = safeInput;

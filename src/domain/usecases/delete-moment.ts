@@ -18,8 +18,8 @@ type DeleteMomentInput = {
 type DeleteMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
-  registrationRepository?: RegistrationRepository;
-  paymentService?: PaymentService;
+  registrationRepository: RegistrationRepository;
+  paymentService: PaymentService;
 };
 
 export async function deleteMoment(
@@ -48,18 +48,16 @@ export async function deleteMoment(
   // pas ici, car le usecase pur n'a pas la notion de session/admin.
 
   // Remboursement des inscrits payants avant la suppression (cascade DB).
-  if (deps.registrationRepository && deps.paymentService) {
-    const { failures } = await refundAllPaidRegistrations(existing, {
-      registrationRepository: deps.registrationRepository,
-      paymentService: deps.paymentService,
-    });
-    // Une inscription supprimée ne se rembourse plus : on garde l'événement.
-    if (failures.length > 0) {
-      throw new MomentRefundsFailedError(
-        input.momentId,
-        failures.map(({ registration }) => registration.userId)
-      );
-    }
+  const { failures } = await refundAllPaidRegistrations(existing, {
+    registrationRepository: deps.registrationRepository,
+    paymentService: deps.paymentService,
+  });
+  // Une inscription supprimée ne se rembourse plus : on garde l'événement.
+  if (failures.length > 0) {
+    throw new MomentRefundsFailedError(
+      input.momentId,
+      failures.map(({ registration }) => registration.userId)
+    );
   }
 
   await momentRepository.delete(input.momentId);
