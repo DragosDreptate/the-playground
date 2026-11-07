@@ -78,7 +78,7 @@
     "comparisonCta": "Get started for free",
     "faqHeading": "Frequently asked questions",
     "faqQ1": "Is The Playground really free?",
-    "faqA1": "Yes, <b>100% free</b>. No subscription, no platform commission, no limit on the number of communities, events or members. If you host paid events, only standard Stripe fees apply (~2.9% + $0.30 per transaction) — The Playground takes no cut.",
+    "faqA1": "Yes, <b>100% free</b>. No subscription, no platform commission, no limit on the number of communities, events or members. For a paid event, you only pay Stripe fees (1.5% + €0.25 per ticket with a standard European card). We take no cut.",
     "faqQ2": "What's the difference with Meetup?",
     "faqA2": "<b>Meetup</b> has a solid community model (groups, members), but requires a <b>paid organizer subscription</b> and offers a dated experience. The Playground takes Meetup's community model — with a <b>modern UX</b> inspired by Luma, premium event pages, and most importantly <b>total free access</b> for organizers.",
     "faqQ3": "What's the difference with Luma?",
@@ -86,7 +86,7 @@
     "faqQ4": "How do I create a community?",
     "faqA4": "Create your community in <b>30 seconds</b>: a name, a description, a theme — that's it. Your community is immediately ready. You can then create events, invite members via link, and customize your community page. No approval, no waiting.",
     "faqQ5": "Can I host paid events?",
-    "faqA5": "Yes. Ticketing is built in via <b>Stripe Connect</b>. You receive payments directly to your Stripe account — The Playground <b>takes no commission</b>. Only standard Stripe processing fees apply.",
+    "faqA5": "Yes. You open your own Stripe account from your Community, and payments go straight to it. The Playground <b>takes no commission</b>: only Stripe fees apply.",
     "faqQ6": "Can I export my data?",
     "faqA6": "Yes. You can <b>export your members and registrations</b> as CSV anytime. No lock-in, no tricks. What you build on The Playground stays yours.",
     "faqQ7": "Is my data stored in Europe?",
@@ -317,7 +317,8 @@
     "delete": {
       "title": "Delete community",
       "description": "Are you sure you want to delete this community? This action cannot be undone. All Events and memberships will be permanently removed.",
-      "confirm": "Yes, delete this community"
+      "confirm": "Yes, delete this community",
+      "blockedByPayments": "This Community can't be deleted: members have paid and have not been refunded. Refund them from \"View my payments\", or wait for their refunds to complete."
     },
     "detail": {
       "members": "Members",
@@ -443,13 +444,15 @@
     },
     "stripeConnect": {
       "title": "Payments",
-      "description": "Enable payments to offer paid events. Stripe fees (~2.9% + $0.30) are deducted from your earnings. The Playground takes no commission.",
+      "description": "Enable payments to offer paid events. You open your own Stripe account and get paid directly. Stripe fees (from 1.5% + €0.25 per ticket) are deducted from your earnings. The Playground takes no commission.",
       "activate": "Enable payments",
       "resume": "Resume activation",
       "active": "Payments enabled",
-      "pending": "Activation in progress — complete your Stripe profile",
+      "pending": "Activation not finished: Stripe needs information from you.",
+      "verifying": "Stripe is reviewing your details. Nothing to do for now.",
       "viewDashboard": "View my payments",
-      "cancel": "Cancel activation"
+      "cancel": "Cancel activation",
+      "cancelBlocked": "Can't cancel: this Community has already received payments, or has a published paid event."
     }
   },
   "Moment": {
@@ -484,7 +487,7 @@
       "ticketPrice": "Ticket price",
       "priceSoon": "Coming soon",
       "priceRequiresStripe": "Enable payments in your community settings",
-      "priceEstimation": "You will receive ~{net} {currency} after Stripe fees (2.9% + 0.30 {currency})",
+      "priceEstimation": "You will receive about {net} with a standard European card (Stripe fees: 1.5% + €0.25). If you refund, these fees are not returned.",
       "attachments": {
         "label": "Documents (optional)",
         "count": "{count}/{max} files",
@@ -562,7 +565,8 @@
       "title": "Delete Event",
       "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",
       "confirm": "Yes, delete this Event",
-      "error": "The deletion could not be completed. Refresh the page and try again."
+      "error": "The deletion could not be completed. Refresh the page and try again.",
+      "refundFailed": "At least one refund did not go through: the event was not deleted. Other members may have been refunded. The Community owner received by email the list of those still to refund."
     },
     "cancel": {
       "title": "Cancel this event",
@@ -633,7 +637,7 @@
       "youAreWaitlistedWithPosition": "You're on the waitlist · #{position}",
       "cancelConfirmTitle": "Cancel registration",
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
-      "cancelRefundableInfo": "You will be refunded automatically within 5 to 10 business days.",
+      "cancelRefundableInfo": "You will be refunded automatically, usually within 5 to 10 business days.",
       "cancelNonRefundableWarning": "This event is non-refundable. You will not be refunded.",
       "confirmCancel": "Yes, cancel",
       "checkoutUnavailableTitle": "Payment is not available yet",
@@ -775,6 +779,8 @@
       "INVALID_PRICE": "Price must be 0 (free) or at least €0.50.",
       "PAID_MOMENT_REQUIRES_STRIPE": "Enable payments on your community to set a price.",
       "PRICE_LOCKED": "Price can no longer be changed as members have already paid.",
+      "REFUNDABLE_LOCKED": "This event must stay refundable as members have already paid.",
+      "MOMENT_REFUNDS_FAILED": "At least one refund did not go through: the event was not changed. Other members may have been refunded. The Community owner received by email the list of those still to refund.",
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Cannot make this event paid: members are already registered.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Paid events cannot require registration approval.",
       "MOMENT_SLUG_EXISTS": "An event with a similar title already exists.",
@@ -1242,6 +1248,14 @@
       "hostPendingMembershipMessage": "{playerName} wants to join your community \"{circleName}\". This request requires your approval.",
       "manageCta": "Manage requests"
     },
+    "hostRefundFailed": {
+      "subject": "Action needed: refund to complete for {momentTitle}",
+      "heading": "A refund did not go through",
+      "message": "{count, plural, one {Stripe could not process a refund} other {Stripe could not process # refunds}} for {momentTitle}.",
+      "participants": "Members affected: {names}.",
+      "action": "They are waiting for their money. From your Community settings, open \"View my payments\" to refund them in Stripe.",
+      "ctaLabel": "Open Community settings"
+    },
     "hostCancellation": {
       "subject": "{playerName} cancelled their registration for {momentTitle}",
       "heading": "A participant cancelled their registration",
@@ -1427,7 +1441,10 @@
         "payment": {
           "title": "Payment data (paid events only)",
           "stripe": "Payment details (card number, expiration date, CVV) are processed exclusively by Stripe and are never stored by The Playground",
-          "ref": "We only retain the Stripe transaction reference and receipt URL"
+          "ref": "We only retain the Stripe transaction reference, the organizer's Stripe account identifier and the receipt URL",
+          "role": "For a paid event, payment is made on the organizer's Stripe account, and the organizer is the seller. Stripe processes payment data, as controller or processor depending on the activity, as described in <link>its privacy policy</link>",
+          "roleUrl": "https://stripe.com/privacy",
+          "organizer": "If you enable payments, you provide Stripe directly with the information needed to open your account (identity, bank details, supporting documents). We do not store it: we only retain your Stripe account identifier. We send Stripe your Community's name and address to prefill your application"
         },
         "analytics": {
           "title": "Browsing and analytics data",
@@ -1537,8 +1554,8 @@
           "safeguards": "Resend DPA, EU standard contractual clauses"
         },
         "stripe": {
-          "purpose": "Payment processing (paid Events)",
-          "data": "Email address, user identifier",
+          "purpose": "Payment processing for paid Events, on the organizer's account",
+          "data": "Email address, user identifier, Community name and address",
           "hq": "United States",
           "hosting": "United States / European Union (global infrastructure)",
           "safeguards": "PCI-DSS certified, Stripe DPA, EU standard contractual clauses"
@@ -1630,11 +1647,11 @@
       },
       "pricing": {
         "title": "Pricing",
-        "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Events, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
+        "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Events, each Host gets paid on their own Stripe account and bears Stripe fees (1.5% + €0.25 per payment with a standard European card, more with a premium or non-European card). These fees are not returned when a payment is refunded."
       },
       "payments": {
         "title": "Payments and transactions",
-        "content": "The Playground acts as a technical intermediary via Stripe Connect. The platform facilitates the transaction between the Host and the Member but is not a party to the sale. Payment data is processed exclusively by Stripe and is never stored by The Playground. The refund policy is set by each Host when creating the event: either refundable (full refund on cancellation) or non-refundable. If an event is cancelled by the Host, a full refund is always issued regardless of the refund policy. In case of dispute, the Member should contact the Host. As a last resort, a chargeback can be filed with their bank."
+        "content": "The Playground acts as a technical intermediary. Each Host receives payments on their own Stripe account: the Host is the seller and handles refunds and disputes for their events. The Playground is not a party to the sale. Payment data is processed exclusively by Stripe and is never stored by The Playground. The refund policy is set by each Host when creating the event: either refundable (full refund on cancellation) or non-refundable. If an event is cancelled by the Host, a full refund is always issued regardless of the refund policy. In case of dispute, the Member should contact the Host. As a last resort, a chargeback can be filed with their bank."
       },
       "liability": {
         "title": "Limitation of liability",
@@ -1841,7 +1858,7 @@
         "refundLabel": "Refund policy:",
         "refund1": "Each event is either <strong>refundable</strong> (automatic refund on cancellation) or <strong>non-refundable</strong> (no refund if you cancel)",
         "refund2": "If the <strong>event is cancelled by the organizer</strong>, you are always refunded regardless of the policy",
-        "refund3": "Refunds are processed within <strong>5 to 10 business days</strong> to your card",
+        "refund3": "Refunds are usually processed within <strong>5 to 10 business days</strong> to your card",
         "callout": "The Playground takes no commission. Your payment data is handled by Stripe and is never stored by the platform."
       },
       "comments": {
@@ -1912,7 +1929,7 @@
         "field4Desc": "context, agenda, what attendees need to know",
         "advancedLabel": "Advanced options (accessible via \"More options\"):",
         "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist). To switch back to unlimited capacity, click the × next to the field.",
-        "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
+        "adv2": "<strong>Price</strong>: if the event is paid, payment goes straight to your Stripe account. The Playground takes no commission.",
         "adv3": "<strong>Cover image</strong>",
         "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members. On desktop, you can also click <strong>Publish</strong> directly in the creation form to create and publish in a single step."
       },
@@ -1994,7 +2011,7 @@
         "right4": "Receive the same notifications you do (new registrations, comments, etc.)",
         "limitsIntro": "Only the owner can:",
         "limit1": "Delete the community",
-        "limit2": "Manage the Stripe Connect account (for paid events)",
+        "limit2": "Manage the Stripe account (for paid events)",
         "limit3": "Promote, demote, or remove another co-organizer",
         "howTo": "To promote a member: on the <strong>Members</strong> page of your community, open the <strong>⋮</strong> menu next to their name and click <strong>Promote to co-organizer</strong>. They'll receive an email confirming their new rights, and can immediately start helping you manage the community.",
         "demote": "To revoke a co-organizer's rights, open the same menu and click Demote to member. The person remains a member of the community but loses their management rights, and receives a plain email informing them of the change."
@@ -2010,27 +2027,27 @@
       },
       "payments": {
         "title": "Enable payments",
-        "intro": "You can offer paid events by enabling payments on your community via <strong>Stripe Connect</strong>.",
+        "intro": "You can offer paid events by opening your own Stripe account from your community.",
         "stepsLabel": "To enable payments:",
         "step1": "Go to <strong>Edit</strong> your community",
         "step2": "In the <strong>Payments</strong> section, click <strong>Enable payments</strong>",
         "step3": "You'll be redirected to Stripe to complete your profile (name, address, bank details, ID)",
-        "step4": "Back on The Playground, the status changes to <strong>Payments enabled</strong>",
+        "step4": "Once Stripe has verified your details, the status changes to <strong>Payments enabled</strong>.",
         "priceLabel": "To set a price on an event:",
         "price1": "In the creation/edit form, the <strong>Ticket price</strong> section is now editable",
         "price2": "Enter the price in euros — an estimated net amount (after Stripe fees) is displayed",
         "price3": "Toggle <strong>Refundable</strong> on or off to set the refund policy",
         "billingLabel": "Payment tracking:",
         "billing1": "Each paid event's dashboard shows a <strong>Ticketing</strong> summary (paid registrations, amount collected, refunded)",
-        "billing2": "For full details, click <strong>View my payments</strong> in the community settings — this opens the Stripe Express dashboard",
-        "callout": "The Playground takes <strong>no commission</strong>. Only Stripe fees (~2.9% + $0.30) are deducted from your earnings. The full remaining amount is transferred to you."
+        "billing2": "For full details, click <strong>View my payments</strong> in the community settings. You will find your payments, refunds, disputes and payouts there.",
+        "callout": "The Playground takes <strong>no commission</strong>. Stripe deducts its fees from each ticket (1.5% + €0.25 with a standard European card, more with a premium or non-European card). They are not returned when a payment is refunded. You receive the rest."
       }
     },
     "faq": {
       "sectionTitle": "Frequently asked questions",
       "q1": {
         "question": "Is The Playground free?",
-        "answer": "Yes, completely free for organizers and Members. The Playground takes no commission. The only applicable fees are Stripe fees (~2.9% + $0.30) on paid events, charged directly by Stripe."
+        "answer": "Yes, completely free for organizers and Members. The Playground takes no commission. The only fees are Stripe's on paid events (1.5% + €0.25 with a standard European card), charged directly by Stripe."
       },
       "q2": {
         "question": "What's the difference between a public and private community?",
@@ -2058,7 +2075,7 @@
       },
       "q8": {
         "question": "How do paid events work?",
-        "answer": "The organizer enables payments via Stripe Connect in their community settings, then sets a price on their events. The Member pays the displayed price through a secure Stripe page. The Playground takes no commission — only Stripe fees (~2.9% + $0.30) are charged and borne by the organizer. The refund policy (refundable or non-refundable) is set by the organizer. If the event is cancelled, refunds are always automatic."
+        "answer": "The organizer opens their Stripe account from their community settings, then sets a price on their events. The Member pays the displayed price on a secure Stripe page. The Playground takes no commission. Stripe fees (1.5% + €0.25 with a standard European card) are borne by the organizer. The refund policy (refundable or non-refundable) is set by the organizer. If the event is cancelled, refunds are always automatic."
       }
     },
     "contact": {

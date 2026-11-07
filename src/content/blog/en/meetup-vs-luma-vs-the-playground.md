@@ -89,7 +89,7 @@ The Playground starts from a simple observation: Meetup has the right model (per
 
 The core principle: **when someone registers for your event, they automatically join your community**. After the event, they see the next meetups, the other members, your group's identity. The link doesn't break between events.
 
-On pricing: **0% commission**, no subscription, no limits. Only standard Stripe fees (~2.9% + €0.30) apply on paid events. The full amount goes to the organiser.
+On pricing: **0% commission**, no subscription, no limits. Only standard Stripe fees (1.5% + €0.25 with a standard European card) apply on paid events. The full amount goes to the organiser.
 
 ### What works
 

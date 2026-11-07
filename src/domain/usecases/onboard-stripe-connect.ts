@@ -1,7 +1,13 @@
 import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService, ConnectAccountStatus } from "@/domain/ports/services/payment-service";
-import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
+import {
+  CircleNotFoundError,
+  StripeConnectCancelBlockedError,
+  UnauthorizedCircleActionError,
+} from "@/domain/errors";
 
 type OnboardStripeConnectInput = {
   circleId: string;
@@ -104,4 +110,58 @@ export async function getStripeConnectStatus(
     circle.stripeConnectAccountId
   );
   return { hasAccount: true, status };
+}
+
+// --- Cancel Connect activation ---
+
+type CancelStripeConnectInput = {
+  circleId: string;
+  userId: string;
+};
+
+type CancelStripeConnectDeps = {
+  circleRepository: CircleRepository;
+  momentRepository: MomentRepository;
+  registrationRepository: RegistrationRepository;
+};
+
+/**
+ * Détache le compte de la Communauté. L'Organisateur n'accède à son tableau de
+ * bord Express que depuis The Playground : on refuse dès qu'un paiement a eu lieu
+ * sur ce compte, ou qu'un événement payant publié en dépend.
+ */
+export async function cancelStripeConnect(
+  input: CancelStripeConnectInput,
+  deps: CancelStripeConnectDeps
+): Promise<void> {
+  const circle = await deps.circleRepository.findById(input.circleId);
+  if (!circle) {
+    throw new CircleNotFoundError(input.circleId);
+  }
+
+  const membership = await deps.circleRepository.findMembership(
+    input.circleId,
+    input.userId
+  );
+  if (!isActivePrimaryHost(membership)) {
+    throw new UnauthorizedCircleActionError(input.userId, input.circleId);
+  }
+
+  const accountId = circle.stripeConnectAccountId;
+  if (!accountId) return;
+
+  const moments = await deps.momentRepository.findByCircleId(input.circleId);
+  const hasPublishedPaidMoment = moments.some(
+    (moment) => moment.status === "PUBLISHED" && moment.price > 0
+  );
+  if (
+    hasPublishedPaidMoment ||
+    (await deps.registrationRepository.hasPaymentsOnStripeAccount(accountId))
+  ) {
+    throw new StripeConnectCancelBlockedError(input.circleId);
+  }
+
+  await deps.circleRepository.update(input.circleId, {
+    stripeConnectAccountId: null,
+  });
 }

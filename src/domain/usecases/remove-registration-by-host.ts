@@ -26,6 +26,8 @@ type RemoveRegistrationByHostDeps = {
 type RemoveRegistrationByHostResult = {
   cancelledRegistration: Registration;
   promotedRegistration: Registration | null;
+  // Remboursement échoué : il ne bloque pas le retrait, à signaler par l'appelant.
+  refundError?: unknown;
 };
 
 export async function removeRegistrationByHost(
@@ -74,14 +76,15 @@ export async function removeRegistrationByHost(
 
   // 4. Refund if paid (Host removing = force refund, like event cancellation)
   // Refund failure must not block the removal
+  let refundError: unknown;
   if (deps.paymentService && registration.paymentStatus === "PAID") {
     try {
       await refundRegistration(
         { registration, moment, force: true },
         { registrationRepository, paymentService: deps.paymentService }
       );
-    } catch {
-      // Refund failure must not block removal — error is captured by the caller
+    } catch (err) {
+      refundError = err;
     }
   }
 
@@ -105,5 +108,5 @@ export async function removeRegistrationByHost(
     }
   }
 
-  return { cancelledRegistration, promotedRegistration };
+  return { cancelledRegistration, promotedRegistration, refundError };
 }

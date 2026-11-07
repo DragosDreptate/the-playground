@@ -4,7 +4,11 @@ import type { User } from "@/domain/models/user";
 
 // --- Types ---
 
-export type ConnectAccountStatus = "pending" | "active" | "restricted" | "disabled";
+/**
+ * `verifying` : dossier complet, Stripe vérifie, rien à faire pour l'Organisateur.
+ * `pending`, `restricted`, `disabled` : l'Organisateur doit reprendre son dossier.
+ */
+export type ConnectAccountStatus = "pending" | "verifying" | "active" | "restricted" | "disabled";
 
 export type CheckoutSessionParams = {
   moment: Moment;
@@ -27,9 +31,22 @@ export type PaymentEvent =
       circleId: string;
       paymentIntentId: string;
       receiptUrl: string;
+      /** Compte de l'Organisateur, sur lequel le paiement a eu lieu. */
+      accountId: string;
     }
   | { type: "charge_refunded"; paymentIntentId: string }
   | { type: "unknown" };
+
+/**
+ * Le paiement vit sur le compte de l'Organisateur : le rembourser exige de
+ * désigner ce compte.
+ */
+export type RefundParams = {
+  paymentIntentId: string;
+  accountId: string;
+};
+
+export type RefundStatus = "succeeded" | "pending" | "failed";
 
 // --- Port interface ---
 
@@ -56,5 +73,5 @@ export interface PaymentService {
     signature: string
   ): Promise<PaymentEvent>;
 
-  refund(paymentIntentId: string): Promise<void>;
+  refund(params: RefundParams): Promise<{ status: RefundStatus }>;
 }

@@ -88,7 +88,7 @@ The Playground part d'un constat simple : Meetup a le bon modèle (communauté p
 
 Le principe fondamental : **quand quelqu'un s'inscrit à votre événement, il rejoint automatiquement votre communauté**. Après l'événement, il voit les prochains rendez-vous, les autres membres, l'identité de votre groupe. Le lien ne se casse pas entre deux événements.
 
-Côté tarification : **0% de commission**, aucun abonnement, aucune limite. Seuls les frais Stripe standards (~2.9% + 0.30€) s'appliquent sur les événements payants. L'intégralité du montant va à l'organisateur.
+Côté tarification : **0% de commission**, aucun abonnement, aucune limite. Seuls les frais Stripe standards (1,5 % + 0,25 € avec une carte européenne standard) s'appliquent sur les événements payants. L'intégralité du montant va à l'organisateur.
 
 ### Ce qui fonctionne
 

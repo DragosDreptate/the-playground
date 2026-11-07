@@ -314,6 +314,7 @@ model Registration {
   status                RegistrationStatus @default(REGISTERED)
   paymentStatus         PaymentStatus      @default(NONE)
   stripePaymentIntentId String?
+  stripeAccountId       String?
   stripeReceiptUrl      String?
   registeredAt          DateTime           @default(now())
   cancelledAt           DateTime?

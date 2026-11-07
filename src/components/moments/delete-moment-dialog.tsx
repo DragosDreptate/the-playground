@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteMomentAction } from "@/app/actions/moment";
+import { STRIPE_ERROR_CODES } from "@/domain/errors";
 
 type DeleteMomentDialogProps = {
   momentId: string;
@@ -49,7 +50,11 @@ export function DeleteMomentDialog({
       // neutralisé via preventDefault, sinon Radix la fermerait au clic). Message
       // générique : les erreurs du domaine sont des messages développeur (anglais,
       // avec l'id interne) qu'on ne montre jamais tel quel à l'Organisateur.
-      setError(t("delete.error"));
+      setError(
+        result.code === STRIPE_ERROR_CODES.MomentRefundsFailed
+          ? t("delete.refundFailed")
+          : t("delete.error")
+      );
       setIsPending(false);
     }
   }

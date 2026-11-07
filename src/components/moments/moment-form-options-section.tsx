@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatPrice } from "@/lib/format-price";
+import { estimateNetAfterStripeFees } from "@/lib/stripe-fees";
 
 type MomentFormOptionsSectionProps = {
   // Price
@@ -33,8 +34,7 @@ type MomentFormOptionsSectionProps = {
 };
 
 function estimateNet(cents: number, currency: string): string {
-  const net = cents - Math.round(cents * 0.029 + 30);
-  return formatPrice(Math.max(0, net), currency);
+  return formatPrice(estimateNetAfterStripeFees(cents), currency);
 }
 
 export function MomentFormOptionsSection({
@@ -61,6 +61,8 @@ export function MomentFormOptionsSection({
 
   const priceCents = Math.round((parseFloat(priceValue) || 0) * 100);
   const hasPaidPrice = priceCents > 0;
+
+  const showRefundableToggle = stripeConnectActive && hasPaidPrice && !priceOpen;
 
   return (
     <div className="space-y-1">
@@ -280,15 +282,20 @@ export function MomentFormOptionsSection({
               <p className="text-muted-foreground mt-1 pl-12 text-xs">
                 {t("form.priceEstimation", {
                   net: estimateNet(priceCents, defaultCurrency),
-                  currency: defaultCurrency,
                 })}
               </p>
             )}
           </div>
         )}
 
+        {/* Un interrupteur absent ou désactivé n'est pas envoyé : sans ce champ, la
+            politique de remboursement passerait à « non » sans que l'Organisateur le voie. */}
+        {(!showRefundableToggle || priceLocked) && defaultRefundable && (
+          <input type="hidden" name="refundable" value="on" />
+        )}
+
         {/* Refundable toggle — visible only when price > 0, confirmed (not editing), and Stripe active */}
-        {stripeConnectActive && hasPaidPrice && !priceOpen && (
+        {showRefundableToggle && (
           <div className="flex items-center gap-3 py-1">
             <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
               <RefreshCw className="text-primary size-4" />
@@ -303,8 +310,9 @@ export function MomentFormOptionsSection({
             </div>
             <Switch
               id="refundable"
-              name="refundable"
+              name={priceLocked ? undefined : "refundable"}
               defaultChecked={defaultRefundable}
+              disabled={priceLocked}
             />
           </div>
         )}

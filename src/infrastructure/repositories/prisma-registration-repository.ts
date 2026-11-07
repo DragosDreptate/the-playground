@@ -24,6 +24,7 @@ function toDomainRegistration(record: PrismaRegistration): Registration {
     status: record.status,
     paymentStatus: record.paymentStatus,
     stripePaymentIntentId: record.stripePaymentIntentId,
+    stripeAccountId: record.stripeAccountId,
     stripeReceiptUrl: record.stripeReceiptUrl,
     registeredAt: record.registeredAt,
     cancelledAt: record.cancelledAt,
@@ -75,6 +76,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         status: input.status,
         ...(input.paymentStatus && { paymentStatus: input.paymentStatus }),
         ...(input.stripePaymentIntentId && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeAccountId && { stripeAccountId: input.stripeAccountId }),
         ...(input.stripeReceiptUrl && { stripeReceiptUrl: input.stripeReceiptUrl }),
       },
     });
@@ -219,6 +221,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         ...(input.status !== undefined && { status: input.status }),
         ...(input.paymentStatus !== undefined && { paymentStatus: input.paymentStatus }),
         ...(input.stripePaymentIntentId !== undefined && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeAccountId !== undefined && { stripeAccountId: input.stripeAccountId }),
         ...(input.stripeReceiptUrl !== undefined && { stripeReceiptUrl: input.stripeReceiptUrl }),
         ...(input.cancelledAt !== undefined && {
           cancelledAt: input.cancelledAt,
@@ -347,6 +350,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: string;
       paymentStatus: string;
       stripePaymentIntentId: string | null;
+      stripeAccountId: string | null;
       stripeReceiptUrl: string | null;
       registeredAt: Date;
       cancelledAt: Date | null;
@@ -377,6 +381,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         r.status,
         r."paymentStatus",
         r."stripePaymentIntentId",
+        r."stripeAccountId",
         r."stripeReceiptUrl",
         r."registeredAt",
         r."cancelledAt",
@@ -429,6 +434,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: row.status as RegistrationStatus,
       paymentStatus: row.paymentStatus as PaymentStatus,
       stripePaymentIntentId: row.stripePaymentIntentId,
+      stripeAccountId: row.stripeAccountId,
       stripeReceiptUrl: row.stripeReceiptUrl ?? null,
       registeredAt: row.registeredAt,
       cancelledAt: row.cancelledAt,
@@ -540,6 +546,31 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return result.count;
   },
 
+  async hasPaymentsOnStripeAccount(accountId: string): Promise<boolean> {
+    const record = await prisma.registration.findFirst({
+      where: { stripeAccountId: accountId },
+      select: { id: true },
+    });
+    return record !== null;
+  },
+
+  async hasUnrefundedPaymentsInCircle(circleId: string): Promise<boolean> {
+    const record = await prisma.registration.findFirst({
+      where: {
+        paymentStatus: "PAID",
+        moment: { circleId, status: { not: "PAST" } },
+        OR: [
+          { status: { in: ["REGISTERED", "CHECKED_IN"] } },
+          // Désinscrit dont le remboursement a échoué. Sur un événement non remboursable,
+          // une inscription annulée et payée est normale.
+          { status: "CANCELLED", moment: { refundable: true } },
+        ],
+      },
+      select: { id: true },
+    });
+    return record !== null;
+  },
+
   async findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null> {
     const record = await prisma.registration.findFirst({
       where: { stripePaymentIntentId: paymentIntentId },
@@ -610,6 +641,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: RegistrationStatus;
       paymentStatus: PaymentStatus;
       stripePaymentIntentId: string | null;
+      stripeAccountId: string | null;
       stripeReceiptUrl: string | null;
       registeredAt: Date;
       cancelledAt: Date | null;
@@ -634,6 +666,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         r.status,
         r."paymentStatus",
         r."stripePaymentIntentId",
+        r."stripeAccountId",
         r."stripeReceiptUrl",
         r."registeredAt",
         r."cancelledAt",
@@ -663,6 +696,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: r.status,
       paymentStatus: r.paymentStatus,
       stripePaymentIntentId: r.stripePaymentIntentId,
+      stripeAccountId: r.stripeAccountId,
       stripeReceiptUrl: r.stripeReceiptUrl,
       registeredAt: r.registeredAt,
       cancelledAt: r.cancelledAt,

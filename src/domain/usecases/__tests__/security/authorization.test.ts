@@ -1,3 +1,4 @@
+import { createMockPaymentService } from "../helpers/mock-payment-service";
 /**
  * Tests de sécurité — RBAC (Role-Based Access Control)
  *
@@ -110,7 +111,7 @@ describe("Security — RBAC", () => {
         });
 
         await expect(
-          deleteCircle(input, { circleRepository: circleRepo })
+          deleteCircle(input, { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() })
         ).rejects.toThrow(UnauthorizedCircleActionError);
       }
     );
@@ -123,7 +124,7 @@ describe("Security — RBAC", () => {
       });
 
       await expect(
-        deleteCircle(input, { circleRepository: circleRepo })
+        deleteCircle(input, { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() })
       ).resolves.toBeUndefined();
       expect(circleRepo.delete).toHaveBeenCalledWith("circle-1");
     });
@@ -213,8 +214,7 @@ describe("Security — RBAC", () => {
         await expect(
           updateMoment(input, {
             momentRepository: momentRepo,
-            circleRepository: circleRepo,
-          })
+            circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
         ).rejects.toThrow(UnauthorizedMomentActionError);
       }
     );
@@ -230,8 +230,7 @@ describe("Security — RBAC", () => {
 
       const result = await updateMoment(input, {
         momentRepository: momentRepo,
-        circleRepository: circleRepo,
-      });
+        circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() });
       expect(result.moment.title).toBe("New Title");
     });
   });
@@ -259,8 +258,7 @@ describe("Security — RBAC", () => {
         await expect(
           deleteMoment(input, {
             momentRepository: momentRepo,
-            circleRepository: circleRepo,
-          })
+            circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
         ).rejects.toThrow(UnauthorizedMomentActionError);
       }
     );
@@ -277,8 +275,7 @@ describe("Security — RBAC", () => {
       await expect(
         deleteMoment(input, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).resolves.toBeUndefined();
       expect(momentRepo.delete).toHaveBeenCalledWith("moment-1");
     });

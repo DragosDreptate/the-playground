@@ -22,6 +22,7 @@ export {
   InvalidPriceError,
   PaidMomentRequiresStripeError,
   PriceLockedError,
+  RefundableLockedError,
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
   MomentCannotBeCancelledError,
@@ -59,6 +60,11 @@ export {
   STRIPE_ERROR_CODES,
   StripeConnectNotActiveError,
   StripeConnectAlreadyActiveError,
+  StripeConnectCancelBlockedError,
+  StripeRefundFailedError,
+  InvalidWebhookSignatureError,
+  MomentRefundsFailedError,
+  CircleHasUnrefundedPaymentsError,
 } from "./stripe-errors";
 export {
   CommentPhotoLimitReachedError,

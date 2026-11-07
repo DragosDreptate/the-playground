@@ -75,6 +75,21 @@ export type HostCancellationEmailData = {
   };
 };
 
+// Remboursement refusé par Stripe : le propriétaire de la Communauté doit agir.
+export type HostRefundFailedEmailData = {
+  to: string;
+  circleSlug: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    participants: string;
+    action: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 // Confirmation de désinscription au participant qui annule lui-même (départ de
 // liste d'attente inclus, avec un wording dédié porté par `strings`).
 // `refundMessage` : remboursement constaté pour un événement payant, null sinon.
@@ -579,6 +594,7 @@ export interface EmailService {
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
   sendHostCancellation(data: HostCancellationEmailData): Promise<void>;
+  sendHostRefundFailed(data: HostRefundFailedEmailData): Promise<void>;
   sendCancellationConfirmation(data: CancellationConfirmationEmailData): Promise<void>;
   sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
   sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void>;

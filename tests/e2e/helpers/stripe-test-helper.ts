@@ -30,12 +30,15 @@ export function buildCheckoutCompletedEvent(params: {
   userId: string;
   momentId: string;
   circleId: string;
+  /** Compte de l'Organisateur : le webhook ignore tout événement sans compte. */
+  account: string;
   paymentIntentId?: string;
 }): object {
   const {
     userId,
     momentId,
     circleId,
+    account,
     paymentIntentId = `pi_test_${Date.now()}`,
   } = params;
 
@@ -43,10 +46,12 @@ export function buildCheckoutCompletedEvent(params: {
     id: `evt_test_${Date.now()}`,
     object: "event",
     type: "checkout.session.completed",
+    account,
     data: {
       object: {
         id: `cs_test_${Date.now()}`,
         object: "checkout.session",
+        payment_status: "paid",
         payment_intent: paymentIntentId,
         metadata: {
           userId,

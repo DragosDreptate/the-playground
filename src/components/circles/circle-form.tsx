@@ -21,6 +21,7 @@ import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
 import { onboardStripeConnectAction, getStripeLoginLinkAction, cancelStripeConnectAction } from "@/app/actions/stripe";
+import { STRIPE_ERROR_CODES } from "@/domain/errors";
 
 type StripeConnectProps = {
   circleId: string;
@@ -393,7 +394,11 @@ function StripeConnectInline({
   const busy = isPending || isRedirecting;
 
   const isActive = hasAccount && status === "active";
-  const needsAction = hasAccount && !isActive;
+  const isVerifying = hasAccount && status === "verifying";
+  const needsAction = hasAccount && !isActive && !isVerifying;
+  // Dossier envoyé : le tableau de bord reste accessible même si le compte n'encaisse plus.
+  const canViewDashboardWhileInactive =
+    isVerifying || status === "restricted" || status === "disabled";
 
   function handleActivate() {
     setError(null);
@@ -489,6 +494,8 @@ function StripeConnectInline({
                       const result = await cancelStripeConnectAction(circleId);
                       if (result.success) {
                         window.location.reload();
+                      } else if (result.code === STRIPE_ERROR_CODES.ConnectCancelBlocked) {
+                        setError(t("stripeConnect.cancelBlocked"));
                       } else {
                         setError(result.error);
                       }
@@ -498,6 +505,22 @@ function StripeConnectInline({
                   {t("stripeConnect.cancel")}
                 </button>
               </div>
+            )}
+            {isVerifying && (
+              <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                <AlertCircle className="size-3.5 shrink-0" />
+                <span>{t("stripeConnect.verifying")}</span>
+              </div>
+            )}
+            {canViewDashboardWhileInactive && (
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground mt-1 block text-xs underline underline-offset-2 transition-colors"
+                disabled={busy}
+                onClick={handleViewDashboard}
+              >
+                {t("stripeConnect.viewDashboard")}
+              </button>
             )}
             {isActive && (
               <div className="flex items-center gap-1.5 text-xs text-green-500">

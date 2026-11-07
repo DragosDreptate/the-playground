@@ -158,7 +158,7 @@ That's a real loss if you relied on organic discovery to recruit new members. Th
 
 ### I have paid events still selling on Meetup, how do I handle the transition?
 
-Honour the events already sold on Meetup until their date. For new events, switch to The Playground with Stripe Connect: the organiser receives the payment directly, no platform commission. Only standard Stripe fees (around 2.9% + €0.30) apply.
+Honour the events already sold on Meetup until their date. For new events, switch to The Playground with Stripe Connect: the organiser receives the payment directly, no platform commission. Only standard Stripe fees (1.5% + €0.25 with a standard European card) apply.
 
 ### What if some members refuse to leave Meetup?
 

@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { InvalidWebhookSignatureError } from "@/domain/errors";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -7,6 +8,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
 import { handlePaymentWebhook } from "@/domain/usecases/handle-payment-webhook";
+import { notifyRefundFailure } from "@/app/actions/helpers/notify-refund-failure";
 import { sendRegistrationEmails } from "@/app/actions/registration";
 import { buildEmailLocaleResolver } from "@/app/actions/helpers/email-locale-resolver";
 
@@ -63,15 +65,34 @@ export async function POST(request: Request) {
       });
     }
 
+    if (result.refundFailure) {
+      const { momentId, userId } = result.refundFailure;
+      Sentry.captureMessage(`Stripe webhook: ${result.reason}`, "error");
+      const resolver = await buildEmailLocaleResolver(userId);
+      after(() =>
+        notifyRefundFailure(momentId, [userId], resolver).catch((error) =>
+          Sentry.captureException(error)
+        )
+      );
+    }
+
     // Not handled but not an error (idempotence, ignored event type, etc.)
     return NextResponse.json({ received: true, reason: result.reason });
   } catch (error) {
+    if (error instanceof InvalidWebhookSignatureError) {
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 400 }
+      );
+    }
+
+    // Répondre une erreur pour que Stripe rejoue l'événement : sinon, une panne
+    // passagère laisserait un Participant payé sans inscription. Le rejeu est sans
+    // risque de doublon (garde d'idempotence sur stripePaymentIntentId).
     Sentry.captureException(error);
-    // Always return 200 to Stripe to prevent retries on our errors
-    // (Stripe retries on 4xx/5xx, which could cause duplicate processing)
     return NextResponse.json(
       { error: "Webhook processing failed" },
-      { status: 200 }
+      { status: 500 }
     );
   }
 }

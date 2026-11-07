@@ -40,7 +40,7 @@ Before choosing, ask yourself the right questions:
 
 **The principle**: when someone registers for your event, they automatically join your community. After the event, they see the next meetups, the other members, your group's identity. The connection doesn't break.
 
-**Pricing**: 0% commission, no subscription. Only standard Stripe fees (~2.9% + €0.30) apply on paid events. The full amount goes to the organiser.
+**Pricing**: 0% commission, no subscription. Only standard Stripe fees (1.5% + €0.25 with a standard European card) apply on paid events. The full amount goes to the organiser.
 
 **The European angle.** This matters more than you might think:
 

@@ -7,6 +7,9 @@ import {
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
   InvalidTimezoneError,
+  MomentRefundsFailedError,
+  MomentPastDateError,
+  RefundableLockedError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -45,8 +48,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(defaultInput, {
         momentRepository: momentRepo,
-        circleRepository: circleRepo,
-      });
+        circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() });
 
       expect(result.moment.title).toBe("Updated Title");
       expect(momentRepo.update).toHaveBeenCalledWith(
@@ -66,8 +68,7 @@ describe("UpdateMoment", () => {
 
       await updateMoment(defaultInput, {
         momentRepository: momentRepo,
-        circleRepository: circleRepo,
-      });
+        circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() });
 
       expect(circleRepo.findMembership).toHaveBeenCalledWith(
         "circle-1",
@@ -104,7 +105,7 @@ describe("UpdateMoment", () => {
           locationAddress: null,
           videoLink: "https://meet.example.com/room",
         },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(momentRepo.update).toHaveBeenCalledWith(
@@ -145,7 +146,7 @@ describe("UpdateMoment", () => {
           coverImage: "https://blob.example.com/cover.webp",
           coverImageAttribution: attribution,
         },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(momentRepo.update).toHaveBeenCalledWith(
@@ -186,7 +187,7 @@ describe("UpdateMoment", () => {
           coverImage: null,
           coverImageAttribution: null,
         },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(momentRepo.update).toHaveBeenCalledWith(
@@ -208,8 +209,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(MomentNotFoundError);
     });
   });
@@ -227,8 +227,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(UnauthorizedMomentActionError);
     });
   });
@@ -248,8 +247,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(defaultInput, {
           momentRepository: momentRepo,
-          circleRepository: circleRepo,
-        })
+          circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() })
       ).rejects.toThrow(UnauthorizedMomentActionError);
     });
   });
@@ -275,7 +273,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(
         { momentId: "moment-1", userId: "user-1", price: 1500 },
-        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService: createMockPaymentService() }
       );
 
       expect(result.moment.price).toBe(1500);
@@ -300,7 +298,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", price: 1500 },
-          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(CannotMakePaidWithRegistrationsError);
     });
@@ -325,7 +323,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(
         { momentId: "moment-1", userId: "user-1", price: 2000 },
-        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService: createMockPaymentService() }
       );
 
       expect(result.moment.price).toBe(2000);
@@ -350,7 +348,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", price: 2000 },
-          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(PriceLockedError);
     });
@@ -373,7 +371,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(
         { momentId: "moment-1", userId: "user-1", price: 0 },
-        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService: createMockPaymentService() }
       );
 
       expect(result.moment.price).toBe(0);
@@ -384,7 +382,7 @@ describe("UpdateMoment", () => {
     it("should refund all PAID registrations and allow the transition", async () => {
       const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
       const updated = makeMoment({ id: "moment-1", price: 0 });
-      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" });
+      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
       const freeReg = makeRegistration({ id: "reg-2", paymentStatus: "NONE" });
 
       const momentRepo = createMockMomentRepository({
@@ -406,7 +404,7 @@ describe("UpdateMoment", () => {
       );
 
       expect(result.moment.price).toBe(0);
-      expect(paymentService.refund).toHaveBeenCalledWith("pi_1");
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
       expect(paymentService.refund).toHaveBeenCalledTimes(1); // Only the PAID one, not the free one
     });
   });
@@ -425,7 +423,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", price: 1500, requiresApproval: true },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
     });
@@ -442,7 +440,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", requiresApproval: true },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
     });
@@ -460,7 +458,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", price: 1500 },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
     });
@@ -479,7 +477,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(
         { momentId: "moment-1", userId: "user-1", price: 1500, requiresApproval: false },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(result.moment.price).toBe(1500);
@@ -498,7 +496,7 @@ describe("UpdateMoment", () => {
 
       const result = await updateMoment(
         { momentId: "moment-1", userId: "user-1", price: 0, requiresApproval: true },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(result.moment.requiresApproval).toBe(true);
@@ -537,7 +535,7 @@ describe("UpdateMoment", () => {
           price: 5000,
           requiresApproval: true,
         },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       const updates = (momentRepo.update as ReturnType<typeof vi.fn>).mock.calls[0][1];
@@ -570,7 +568,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", description: "tentative" },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(MomentNotFoundError);
       expect(momentRepo.update).not.toHaveBeenCalled();
@@ -596,7 +594,7 @@ describe("UpdateMoment", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-1", price: 10 },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).resolves.toBeDefined();
     });
@@ -612,7 +610,12 @@ describe("UpdateMoment", () => {
       });
       return {
         momentRepo,
-        deps: { momentRepository: momentRepo, circleRepository: circleRepo },
+        deps: {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: createMockRegistrationRepository(),
+          paymentService: createMockPaymentService(),
+        },
       };
     }
 
@@ -657,5 +660,125 @@ describe("UpdateMoment", () => {
         expect.not.objectContaining({ timezone: expect.anything() })
       );
     });
+  });
+
+  describe("given the only active registration is a paid one (Organizer unregistered)", () => {
+    it("should refund it when the event becomes free", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", price: 0 })),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(1),
+        getPaymentSummary: vi.fn().mockResolvedValue({ paidCount: 1, totalAmount: 1500, refundedCount: 0 }),
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg]),
+      });
+      const paymentService = createMockPaymentService();
+
+      await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      );
+
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
+    });
+  });
+
+  describe("given a refund refused when the event becomes free", () => {
+    it("should keep the event unchanged and report who was not refunded", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const paidReg = makeRegistration({ id: "reg-1", userId: "user-9", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const momentRepo = createMockMomentRepository({ findById: vi.fn().mockResolvedValue(existing) });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(2),
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg]),
+      });
+      const paymentService = createMockPaymentService({
+        refund: vi.fn().mockResolvedValue({ status: "failed" }),
+      });
+
+      const failure = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      ).catch((error) => error);
+
+      expect(failure).toBeInstanceOf(MomentRefundsFailedError);
+      expect(failure.participantUserIds).toEqual(["user-9"]);
+      expect(momentRepo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a refundable event with paid registrations", () => {
+    function setup(paidCount: number) {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500, refundable: true });
+      return {
+        momentRepository: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(existing),
+          update: vi.fn().mockResolvedValue(existing),
+        }),
+        circleRepository: createMockCircleRepository({
+          findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+        }),
+        registrationRepository: createMockRegistrationRepository({
+          getPaymentSummary: vi.fn().mockResolvedValue({ paidCount, totalAmount: 0, refundedCount: 0 }),
+        }),
+        paymentService: createMockPaymentService(),
+      };
+    }
+
+    it("should refuse to remove the refund promise", async () => {
+      const deps = setup(1);
+
+      await expect(
+        updateMoment({ momentId: "moment-1", userId: "user-1", refundable: false }, deps)
+      ).rejects.toThrow(RefundableLockedError);
+      expect(deps.momentRepository.update).not.toHaveBeenCalled();
+    });
+
+    it("should allow it while nobody has paid", async () => {
+      const deps = setup(0);
+
+      await updateMoment({ momentId: "moment-1", userId: "user-1", refundable: false }, deps);
+
+      expect(deps.momentRepository.update).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("UpdateMoment — refunds come last", () => {
+  it.each([
+    ["a past start date", { startsAt: new Date("2020-01-01") }, MomentPastDateError],
+    ["an invalid timezone", { timezone: "Not/AZone" }, InvalidTimezoneError],
+  ])("should not refund anyone when the update is refused for %s", async (_label, change, expectedError) => {
+    const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+    const paymentService = createMockPaymentService();
+
+    await expect(
+      updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0, ...change },
+        {
+          momentRepository: createMockMomentRepository({ findById: vi.fn().mockResolvedValue(existing) }),
+          circleRepository: createMockCircleRepository({
+            findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+          }),
+          registrationRepository: createMockRegistrationRepository({
+            countActiveByMomentId: vi.fn().mockResolvedValue(2),
+            findActiveByMomentId: vi.fn().mockResolvedValue([
+              makeRegistration({ paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" }),
+            ]),
+          }),
+          paymentService,
+        }
+      )
+    ).rejects.toThrow(expectedError);
+    expect(paymentService.refund).not.toHaveBeenCalled();
   });
 });

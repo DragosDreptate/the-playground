@@ -147,7 +147,7 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
     await expect(
       deleteCircle(
         { circleId: CIRCLE_ID, userId: CO_HOST_ID },
-        { circleRepository: circleRepo }
+        { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() }
       )
     ).rejects.toThrow(UnauthorizedCircleActionError);
   });
@@ -372,8 +372,7 @@ describe("CO_HOST security — transition de rôle", () => {
         {
           momentRepository: momentRepo,
           circleRepository: circleRepo,
-          registrationRepository: createMockRegistrationRepository(),
-        }
+          registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       )
     ).rejects.toThrow(UnauthorizedMomentActionError);
   });

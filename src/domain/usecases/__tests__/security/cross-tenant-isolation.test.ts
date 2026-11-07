@@ -1,3 +1,4 @@
+import { createMockPaymentService } from "../helpers/mock-payment-service";
 /**
  * Tests de sécurité — Isolation Cross-Tenant (IDOR)
  *
@@ -131,7 +132,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       await expect(
         deleteCircle(
           { circleId: "circle-a", userId: "user-attacker" },
-          { circleRepository: circleRepo }
+          { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() }
         )
       ).rejects.toThrow(UnauthorizedCircleActionError);
 
@@ -195,7 +196,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "user-attacker", title: "Hijacked" },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(UnauthorizedMomentActionError);
 
@@ -218,7 +219,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       await expect(
         deleteMoment(
           { momentId: "moment-1", userId: "user-attacker" },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(UnauthorizedMomentActionError);
 
@@ -397,7 +398,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
 
       await updateMoment(
         { momentId: "moment-1", userId: "legitimate-host", title: "OK" },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       // Doit vérifier membership sur le circleId provenant du Moment (pas d'une entrée externe)
@@ -425,7 +426,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
 
       await deleteMoment(
         { momentId: "moment-1", userId: "legitimate-host" },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       expect(circleRepo.findMembership).toHaveBeenCalledWith(targetCircleId, "legitimate-host");

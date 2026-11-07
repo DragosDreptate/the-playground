@@ -70,6 +70,22 @@ test.describe("Événement payant — échec du checkout", () => {
   });
 });
 
+// ── Activation : un compte dont dépend un événement payant ne se détache pas ─
+
+test.describe("Paiements de la Communauté — annulation de l'activation", () => {
+  test.use({ storageState: AUTH.HOST });
+
+  test("should refuse to detach the account while a paid event is published", async ({ page }) => {
+    await page.goto(`/fr/dashboard/circles/${SLUGS.PAID_CIRCLE}/edit`);
+
+    await page.getByRole("button", { name: "Annuler l'activation" }).click();
+
+    await expect(page.getByText(/Impossible d'annuler/)).toBeVisible({ timeout: 15000 });
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Annuler l'activation" })).toBeVisible();
+  });
+});
+
 // ── Non authentifié — pas de prix dans le bouton ─────────────────────────────
 
 test.describe("Événement payant — non authentifié", () => {

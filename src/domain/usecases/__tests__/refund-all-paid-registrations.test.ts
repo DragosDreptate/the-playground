@@ -35,14 +35,14 @@ describe("refundAllPaidRegistrations", () => {
   describe("given a paid event with paid registrations", () => {
     it("should refund every PAID registration and mark it REFUNDED", async () => {
       const deps = makeDeps([
-        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" }),
-        makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: "pi_2" }),
+        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" }),
+        makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: "pi_2", stripeAccountId: "acct_test" }),
       ]);
 
       await refundAllPaidRegistrations(makeMoment({ id: "moment-1", price: 1500 }), deps);
 
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_1");
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_2");
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_2", accountId: "acct_test" });
       expect(deps.registrationRepository.update).toHaveBeenCalledWith("reg-1", {
         paymentStatus: "REFUNDED",
       });
@@ -53,7 +53,7 @@ describe("refundAllPaidRegistrations", () => {
 
     it("should skip registrations that are not PAID or lack a payment intent", async () => {
       const deps = makeDeps([
-        makeRegistration({ id: "reg-1", paymentStatus: "PENDING", stripePaymentIntentId: "pi_1" }),
+        makeRegistration({ id: "reg-1", paymentStatus: "PENDING", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" }),
         makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: null }),
       ]);
 
@@ -67,7 +67,7 @@ describe("refundAllPaidRegistrations", () => {
     it("should use them without re-querying the repository", async () => {
       const deps = makeDeps([]); // findActiveByMomentId renverrait [] si on l'appelait
       const preloaded = [
-        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" }),
+        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" }),
       ];
 
       await refundAllPaidRegistrations(
@@ -77,14 +77,14 @@ describe("refundAllPaidRegistrations", () => {
       );
 
       expect(deps.registrationRepository.findActiveByMomentId).not.toHaveBeenCalled();
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_1");
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
     });
   });
 
   describe("given no pre-loaded registrations", () => {
     it("should query active registrations from the repository", async () => {
       const deps = makeDeps([
-        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" }),
+        makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" }),
       ]);
 
       await refundAllPaidRegistrations(makeMoment({ id: "moment-1", price: 1500 }), deps);
@@ -92,7 +92,27 @@ describe("refundAllPaidRegistrations", () => {
       expect(deps.registrationRepository.findActiveByMomentId).toHaveBeenCalledWith(
         "moment-1"
       );
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_1");
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
+    });
+  });
+
+  describe("given one refund failing among several", () => {
+    it("should still refund the others and return the failure", async () => {
+      const failed = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const refunded = makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: "pi_2", stripeAccountId: "acct_test" });
+      const deps = makeDeps([failed, refunded]);
+      const failure = new Error("Stripe down");
+      deps.paymentService.refund = vi
+        .fn()
+        .mockRejectedValueOnce(failure)
+        .mockResolvedValueOnce({ status: "succeeded" });
+
+      const result = await refundAllPaidRegistrations(makeMoment({ id: "moment-1", price: 1500 }), deps);
+
+      expect(deps.paymentService.refund).toHaveBeenCalledTimes(2);
+      expect(result.failures).toEqual([{ registration: failed, error: failure }]);
+      expect(deps.registrationRepository.update).toHaveBeenCalledTimes(1);
+      expect(deps.registrationRepository.update).toHaveBeenCalledWith("reg-2", { paymentStatus: "REFUNDED" });
     });
   });
 });

@@ -19,7 +19,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
 import { cancelMoment } from "@/domain/usecases/cancel-moment";
 import { refundAllPaidRegistrations } from "@/domain/usecases/refund-all-paid-registrations";
-import { MomentCannotBeDeletedError } from "@/domain/errors";
+import { MomentCannotBeDeletedError, MomentRefundsFailedError } from "@/domain/errors";
 import {
   getMomentParticipantsPage,
   type GetMomentParticipantsPageResult,
@@ -44,10 +44,28 @@ import {
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
 import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { notifyRefundFailure } from "./helpers/notify-refund-failure";
 import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
+
+/** Remboursements groupés refusés : prévenir le propriétaire, et laisser l'erreur remonter à l'écran. */
+function rethrowAfterReportingRefundFailures(userId: string) {
+  return async (error: unknown): Promise<never> => {
+    if (error instanceof MomentRefundsFailedError) {
+      const { momentId, participantUserIds } = error;
+      const resolver = await buildEmailLocaleResolver(userId);
+      Sentry.captureException(error);
+      after(() =>
+        notifyRefundFailure(momentId, participantUserIds, resolver).catch((err) =>
+          Sentry.captureException(err)
+        )
+      );
+    }
+    throw error;
+  };
+}
 const paymentService = createStripePaymentService();
 
 /** Longueur max du mot d'annulation saisi par l'Organisateur (UI + serveur). */
@@ -294,8 +312,9 @@ export async function updateMomentAction(
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
+        paymentService,
       }
-    );
+    ).catch(rethrowAfterReportingRefundFailures(userId));
 
     // Cleanup ancien blob si une nouvelle image a été uploadée
     if (
@@ -540,7 +559,7 @@ export async function deleteMomentAction(
         registrationRepository: prismaRegistrationRepository,
         paymentService,
       }
-    );
+    ).catch(rethrowAfterReportingRefundFailures(userId));
 
     // Blob cleanup is external to the DB cascade and must run explicitly.
     // Best-effort, différé via after() pour survivre au teardown serverless : les
@@ -670,17 +689,30 @@ export async function cancelMomentAction(
     // 0) Remboursement des inscrits payants — best-effort, APRÈS la bascule en
     //    CANCELLED (déjà persistée) et hors de la garde de statut. On réutilise les
     //    inscriptions actives déjà chargées (pas de SELECT redondant). Un échec
-    //    Stripe est capturé dans Sentry sans faire échouer l'annulation ; le
-    //    remboursement est idempotent et rejoué au besoin par la suppression de
-    //    l'événement annulé. Différé via after() pour survivre au teardown serverless.
-    //    Indépendant de la notif : pas besoin du contrôle de membership.
-    after(() =>
-      refundAllPaidRegistrations(
-        result.moment,
-        { registrationRepository: prismaRegistrationRepository, paymentService },
-        activeToNotify
-      ).catch((err) => Sentry.captureException(err))
-    );
+    //    Stripe est capturé dans Sentry et signalé au propriétaire sans faire échouer
+    //    l'annulation ; le remboursement est idempotent et rejoué au besoin par la
+    //    suppression de l'événement annulé. Différé via after() pour survivre au
+    //    teardown serverless. Indépendant de la notif : pas besoin du contrôle de membership.
+    const refundResolver = await buildEmailLocaleResolver(userId);
+    after(async () => {
+      try {
+        const { failures } = await refundAllPaidRegistrations(
+          result.moment,
+          { registrationRepository: prismaRegistrationRepository, paymentService },
+          activeToNotify
+        );
+        if (failures.length > 0) {
+          failures.forEach(({ error }) => Sentry.captureException(error));
+          await notifyRefundFailure(
+            result.moment.id,
+            failures.map(({ registration }) => registration.userId),
+            refundResolver
+          );
+        }
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
 
     // Le contrôle de membership (allowed / isOrganizerOfEvent) ne sert qu'à la notif
     // et au commentaire : on l'évite quand il n'y a ni inscrit à prévenir ni message

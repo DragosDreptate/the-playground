@@ -16,6 +16,7 @@ function makeRegistration(overrides: {
     status: "REGISTERED",
     paymentStatus: "NONE",
     stripePaymentIntentId: null,
+    stripeAccountId: null,
     stripeReceiptUrl: null,
     registeredAt: new Date("2026-04-01T10:00:00Z"),
     cancelledAt: null,

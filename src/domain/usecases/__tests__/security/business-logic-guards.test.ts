@@ -1,3 +1,4 @@
+import { createMockPaymentService } from "../helpers/mock-payment-service";
 /**
  * Tests de sécurité — Gardes de logique métier
  *
@@ -66,7 +67,7 @@ describe("Security — Business Logic Guards", () => {
 
       await updateMoment(
         { momentId: "moment-1", userId: "host-user", title: "New title" },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
       );
 
       const updateArg = vi.mocked(momentRepo.update).mock.calls[0][1];
@@ -85,7 +86,7 @@ describe("Security — Business Logic Guards", () => {
       await expect(
         updateMoment(
           { momentId: "moment-1", userId: "player-user", title: "Hack" },
-          { momentRepository: momentRepo, circleRepository: circleRepo }
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository(), paymentService: createMockPaymentService() }
         )
       ).rejects.toThrow(UnauthorizedMomentActionError);
 

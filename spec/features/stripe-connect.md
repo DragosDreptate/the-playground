@@ -2,6 +2,8 @@
 
 > **Statut** : implémenté (feature branch `feat/stripe-connect`, en attente de MEP)
 > **Date** : 2026-03-19 (exploration) → 2026-03-25 (implémentation)
+>
+> ⚠️ **Modèle de paiement remplacé le 2026-11-07** : voir [ADR-0009](../decisions/0009-organisateur-marchand-direct-charges.md) et [`paiements-direct-charges.md`](paiements-direct-charges.md). L'Organisateur est désormais le marchand : tout ce qui suit sur les destination charges, les frais (~2,9 % + 0,30 €), les litiges et le port `PaymentService` est historique. Les règles métier restent valables : prix verrouillé, pas de liste d'attente sur payant, authentification avant paiement, remboursement à l'annulation.
 
 ## Contexte
 
