@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatPrice } from "@/lib/format-price";
+import { estimateNetAfterStripeFees } from "@/lib/stripe-fees";
 
 type MomentFormOptionsSectionProps = {
   // Price
@@ -33,8 +34,7 @@ type MomentFormOptionsSectionProps = {
 };
 
 function estimateNet(cents: number, currency: string): string {
-  const net = cents - Math.round(cents * 0.029 + 30);
-  return formatPrice(Math.max(0, net), currency);
+  return formatPrice(estimateNetAfterStripeFees(cents), currency);
 }
 
 export function MomentFormOptionsSection({
@@ -280,7 +280,6 @@ export function MomentFormOptionsSection({
               <p className="text-muted-foreground mt-1 pl-12 text-xs">
                 {t("form.priceEstimation", {
                   net: estimateNet(priceCents, defaultCurrency),
-                  currency: defaultCurrency,
                 })}
               </p>
             )}

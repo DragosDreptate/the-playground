@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Stripe from "stripe";
-import { createStripePaymentService } from "../stripe-payment-service";
+import { createStripePaymentService, toConnectAccountStatus } from "../stripe-payment-service";
 import { InvalidWebhookSignatureError } from "@/domain/errors";
 
 const WEBHOOK_SECRET = "whsec_test_secret";
@@ -127,5 +127,17 @@ describe("StripePaymentService.handleWebhookEvent", () => {
         createStripePaymentService().handleWebhookEvent(payload, "t=1,v1=invalid")
       ).rejects.toThrow(InvalidWebhookSignatureError);
     });
+  });
+});
+
+describe("toConnectAccountStatus", () => {
+  it.each([
+    ["active", { details_submitted: true, charges_enabled: true }],
+    ["verifying", { details_submitted: true, charges_enabled: false, requirements: { disabled_reason: "requirements.pending_verification" } }],
+    ["disabled", { details_submitted: true, charges_enabled: false, requirements: { disabled_reason: "requirements.past_due" } }],
+    ["restricted", { details_submitted: false, charges_enabled: false, requirements: { disabled_reason: null, currently_due: ["external_account"] } }],
+    ["pending", { details_submitted: false, charges_enabled: false, requirements: { disabled_reason: null, currently_due: [] } }],
+  ])("should return %s", (status, account) => {
+    expect(toConnectAccountStatus(account as unknown as Stripe.Account)).toBe(status);
   });
 });

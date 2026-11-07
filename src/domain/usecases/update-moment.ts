@@ -143,10 +143,11 @@ export async function updateMoment(
 
       // Payant → gratuit avec inscrits payants : autorisé, remboursement batch
       if (wasPaid && becomingFree && deps.paymentService) {
-        await refundAllPaidRegistrations(existing, {
+        const { failures } = await refundAllPaidRegistrations(existing, {
           registrationRepository: deps.registrationRepository,
           paymentService: deps.paymentService,
         });
+        if (failures.length > 0) throw failures[0].error;
       }
     }
   }

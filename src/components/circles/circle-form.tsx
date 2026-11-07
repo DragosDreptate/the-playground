@@ -394,7 +394,8 @@ function StripeConnectInline({
   const busy = isPending || isRedirecting;
 
   const isActive = hasAccount && status === "active";
-  const needsAction = hasAccount && !isActive;
+  const isVerifying = hasAccount && status === "verifying";
+  const needsAction = hasAccount && !isActive && !isVerifying;
 
   function handleActivate() {
     setError(null);
@@ -500,6 +501,12 @@ function StripeConnectInline({
                 >
                   {t("stripeConnect.cancel")}
                 </button>
+              </div>
+            )}
+            {isVerifying && (
+              <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                <AlertCircle className="size-3.5 shrink-0" />
+                <span>{t("stripeConnect.verifying")}</span>
               </div>
             )}
             {isActive && (

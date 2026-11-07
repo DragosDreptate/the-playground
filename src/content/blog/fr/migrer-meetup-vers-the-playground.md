@@ -160,7 +160,7 @@ C'est une vraie perte si vous comptiez sur la découverte organique pour recrute
 
 ### J'ai des événements payants en cours sur Meetup, comment gérer ?
 
-Honorez les événements déjà vendus sur Meetup jusqu'à leur date. Pour les nouveaux événements, basculez sur The Playground avec Stripe Connect : l'organisateur reçoit le paiement directement, sans commission plateforme. Seuls les frais Stripe standards (environ 2.9% + 0.30€) s'appliquent.
+Honorez les événements déjà vendus sur Meetup jusqu'à leur date. Pour les nouveaux événements, basculez sur The Playground avec Stripe Connect : l'organisateur reçoit le paiement directement, sans commission plateforme. Seuls les frais Stripe standards (1,5 % + 0,25 € avec une carte européenne standard) s'appliquent.
 
 ### Et si certains membres refusent de quitter Meetup ?
 

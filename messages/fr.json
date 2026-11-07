@@ -78,7 +78,7 @@
     "comparisonCta": "Commencer gratuitement",
     "faqHeading": "Questions fréquentes",
     "faqQ1": "The Playground est-il vraiment gratuit ?",
-    "faqA1": "Oui, <b>100% gratuit</b>. Pas d'abonnement, pas de commission plateforme, pas de limite sur le nombre de communautés, d'événements ou de membres. Si vous organisez des événements payants, seuls les frais Stripe standard s'appliquent (~2,9% + 0,30€ par transaction) — The Playground ne prend aucune marge.",
+    "faqA1": "Oui, <b>100 % gratuit</b>. Pas d'abonnement, pas de commission plateforme, pas de limite sur le nombre de communautés, d'événements ou de membres. Pour un événement payant, vous payez uniquement les frais de Stripe (1,5 % + 0,25 € par billet avec une carte européenne standard). Nous ne prenons aucune marge.",
     "faqQ2": "Quelle est la différence avec Meetup ?",
     "faqA2": "<b>Meetup</b> propose un bon modèle communautaire (groupes, membres), mais impose un <b>abonnement payant aux organisateurs</b> et offre une expérience datée. The Playground reprend le modèle communautaire de Meetup — avec une <b>UX moderne</b> inspirée de Luma, des pages événement premium, et surtout une <b>gratuité totale</b> pour les organisateurs.",
     "faqQ3": "Quelle est la différence avec Luma ?",
@@ -86,7 +86,7 @@
     "faqQ4": "Comment créer une communauté ?",
     "faqA4": "Créez votre communauté en <b>30 secondes</b> : un nom, une description, un thème — c'est tout. Votre communauté est immédiatement prête. Vous pouvez ensuite créer des événements, inviter des membres par lien, et personnaliser votre page communauté. Aucune validation, aucune attente.",
     "faqQ5": "Puis-je organiser des événements payants ?",
-    "faqA5": "Oui. La billetterie est intégrée via <b>Stripe Connect</b>. Vous recevez les paiements directement sur votre compte Stripe — The Playground <b>ne prend aucune commission</b>. Seuls les frais de traitement Stripe standard s'appliquent.",
+    "faqA5": "Oui. Vous ouvrez votre propre compte Stripe depuis votre Communauté, et les paiements arrivent directement dessus. The Playground <b>ne prend aucune commission</b> : seuls les frais de Stripe s'appliquent.",
     "faqQ6": "Mes données sont-elles exportables ?",
     "faqA6": "Oui. Vous pouvez <b>exporter vos membres et vos inscriptions</b> au format CSV à tout moment. Pas de lock-in, pas de piège. Ce que vous construisez sur The Playground reste à vous.",
     "faqQ7": "Mes données restent-elles en Europe ?",
@@ -443,11 +443,12 @@
     },
     "stripeConnect": {
       "title": "Paiements",
-      "description": "Activez les paiements pour proposer des événements payants. Les frais Stripe (~2,9% + 0,30 €) sont déduits de vos revenus. The Playground ne prend aucune commission.",
+      "description": "Activez les paiements pour proposer des événements payants. Vous ouvrez votre compte Stripe et vous encaissez directement. Les frais de Stripe (à partir de 1,5 % + 0,25 € par billet) sont déduits de vos revenus. The Playground ne prend aucune commission.",
       "activate": "Activer les paiements",
       "resume": "Reprendre l'activation",
       "active": "Paiements activés",
-      "pending": "Activation en cours — complétez votre profil Stripe",
+      "pending": "Activation à terminer : Stripe a besoin d'informations de votre part.",
+      "verifying": "Stripe vérifie votre dossier. Rien à faire pour l'instant.",
       "viewDashboard": "Voir mes paiements",
       "cancel": "Annuler l'activation",
       "cancelBlocked": "Impossible d'annuler : cette Communauté a déjà encaissé des paiements, ou a un événement payant publié."
@@ -485,7 +486,7 @@
       "ticketPrice": "Prix du billet",
       "priceSoon": "Bientôt disponible",
       "priceRequiresStripe": "Activez les paiements dans les paramètres de votre communauté",
-      "priceEstimation": "Vous recevrez ~{net} {currency} après frais Stripe (2,9% + 0,30 {currency})",
+      "priceEstimation": "Vous recevrez environ {net} avec une carte européenne standard (frais de Stripe : 1,5 % + 0,25 €). En cas de remboursement, ces frais ne sont pas rendus.",
       "attachments": {
         "label": "Documents (optionnel)",
         "count": "{count}/{max} fichiers",
@@ -634,7 +635,7 @@
       "youAreWaitlistedWithPosition": "Vous êtes en liste d'attente · #{position}",
       "cancelConfirmTitle": "Annuler l'inscription",
       "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cet événement ?",
-      "cancelRefundableInfo": "Vous serez remboursé automatiquement sous 5 à 10 jours.",
+      "cancelRefundableInfo": "Vous serez remboursé automatiquement, en général sous 5 à 10 jours.",
       "cancelNonRefundableWarning": "Cet événement n'est pas remboursable. Vous ne serez pas remboursé.",
       "confirmCancel": "Oui, annuler",
       "checkoutUnavailableTitle": "Paiement indisponible pour le moment",
@@ -1243,6 +1244,14 @@
       "hostPendingMembershipMessage": "{playerName} souhaite rejoindre votre communauté « {circleName} ». Cette demande nécessite votre validation.",
       "manageCta": "Gérer les demandes"
     },
+    "hostRefundFailed": {
+      "subject": "Action requise : remboursement à faire pour {momentTitle}",
+      "heading": "Un remboursement n'a pas abouti",
+      "message": "{count, plural, one {Stripe n'a pas pu effectuer un remboursement} other {Stripe n'a pas pu effectuer # remboursements}} pour {momentTitle}.",
+      "participants": "Participants concernés : {names}.",
+      "action": "Ils attendent leur argent. Depuis les paramètres de votre Communauté, ouvrez « Voir mes paiements » pour les rembourser dans Stripe.",
+      "ctaLabel": "Ouvrir les paramètres de la Communauté"
+    },
     "hostCancellation": {
       "subject": "{playerName} s'est désinscrit(e) de {momentTitle}",
       "heading": "Désinscription d'un événement",
@@ -1428,7 +1437,10 @@
         "payment": {
           "title": "Données de paiement (événements payants uniquement)",
           "stripe": "Les données bancaires (numéro de carte, date d'expiration, CVV) sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground",
-          "ref": "Nous conservons uniquement la référence de la transaction Stripe et l'URL du reçu"
+          "ref": "Nous conservons uniquement la référence de la transaction Stripe, l'identifiant du compte Stripe de l'organisateur et l'URL du reçu",
+          "role": "Pour un événement payant, le paiement est effectué sur le compte Stripe de l'organisateur, qui est le vendeur. Stripe traite les données de paiement, en tant que responsable de traitement ou sous-traitant selon l'activité, comme le décrit <link>sa politique de confidentialité</link>",
+          "roleUrl": "https://stripe.com/fr/privacy",
+          "organizer": "Si vous activez les paiements, vous transmettez directement à Stripe les informations nécessaires à l'ouverture de votre compte (identité, coordonnées bancaires, pièces justificatives). Nous ne les stockons pas : nous conservons uniquement l'identifiant de votre compte Stripe. Nous lui transmettons le nom et l'adresse de votre Communauté pour préremplir votre dossier"
         },
         "analytics": {
           "title": "Données de navigation et d'analyse",
@@ -1538,8 +1550,8 @@
           "safeguards": "DPA Resend, clauses contractuelles types UE"
         },
         "stripe": {
-          "purpose": "Traitement des paiements (événements payants)",
-          "data": "Adresse email, identifiant utilisateur",
+          "purpose": "Traitement des paiements des événements payants, sur le compte de l'organisateur",
+          "data": "Adresse email, identifiant utilisateur, nom et adresse de la Communauté",
           "hq": "États-Unis",
           "hosting": "États-Unis / Union européenne (infrastructure globale)",
           "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE"
@@ -1631,11 +1643,11 @@
       },
       "pricing": {
         "title": "Gratuité et tarification",
-        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'organisateur."
+        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, chaque organisateur encaisse sur son propre compte Stripe et supporte les frais de Stripe (1,5 % + 0,25 € par paiement avec une carte européenne standard, davantage avec une carte premium ou hors d'Europe). Ces frais ne sont pas rendus en cas de remboursement."
       },
       "payments": {
         "title": "Paiements et transactions",
-        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'organisateur et le participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le participant est invité à contacter l'organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
+        "content": "The Playground agit en qualité d'intermédiaire technique. Chaque organisateur encaisse les paiements sur son propre compte Stripe : il est le vendeur, et il assume les remboursements et les litiges liés à ses événements. The Playground n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le participant est invité à contacter l'organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
       },
       "liability": {
         "title": "Limitation de responsabilité",
@@ -1842,7 +1854,7 @@
         "refundLabel": "Politique de remboursement :",
         "refund1": "Chaque événement est soit <strong>remboursable</strong> (remboursement automatique en cas de désinscription), soit <strong>non remboursable</strong> (pas de remboursement si vous vous désinscrivez)",
         "refund2": "En cas d''<strong>annulation de l''événement par l''organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
-        "refund3": "Les remboursements sont effectués sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
+        "refund3": "Les remboursements sont effectués en général sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
         "callout": "The Playground ne prend aucune commission. Vos données bancaires sont traitées par Stripe et ne sont jamais stockées par la plateforme."
       },
       "comments": {
@@ -1913,7 +1925,7 @@
         "field4Desc": "contexte, programme, ce que les participants doivent savoir",
         "advancedLabel": "Options avancées (accessibles via \"Plus d'options\") :",
         "adv1": "<strong>Capacité</strong> — nombre maximum de participants (active la liste d'attente automatiquement). Pour repasser en capacité illimitée, cliquez sur la croix à côté du champ.",
-        "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
+        "adv2": "<strong>Prix</strong> : si l'événement est payant, le paiement arrive directement sur votre compte Stripe. The Playground ne prend aucune commission.",
         "adv3": "<strong>Image de couverture</strong>",
         "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Découvrir ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la communauté. Sur ordinateur, vous pouvez aussi cliquer directement sur <strong>Publier</strong> depuis le formulaire de création pour créer et publier en une seule étape."
       },
@@ -1995,7 +2007,7 @@
         "right4": "Recevoir les mêmes notifications que vous (nouvelles inscriptions, commentaires, etc.)",
         "limitsIntro": "Seul le propriétaire peut :",
         "limit1": "Supprimer la communauté",
-        "limit2": "Gérer le compte Stripe Connect (pour les événements payants)",
+        "limit2": "Gérer le compte Stripe (pour les événements payants)",
         "limit3": "Promouvoir, rétrograder ou retirer un autre co-organisateur",
         "howTo": "Pour promouvoir un membre : sur la page <strong>Membres</strong> de votre communauté, ouvrez le menu <strong>⋮</strong> à côté de son nom et cliquez sur <strong>Promouvoir en co-organisateur</strong>. La personne reçoit un email lui confirmant ses nouveaux droits, et peut immédiatement commencer à gérer la communauté.",
         "demote": "Pour retirer les droits d'un co-organisateur, ouvrez le même menu et cliquez sur Rétrograder en participant. La personne reste membre de la communauté mais perd ses droits de gestion, et reçoit un email sobre l'informant du changement."
@@ -2011,27 +2023,27 @@
       },
       "payments": {
         "title": "Activer les paiements",
-        "intro": "Vous pouvez proposer des événements payants en activant les paiements sur votre communauté via <strong>Stripe Connect</strong>.",
+        "intro": "Vous pouvez proposer des événements payants en ouvrant votre propre compte Stripe depuis votre communauté.",
         "stepsLabel": "Pour activer les paiements :",
         "step1": "Allez dans <strong>Modifier</strong> votre communauté",
         "step2": "Dans la section <strong>Paiements</strong>, cliquez sur <strong>Activer les paiements</strong>",
         "step3": "Vous êtes redirigé vers Stripe pour compléter votre profil (nom, adresse, IBAN, pièce d'identité)",
-        "step4": "De retour sur The Playground, le statut passe à <strong>Paiements activés</strong>",
+        "step4": "Une fois votre dossier vérifié par Stripe, le statut passe à <strong>Paiements activés</strong>.",
         "priceLabel": "Pour définir un prix sur un événement :",
         "price1": "Dans le formulaire de création/modification, la section <strong>Prix du billet</strong> est maintenant éditable",
         "price2": "Saisissez le prix en euros — une estimation du montant net (après frais Stripe) s'affiche",
         "price3": "Activez ou désactivez le toggle <strong>Remboursable</strong> pour choisir la politique de remboursement",
         "billingLabel": "Suivi des paiements :",
         "billing1": "Le tableau de bord de chaque événement payant affiche un résumé <strong>Billetterie</strong> (inscrits payants, montant collecté, remboursés)",
-        "billing2": "Pour le détail complet, cliquez sur <strong>Voir mes paiements</strong> dans les paramètres de la communauté — vous accédez au dashboard Stripe Express",
-        "callout": "The Playground ne prend <strong>aucune commission</strong>. Seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et déduits de vos revenus. L'intégralité du montant restant vous est reversée."
+        "billing2": "Pour le détail complet, cliquez sur <strong>Voir mes paiements</strong> dans les paramètres de la communauté. Vous y retrouvez vos paiements, remboursements, litiges et virements.",
+        "callout": "The Playground ne prend <strong>aucune commission</strong>. Stripe prélève ses frais sur chaque billet (1,5 % + 0,25 € avec une carte européenne standard, davantage avec une carte premium ou hors d'Europe). Ils ne sont pas rendus en cas de remboursement. Vous recevez le reste."
       }
     },
     "faq": {
       "sectionTitle": "Questions fréquentes",
       "q1": {
         "question": "The Playground est-il gratuit ?",
-        "answer": "Oui, entièrement gratuit pour les organisateurs et les participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
+        "answer": "Oui, entièrement gratuit pour les organisateurs et les participants. The Playground ne prend aucune commission. Les seuls frais sont ceux de Stripe sur les événements payants (1,5 % + 0,25 € avec une carte européenne standard), prélevés directement par Stripe."
       },
       "q2": {
         "question": "Quelle est la différence entre une communauté publique et privée ?",
@@ -2059,7 +2071,7 @@
       },
       "q8": {
         "question": "Comment fonctionnent les événements payants ?",
-        "answer": "L'organisateur active les paiements via Stripe Connect dans les paramètres de sa communauté, puis définit un prix sur ses événements. Le participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'organisateur. La politique de remboursement (remboursable ou non) est définie par l'organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
+        "answer": "L'organisateur ouvre son compte Stripe depuis les paramètres de sa communauté, puis définit un prix sur ses événements. Le participant paie le prix affiché sur une page Stripe sécurisée. The Playground ne prend aucune commission. Les frais de Stripe (1,5 % + 0,25 € avec une carte européenne standard) sont supportés par l'organisateur. La politique de remboursement (remboursable ou non) est définie par l'organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
       }
     },
     "contact": {

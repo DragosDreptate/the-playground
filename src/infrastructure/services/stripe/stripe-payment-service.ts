@@ -25,6 +25,22 @@ function publicCircleUrl(circle: Circle): string | undefined {
   return appUrl.startsWith("https://") ? `${appUrl}/circles/${circle.slug}` : undefined;
 }
 
+export function toConnectAccountStatus(account: Stripe.Account): ConnectAccountStatus {
+  if (account.details_submitted && account.charges_enabled) {
+    return "active";
+  }
+  if (account.requirements?.disabled_reason === "requirements.pending_verification") {
+    return "verifying";
+  }
+  if (account.requirements?.disabled_reason) {
+    return "disabled";
+  }
+  if (account.requirements?.currently_due?.length) {
+    return "restricted";
+  }
+  return "pending";
+}
+
 function toRefundStatus(status: string | null): RefundStatus {
   if (status === "succeeded") return "succeeded";
   if (status === "failed" || status === "canceled") return "failed";
@@ -98,17 +114,7 @@ export function createStripePaymentService(): PaymentService {
     async getConnectAccountStatus(
       accountId: string
     ): Promise<ConnectAccountStatus> {
-      const account = await stripe.accounts.retrieve(accountId);
-      if (account.details_submitted && account.charges_enabled) {
-        return "active";
-      }
-      if (account.requirements?.disabled_reason) {
-        return "disabled";
-      }
-      if (account.requirements?.currently_due?.length) {
-        return "restricted";
-      }
-      return "pending";
+      return toConnectAccountStatus(await stripe.accounts.retrieve(accountId));
     },
 
     async createCheckoutSession(

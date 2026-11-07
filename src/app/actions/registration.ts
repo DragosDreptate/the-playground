@@ -25,11 +25,26 @@ import { formatPrice } from "@/lib/format-price";
 import { notifySlackNewRegistration } from "@/infrastructure/services/slack/slack-notification-service";
 import type { EmailLocaleResolver } from "@/lib/email/email-locale";
 import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { notifyRefundFailure } from "./helpers/notify-refund-failure";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
+
+function reportRefundFailure(
+  error: unknown,
+  momentId: string,
+  participantUserId: string,
+  resolver: EmailLocaleResolver
+): void {
+  Sentry.captureException(error);
+  after(() =>
+    notifyRefundFailure(momentId, [participantUserId], resolver).catch((err) =>
+      Sentry.captureException(err)
+    )
+  );
+}
 const paymentService = createStripePaymentService();
 
 export async function joinMomentAction(
@@ -133,7 +148,11 @@ export async function cancelOrganizerRegistrationAction(
       }
     );
 
-    if (result.refundError) Sentry.captureException(result.refundError);
+    if (result.refundError) {
+      const failed = result.registration;
+      const resolver = await buildEmailLocaleResolver(userId);
+      reportRefundFailure(result.refundError, failed.momentId, failed.userId, resolver);
+    }
 
     if (result.promotedRegistration) {
       const promoted = result.promotedRegistration;
@@ -173,10 +192,12 @@ export async function cancelRegistrationAction(
       }
     );
 
-    if (result.refundError) Sentry.captureException(result.refundError);
-
     // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(userId);
+
+    if (result.refundError) {
+      reportRefundFailure(result.refundError, result.registration.momentId, result.registration.userId, resolver);
+    }
 
     if (result.promotedRegistration) {
       const promoted = result.promotedRegistration;
@@ -556,11 +577,13 @@ export async function removeRegistrationByHostAction(
       }
     );
 
-    if (result.refundError) Sentry.captureException(result.refundError);
-
     // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(hostUserId);
     const { momentId, userId } = result.cancelledRegistration;
+
+    if (result.refundError) {
+      reportRefundFailure(result.refundError, momentId, userId, resolver);
+    }
 
     after(async () => {
       try {

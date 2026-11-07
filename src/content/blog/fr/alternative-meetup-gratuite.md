@@ -40,7 +40,7 @@ Avant de choisir, posez-vous les bonnes questions :
 
 **Le principe** : quand quelqu'un s'inscrit à votre événement, il rejoint automatiquement votre communauté. Après l'événement, il voit les prochains rendez-vous, les autres membres, l'identité de votre groupe. Le lien ne se casse pas.
 
-**Tarification** : 0% de commission, aucun abonnement. Seuls les frais Stripe standards (~2.9% + 0.30€) s'appliquent sur les événements payants. L'intégralité du montant va à l'organisateur.
+**Tarification** : 0% de commission, aucun abonnement. Seuls les frais Stripe standards (1,5 % + 0,25 € avec une carte européenne standard) s'appliquent sur les événements payants. L'intégralité du montant va à l'organisateur.
 
 **L'angle européen.** C'est un point qui compte de plus en plus :
 

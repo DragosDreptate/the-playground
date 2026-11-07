@@ -25,6 +25,7 @@ import { RegistrationReminderEmail } from "@/infrastructure/services/email/templ
 import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
 import { CancellationConfirmationEmail } from "@/infrastructure/services/email/templates/cancellation-confirmation";
 import { HostCancellationEmail } from "@/infrastructure/services/email/templates/host-cancellation";
+import { HostRefundFailedEmail } from "@/infrastructure/services/email/templates/host-refund-failed";
 import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
 import { OnboardingWelcomeEmail } from "@/infrastructure/services/email/templates/onboarding-welcome";
 import { getOnboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
@@ -230,6 +231,26 @@ function localizedEmails(locale: PreviewLocale, t: EmailTranslations): EmailDef[
         momentSlug: MOMENT_SLUG,
         circleSlug: CIRCLE_SLUG,
         amountRefunded: refunded ? amount : null,
+        strings,
+        baseUrl: BASE_URL,
+      }),
+    };
+  };
+  const hostRefundFailedEmail = () => {
+    const strings = {
+      subject: t("hostRefundFailed.subject", { momentTitle: MOMENT_TITLE }),
+      heading: t("hostRefundFailed.heading"),
+      message: t("hostRefundFailed.message", { count: 1, momentTitle: MOMENT_TITLE }),
+      participants: t("hostRefundFailed.participants", { names: PLAYER }),
+      action: t("hostRefundFailed.action"),
+      ctaLabel: t("hostRefundFailed.ctaLabel"),
+      footer,
+    };
+    return {
+      subject: strings.subject,
+      element: HostRefundFailedEmail({
+        to: "bob@example.com",
+        circleSlug: CIRCLE_SLUG,
         strings,
         baseUrl: BASE_URL,
       }),
@@ -688,6 +709,13 @@ function localizedEmails(locale: PreviewLocale, t: EmailTranslations): EmailDef[
       label: "Désinscription d'un participant (non remboursable)",
       recipient: "Organisateurs de la Communauté",
       ...hostCancellationEmail(false),
+    },
+    {
+      id: "host-refund-failed",
+      group: "host",
+      label: "Remboursement refusé par Stripe",
+      recipient: "Propriétaire de la Communauté",
+      ...hostRefundFailedEmail(),
     },
     {
       id: "host-new-circle-member",

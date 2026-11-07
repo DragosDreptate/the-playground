@@ -520,7 +520,7 @@ async function main() {
             status: "REGISTERED",
             paymentStatus: "PAID",
             stripePaymentIntentId: `pi_test_seed_${moment.id}_${userId}`,
-            stripeAccountId: "acct_test_seed",
+            stripeAccountId: "acct_test_e2e_fake",
           },
           update: { status: "REGISTERED", paymentStatus: "PAID" },
         });

@@ -48,10 +48,12 @@ export async function deleteMoment(
 
   // Remboursement des inscrits payants avant la suppression (cascade DB).
   if (deps.registrationRepository && deps.paymentService) {
-    await refundAllPaidRegistrations(existing, {
+    const { failures } = await refundAllPaidRegistrations(existing, {
       registrationRepository: deps.registrationRepository,
       paymentService: deps.paymentService,
     });
+    // Une inscription supprimée ne se rembourse plus : on garde l'événement.
+    if (failures.length > 0) throw failures[0].error;
   }
 
   await momentRepository.delete(input.momentId);

@@ -29,6 +29,7 @@ export function createMockEmailService(
     sendRegistrationRemovedByHost: vi.fn().mockResolvedValue(undefined),
     sendApprovalNotification: vi.fn().mockResolvedValue(undefined),
     sendHostCancellation: vi.fn().mockResolvedValue(undefined),
+    sendHostRefundFailed: vi.fn().mockResolvedValue(undefined),
   sendCancellationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendOnboardingWelcome: vi.fn().mockResolvedValue(undefined),
     sendCoHostPromoted: vi.fn().mockResolvedValue(undefined),

@@ -82,6 +82,12 @@ export default async function PrivacyPage() {
       <ul>
         <li>{t("privacy.dataCollected.payment.stripe")}</li>
         <li>{t("privacy.dataCollected.payment.ref")}</li>
+        <li>
+          {t.rich("privacy.dataCollected.payment.role", {
+            link: (chunks) => <a href={t("privacy.dataCollected.payment.roleUrl")}>{chunks}</a>,
+          })}
+        </li>
+        <li>{t("privacy.dataCollected.payment.organizer")}</li>
       </ul>
 
       <h3>{t("privacy.dataCollected.analytics.title")}</h3>

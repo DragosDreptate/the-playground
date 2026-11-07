@@ -4,7 +4,11 @@ import type { User } from "@/domain/models/user";
 
 // --- Types ---
 
-export type ConnectAccountStatus = "pending" | "active" | "restricted" | "disabled";
+/**
+ * `verifying` : dossier complet, Stripe vérifie, rien à faire pour l'Organisateur.
+ * `pending`, `restricted`, `disabled` : l'Organisateur doit reprendre son dossier.
+ */
+export type ConnectAccountStatus = "pending" | "verifying" | "active" | "restricted" | "disabled";
 
 export type CheckoutSessionParams = {
   moment: Moment;

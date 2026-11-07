@@ -27,6 +27,7 @@ import type {
   RegistrationRemovedByHostEmailData,
   ApprovalNotificationEmailData,
   HostCancellationEmailData,
+  HostRefundFailedEmailData,
   CancellationConfirmationEmailData,
   OnboardingWelcomeEmailData,
   CoHostPromotedEmailData,
@@ -34,6 +35,7 @@ import type {
   HostContactMessageEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
+import { HostRefundFailedEmail } from "./templates/host-refund-failed";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "./templates/host-new-registration";
 import { NewCommentEmail } from "./templates/new-comment";
@@ -474,6 +476,17 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: HostCancellationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendHostRefundFailed(data: HostRefundFailedEmailData): Promise<void> {
+      if (isDemoEmail(data.to)) return;
+      const baseUrl = getBaseUrl();
+      await send({
+        from: getSender(),
+        to: data.to,
+        subject: data.strings.subject,
+        react: HostRefundFailedEmail({ ...data, baseUrl }),
       });
     },
 

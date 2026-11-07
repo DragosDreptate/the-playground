@@ -1,6 +1,6 @@
 # Paiements : l'Organisateur devient le marchand (direct charges)
 
-> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0 et 1 terminés, lot 2 codé dans `feat/paiements-direct-charges`, non commité.
+> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0, 1 et 2 commités dans `feat/paiements-direct-charges`. Lot 3 commité, relecture juridique des CGU et de la confidentialité à faire avant la release. Lot 4 en cours.
 > **Remplace à terme** le modèle de paiement de [`stripe-connect.md`](stripe-connect.md). Les règles métier de cette spec restent valables (prix verrouillé, pas de liste d'attente sur payant, authentification avant paiement).
 > **Contexte** : aucun paiement réel en production au 2026-11-07, donc rien à migrer côté transactions.
 
@@ -135,6 +135,8 @@ Fichiers : `stripe-payment-service.ts`, `payment-service.ts`, `mock-payment-serv
 - `messages/*.json` : FAQ, Aide, CGU, confidentialité, landing. Retirer tous les « 2,9 % + 0,30 € ».
 - Articles de blog concernés, et `src/app/[locale]/(routes)/legal/confidentialite/page.tsx`.
 - CGU : relecture juridique recommandée sur le rôle de chacun et sur les frais.
+- Confidentialité : le rôle de Stripe change (il traite pour l'Organisateur), à faire relire avec les CGU.
+- `refundAllPaidRegistrations` : un échec n'arrête plus les autres remboursements, et un seul email part par événement (D8). La suppression et le passage en gratuit restent bloqués par un échec.
 
 ### Lot 4. Tests
 

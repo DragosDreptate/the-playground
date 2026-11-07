@@ -44,6 +44,7 @@ import {
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
 import { buildEmailLocaleResolver } from "./helpers/email-locale-resolver";
+import { notifyRefundFailure } from "./helpers/notify-refund-failure";
 import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
@@ -670,17 +671,30 @@ export async function cancelMomentAction(
     // 0) Remboursement des inscrits payants — best-effort, APRÈS la bascule en
     //    CANCELLED (déjà persistée) et hors de la garde de statut. On réutilise les
     //    inscriptions actives déjà chargées (pas de SELECT redondant). Un échec
-    //    Stripe est capturé dans Sentry sans faire échouer l'annulation ; le
-    //    remboursement est idempotent et rejoué au besoin par la suppression de
-    //    l'événement annulé. Différé via after() pour survivre au teardown serverless.
-    //    Indépendant de la notif : pas besoin du contrôle de membership.
-    after(() =>
-      refundAllPaidRegistrations(
-        result.moment,
-        { registrationRepository: prismaRegistrationRepository, paymentService },
-        activeToNotify
-      ).catch((err) => Sentry.captureException(err))
-    );
+    //    Stripe est capturé dans Sentry et signalé au propriétaire sans faire échouer
+    //    l'annulation ; le remboursement est idempotent et rejoué au besoin par la
+    //    suppression de l'événement annulé. Différé via after() pour survivre au
+    //    teardown serverless. Indépendant de la notif : pas besoin du contrôle de membership.
+    const refundResolver = await buildEmailLocaleResolver(userId);
+    after(async () => {
+      try {
+        const { failures } = await refundAllPaidRegistrations(
+          result.moment,
+          { registrationRepository: prismaRegistrationRepository, paymentService },
+          activeToNotify
+        );
+        if (failures.length > 0) {
+          failures.forEach(({ error }) => Sentry.captureException(error));
+          await notifyRefundFailure(
+            result.moment.id,
+            failures.map(({ registration }) => registration.userId),
+            refundResolver
+          );
+        }
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
 
     // Le contrôle de membership (allowed / isOrganizerOfEvent) ne sert qu'à la notif
     // et au commentaire : on l'évite quand il n'y a ni inscrit à prévenir ni message
