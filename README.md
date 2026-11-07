@@ -101,7 +101,7 @@ Relevés sur `main` le 7 novembre 2026 (v2.20.0), premier commit le 19 février 
 | **1 703** | textes traduits, en FR et en EN |
 | **2 115** | commits (hors merges), dont 83 % co-écrits avec Claude |
 | **558** | pull requests mergées |
-| **41** | versions publiées |
+| **44** | versions publiées |
 
 → [Fiche technique illustrée](https://claude.ai/artifact/2FUB7fkvT9aRGqFGAesxai)
 
