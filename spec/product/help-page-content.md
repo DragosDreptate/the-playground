@@ -200,7 +200,7 @@ Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent
 ## 5. FAQ
 
 **The Playground est-il gratuit ?**
-Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe.
+Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais sont ceux de Stripe sur les événements payants (1,5 % + 0,25 € avec une carte européenne standard), prélevés directement par Stripe.
 
 ---
 

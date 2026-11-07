@@ -49,7 +49,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 **Plateforme**
 - Répertoire public de communautés ([Explorer](https://the-playground.fr/explorer))
 - Bilingue FR / EN
-- 100% gratuit — seuls les frais Stripe (~2,9% + 0,30€) sur les événements payants
+- 100% gratuit — seuls les frais Stripe (1,5 % + 0,25 € pour une carte européenne standard) sur les événements payants
 
 ## Stack
 

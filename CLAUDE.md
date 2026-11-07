@@ -199,7 +199,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 ## Monétisation
 
 - **100% gratuit** — aucune commission plateforme, aucun abonnement requis
-- Seuls les frais Stripe (~2.9% + 0.30$) sur les événements payants
+- Seuls les frais Stripe (1,5 % + 0,25 € pour une carte européenne standard) sur les événements payants, à la charge de l'Organisateur
 - The Playground ne prend aucune marge sur les transactions
 - Évolution future : Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 
@@ -245,7 +245,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - **ORM** : Prisma — schema déclaratif, migrations
 - **Base de données** : PostgreSQL — multi-tenant
 - **Auth** : Auth.js (NextAuth v5) — magic link (Resend) + OAuth (Google, GitHub, LinkedIn), self-hosted
-- **Paiements** : Stripe Connect — reversement aux Organisateurs
+- **Paiements** : Stripe Connect — paiement direct sur le compte de l'Organisateur, qui est le marchand (voir [ADR-0009](spec/decisions/0009-organisateur-marchand-direct-charges.md))
 
 ### UI / Design
 - **Styling** : Tailwind CSS 4
