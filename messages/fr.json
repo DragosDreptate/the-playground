@@ -449,7 +449,8 @@
       "active": "Paiements activés",
       "pending": "Activation en cours — complétez votre profil Stripe",
       "viewDashboard": "Voir mes paiements",
-      "cancel": "Annuler l'activation"
+      "cancel": "Annuler l'activation",
+      "cancelBlocked": "Impossible d'annuler : cette Communauté a déjà encaissé des paiements, ou a un événement payant publié."
     }
   },
   "Moment": {

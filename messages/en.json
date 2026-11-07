@@ -449,7 +449,8 @@
       "active": "Payments enabled",
       "pending": "Activation in progress — complete your Stripe profile",
       "viewDashboard": "View my payments",
-      "cancel": "Cancel activation"
+      "cancel": "Cancel activation",
+      "cancelBlocked": "Can't cancel: this Community has already received payments, or has a published paid event."
     }
   },
   "Moment": {
