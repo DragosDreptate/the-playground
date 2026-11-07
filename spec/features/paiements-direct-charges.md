@@ -1,6 +1,6 @@
 # Paiements : l'Organisateur devient le marchand (direct charges)
 
-> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0, 1 et 2 commités dans `feat/paiements-direct-charges`. Lot 3 commité, relecture juridique des CGU et de la confidentialité à faire avant la release. Lot 4 en cours.
+> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0, 1 et 2 commités dans `feat/paiements-direct-charges`. Lots 0 à 3 commités, lot 4 validé et non commité. Relecture juridique des CGU et de la confidentialité à faire avant la release.
 > **Remplace à terme** le modèle de paiement de [`stripe-connect.md`](stripe-connect.md). Les règles métier de cette spec restent valables (prix verrouillé, pas de liste d'attente sur payant, authentification avant paiement).
 > **Contexte** : aucun paiement réel en production au 2026-11-07, donc rien à migrer côté transactions.
 
@@ -143,6 +143,8 @@ Fichiers : `stripe-payment-service.ts`, `payment-service.ts`, `mock-payment-serv
 - Unitaires : port mis à jour, remboursement avec compte, remboursement en attente, `charge_refunded` idempotent, garde de déconnexion.
 - E2E : helper de webhook avec `account`, seed adapté, parcours avec un compte Organisateur ordinaire.
 - Validation manuelle du parcours réel, WebKit compris.
+
+**Résultat du 2026-11-07 :** 15 tests e2e de `stripe-payment.spec.ts` verts sur Chromium, et parcours réel `stripe-live.spec.ts` vert sur Chromium et WebKit : paiement sur la vraie page Stripe, webhook, inscription, désinscription, remboursement. Ce parcours tourne sur un ancien compte Express de test, faute de compte au profil cible (son inscription exige un humain). Le profil cible a été validé à part au lot 0. Google Pay et la suite e2e complète restent à passer.
 
 ### Lot 5. Release
 
