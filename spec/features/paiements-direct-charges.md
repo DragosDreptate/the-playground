@@ -1,6 +1,6 @@
 # Paiements : l'Organisateur devient le marchand (direct charges)
 
-> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0, 1 et 2 commités dans `feat/paiements-direct-charges`. Lots 0 à 3 commités, lot 4 validé et non commité. Relecture juridique des CGU et de la confidentialité à faire avant la release.
+> **Statut** : lots 0 à 4 livrés sur `feat/paiements-direct-charges` (PR #644). Décisions D1 à D8 tranchées, relecture juridique validée. Lot 5 en cours.
 > **Remplace à terme** le modèle de paiement de [`stripe-connect.md`](stripe-connect.md). Les règles métier de cette spec restent valables (prix verrouillé, pas de liste d'attente sur payant, authentification avant paiement).
 > **Contexte** : aucun paiement réel en production au 2026-11-07, donc rien à migrer côté transactions.
 
@@ -160,10 +160,16 @@ Fichiers : `stripe-payment-service.ts`, `payment-service.ts`, `mock-payment-serv
 
 ### Lot 5. Release
 
-- Endpoint webhook « Connected accounts » en live, et nouveau secret dans Vercel (production et staging).
-- `db:push:prod` au moment de la release, avec feu vert dédié.
-- Comptes Express existants : un type de compte ne change pas. Lister, prévenir les Organisateurs, remettre `stripeConnectAccountId` à zéro après leur accord, fermer les anciens comptes. Refaire l'onboarding. Écriture en production : feu vert dédié.
-- Mise à jour de `spec/features/stripe-connect.md`, de `CLAUDE.md` et de l'ADR.
+Relecture juridique des CGU et de la confidentialité : validée par Dragos le 2026-11-07.
+
+Dans cet ordre, chaque étape en production avec un feu vert dédié :
+
+1. Endpoint webhook « Connected accounts » en live (`checkout.session.completed`, `charge.refunded`), et son secret dans `STRIPE_WEBHOOK_SECRET` sur Vercel. Supprimer ensuite l'ancien endpoint plateforme.
+2. `db:push:prod` pour `Registration.stripeAccountId`, **avant le merge** : le code lit cette colonne, y compris dans des requêtes SQL.
+3. Merge et déploiement.
+4. Désactivation des 8 comptes existants **juste après le déploiement**, pas avant : l'ancien code recréerait un compte de l'ancien modèle. Aucun paiement réel et aucun événement payant à venir au 2026-11-07. Sans message aux Organisateurs (décision de Dragos) : qui veut refaire un événement payant réactive depuis sa Communauté. Anciens comptes laissés chez Stripe, à supprimer plus tard avec une clé live si besoin.
+5. Un vrai petit paiement, remboursé ensuite. Google Pay à vérifier sur Android.
+6. Mise à jour de cette spec, nettoyage du worktree.
 
 ## 6. Hors périmètre
 
