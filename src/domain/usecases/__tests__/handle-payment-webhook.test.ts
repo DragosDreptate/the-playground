@@ -12,6 +12,7 @@ const checkoutEvent = {
   circleId: "circle-1",
   paymentIntentId: "pi_test_123",
   receiptUrl: "https://pay.stripe.com/receipts/test",
+  accountId: "acct_organizer",
 };
 
 function makeDeps(overrides: {
@@ -72,6 +73,7 @@ describe("handlePaymentWebhook", () => {
         status: "REGISTERED",
         paymentStatus: "PAID",
         stripePaymentIntentId: "pi_test_123",
+        stripeAccountId: "acct_organizer",
         stripeReceiptUrl: "https://pay.stripe.com/receipts/test",
       });
       expect(deps.circleRepository.addMembership).toHaveBeenCalledWith("circle-1", "user-2", "PLAYER");
@@ -107,7 +109,6 @@ describe("handlePaymentWebhook", () => {
       const deps = makeDeps({
         paymentService: {
           handleWebhookEvent: vi.fn().mockResolvedValue(checkoutEvent),
-          refund: vi.fn().mockResolvedValue(undefined),
         },
         momentRepository: {
           findById: vi.fn().mockResolvedValue(moment),
@@ -124,7 +125,10 @@ describe("handlePaymentWebhook", () => {
       );
 
       expect(result.handled).toBe(false);
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_test_123");
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({
+        paymentIntentId: "pi_test_123",
+        accountId: "acct_organizer",
+      });
       expect(deps.registrationRepository.create).not.toHaveBeenCalled();
     });
   });

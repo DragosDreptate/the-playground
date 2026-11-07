@@ -36,6 +36,8 @@ export type Registration = {
   status: RegistrationStatus;
   paymentStatus: PaymentStatus;
   stripePaymentIntentId: string | null;
+  /** Compte de l'Organisateur portant le paiement, requis pour le rembourser. */
+  stripeAccountId: string | null;
   stripeReceiptUrl: string | null;
   registeredAt: Date;
   cancelledAt: Date | null;
@@ -72,6 +74,7 @@ export function redactRegistrationForNonHost(
   return {
     ...registration,
     stripePaymentIntentId: null,
+    stripeAccountId: null,
     stripeReceiptUrl: null,
     user: { ...registration.user, email: "" },
   };

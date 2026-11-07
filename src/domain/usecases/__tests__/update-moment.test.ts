@@ -384,7 +384,7 @@ describe("UpdateMoment", () => {
     it("should refund all PAID registrations and allow the transition", async () => {
       const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
       const updated = makeMoment({ id: "moment-1", price: 0 });
-      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" });
+      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
       const freeReg = makeRegistration({ id: "reg-2", paymentStatus: "NONE" });
 
       const momentRepo = createMockMomentRepository({
@@ -406,7 +406,7 @@ describe("UpdateMoment", () => {
       );
 
       expect(result.moment.price).toBe(0);
-      expect(paymentService.refund).toHaveBeenCalledWith("pi_1");
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
       expect(paymentService.refund).toHaveBeenCalledTimes(1); // Only the PAID one, not the free one
     });
   });

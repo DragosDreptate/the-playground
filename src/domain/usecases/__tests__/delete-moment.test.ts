@@ -120,8 +120,8 @@ describe("DeleteMoment", () => {
   describe("given a paid event with PAID registrations", () => {
     it("should refund all PAID registrations before deleting (force=true)", async () => {
       const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
-      const paidReg1 = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" });
-      const paidReg2 = makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: "pi_2" });
+      const paidReg1 = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const paidReg2 = makeRegistration({ id: "reg-2", paymentStatus: "PAID", stripePaymentIntentId: "pi_2", stripeAccountId: "acct_test" });
       const freeReg = makeRegistration({ id: "reg-3", paymentStatus: "NONE" });
 
       const momentRepo = createMockMomentRepository({
@@ -144,8 +144,8 @@ describe("DeleteMoment", () => {
 
       // Should refund only the 2 PAID registrations, not the free one
       expect(paymentService.refund).toHaveBeenCalledTimes(2);
-      expect(paymentService.refund).toHaveBeenCalledWith("pi_1");
-      expect(paymentService.refund).toHaveBeenCalledWith("pi_2");
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_2", accountId: "acct_test" });
       expect(momentRepo.delete).toHaveBeenCalledWith("moment-1");
     });
   });

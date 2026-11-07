@@ -11,7 +11,7 @@ export function createMockPaymentService(
     getConnectAccountStatus: vi.fn().mockResolvedValue("active"),
     createCheckoutSession: vi.fn().mockResolvedValue({ url: "https://checkout.stripe.com/test", sessionId: "cs_test_123" }),
     handleWebhookEvent: vi.fn().mockResolvedValue({ type: "unknown" }),
-    refund: vi.fn().mockResolvedValue(undefined),
+    refund: vi.fn().mockResolvedValue({ status: "succeeded" }),
     ...overrides,
   };
 }

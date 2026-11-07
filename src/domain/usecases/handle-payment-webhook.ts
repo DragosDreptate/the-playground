@@ -33,7 +33,7 @@ export async function handlePaymentWebhook(
     return { handled: false, reason: `Ignored event type: ${event.type}` };
   }
 
-  const { userId, momentId, circleId, paymentIntentId, receiptUrl } = event;
+  const { userId, momentId, circleId, paymentIntentId, receiptUrl, accountId } = event;
 
   // Validate metadata is present
   if (!userId || !momentId || !circleId) {
@@ -60,7 +60,7 @@ export async function handlePaymentWebhook(
     if (activeCount >= moment.capacity) {
       // Event is full — refund the payment
       if (paymentIntentId) {
-        await paymentService.refund(paymentIntentId);
+        await paymentService.refund({ paymentIntentId, accountId });
       }
       return { handled: false, reason: "Event is full — payment refunded" };
     }
@@ -77,6 +77,7 @@ export async function handlePaymentWebhook(
       status: "REGISTERED",
       paymentStatus: "PAID",
       stripePaymentIntentId: paymentIntentId || null,
+      stripeAccountId: accountId,
       stripeReceiptUrl: receiptUrl || null,
       cancelledAt: null,
     });
@@ -87,6 +88,7 @@ export async function handlePaymentWebhook(
       status: "REGISTERED",
       paymentStatus: "PAID",
       stripePaymentIntentId: paymentIntentId || null,
+      stripeAccountId: accountId,
       stripeReceiptUrl: receiptUrl || null,
     });
   }

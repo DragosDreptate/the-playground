@@ -12,6 +12,7 @@ export type CreateRegistrationInput = {
   status: RegistrationStatus;
   paymentStatus?: PaymentStatus;
   stripePaymentIntentId?: string | null;
+  stripeAccountId?: string | null;
   stripeReceiptUrl?: string | null;
 };
 
@@ -19,6 +20,7 @@ export type UpdateRegistrationInput = {
   status?: RegistrationStatus;
   paymentStatus?: PaymentStatus;
   stripePaymentIntentId?: string | null;
+  stripeAccountId?: string | null;
   stripeReceiptUrl?: string | null;
   cancelledAt?: Date | null;
   checkedInAt?: Date | null;

@@ -25,8 +25,10 @@ export async function refundRegistration(
   const { registration, moment, force = false } = input;
   const { registrationRepository, paymentService } = deps;
 
+  const { stripePaymentIntentId, stripeAccountId } = registration;
+
   // No payment to refund
-  if (registration.paymentStatus !== "PAID" || !registration.stripePaymentIntentId) {
+  if (registration.paymentStatus !== "PAID" || !stripePaymentIntentId || !stripeAccountId) {
     return { refunded: false };
   }
 
@@ -36,7 +38,10 @@ export async function refundRegistration(
   }
 
   // Call Stripe refund
-  await paymentService.refund(registration.stripePaymentIntentId);
+  await paymentService.refund({
+    paymentIntentId: stripePaymentIntentId,
+    accountId: stripeAccountId,
+  });
 
   // Update payment status
   await registrationRepository.update(registration.id, {

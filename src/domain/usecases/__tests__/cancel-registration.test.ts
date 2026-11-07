@@ -301,7 +301,7 @@ describe("CancelRegistration", () => {
       const paidReg = makeRegistration({
         status: "REGISTERED",
         paymentStatus: "PAID",
-        stripePaymentIntentId: "pi_test_refund",
+        stripePaymentIntentId: "pi_test_refund", stripeAccountId: "acct_test",
       });
       const paidMoment = makeMoment({ price: 1500, refundable: true });
       const paymentService = createMockPaymentService();
@@ -318,7 +318,7 @@ describe("CancelRegistration", () => {
 
       await cancelRegistration(defaultInput, { ...deps, paymentService });
 
-      expect(paymentService.refund).toHaveBeenCalledWith("pi_test_refund");
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_test_refund", accountId: "acct_test" });
     });
   });
 
@@ -327,7 +327,7 @@ describe("CancelRegistration", () => {
       const paidReg = makeRegistration({
         status: "REGISTERED",
         paymentStatus: "PAID",
-        stripePaymentIntentId: "pi_test_no_refund",
+        stripePaymentIntentId: "pi_test_no_refund", stripeAccountId: "acct_test",
       });
       const nonRefundableMoment = makeMoment({ price: 1500, refundable: false });
       const paymentService = createMockPaymentService();
@@ -383,7 +383,7 @@ describe("CancelRegistration", () => {
       const paidReg = makeRegistration({
         status: "REGISTERED",
         paymentStatus: "PAID",
-        stripePaymentIntentId: "pi_test_no_promote",
+        stripePaymentIntentId: "pi_test_no_promote", stripeAccountId: "acct_test",
       });
       const paidMoment = makeMoment({ price: 1500, refundable: true });
       const waitlistedReg = makeRegistration({ id: "waitlisted-1", status: "WAITLISTED" });
