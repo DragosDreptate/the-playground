@@ -36,7 +36,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - **Co-organisateurs** — déléguez la gestion sans partager les accès sensibles (Stripe, suppression)
 - Créer des événements avec une page autonome et partageable
 - **Pièces jointes** — documents et vidéos consultables directement sur la page événement
-- **Billetterie intégrée** via Stripe Connect — 0% commission plateforme
+- **Billetterie intégrée** — l'Organisateur encaisse directement sur son propre compte Stripe, 0% commission plateforme, remboursements automatiques en cas d'annulation
 - **Inscriptions sur validation** pour filtrer les participants si besoin
 - Gérer ses participants de façon persistante (pas événement par événement)
 - **Email groupé** aux participants d'un événement (inscrits, liste d'attente ou tous)
@@ -50,7 +50,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - **Profil public** avec bio, ville, liens sociaux
 - Ajout à son calendrier en un clic (Google Calendar, Apple Calendar, .ics)
 - **Fuseaux horaires** : horaires affichés dans le fuseau de l'appareil, emails à l'heure du lieu de l'événement
-- Notifications email (confirmation, rappel 24h avant, changements, annulations), **dans la langue choisie** sur le site (FR ou EN)
+- Notifications email (confirmation, rappel 24h avant, changements, annulations), **dans la langue choisie** par chaque destinataire (FR ou EN)
 - Page communauté : prochains événements, membres, historique
 - Fil de commentaires (avec photos) sur chaque événement
 
@@ -60,7 +60,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - **Réseaux** — regrouper plusieurs communautés sous une vitrine commune (fédérations, collectifs, marques)
 - **Blog** — articles de fond et guides pratiques (philosophie produit, migration depuis Meetup, etc.)
 - Bilingue FR / EN avec URLs propres
-- 100% gratuit — seuls les frais Stripe (~2,9% + 0,30€) sur les événements payants
+- 100% gratuit — seuls les frais Stripe (1,5% + 0,25€ pour une carte européenne standard) sur les événements payants, à la charge de l'Organisateur
 
 ## Stack
 
@@ -75,7 +75,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 | **i18n** | next-intl · FR / EN |
 | **Email** | Resend + react-email · invitations calendrier (.ics) |
 | **IA** | Anthropic SDK · Claude Haiku 5.5 (radar des événements concurrents) |
-| **Paiements** | Stripe Connect |
+| **Paiements** | Stripe Connect (paiement direct sur le compte de l'Organisateur) |
 | **Stockage** | Vercel Blob |
 | **Analytics** | PostHog · Vercel Analytics · Speed Insights |
 | **Monitoring** | Sentry |
@@ -87,21 +87,21 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 
 ## En chiffres
 
-Relevés sur `main` le 1er novembre 2026 (v2.19.0), premier commit le 19 février 2026.
+Relevés sur `main` le 7 novembre 2026 (v2.20.0), premier commit le 19 février 2026.
 
 | | |
 | --- | --- |
-| **62 400** | lignes de TypeScript en production (597 fichiers) |
-| **29 600** | lignes de tests |
-| **1 760** | tests unitaires (Vitest) |
-| **211** | tests E2E (Playwright, en CI) + 35 scénarios mobiles sur 3 appareils |
+| **62 900** | lignes de TypeScript en production (595 fichiers) |
+| **31 200** | lignes de tests |
+| **1 817** | tests unitaires (Vitest) |
+| **212** | tests E2E (Playwright, en CI) + 35 scénarios mobiles sur 3 appareils |
 | **90** | cas d'usage métier (domain usecases) |
 | **15** | ports, 10 repositories Prisma, 16 modèles en base |
 | **50** | pages, 23 routes API |
-| **1 688** | textes traduits, en FR et en EN |
-| **2 111** | commits (hors merges), dont 84 % co-écrits avec Claude |
-| **555** | pull requests mergées |
-| **43** | versions publiées |
+| **1 703** | textes traduits, en FR et en EN |
+| **2 115** | commits (hors merges), dont 83 % co-écrits avec Claude |
+| **558** | pull requests mergées |
+| **44** | versions publiées |
 
 → [Fiche technique illustrée](https://claude.ai/artifact/2FUB7fkvT9aRGqFGAesxai)
 
@@ -176,12 +176,16 @@ Quatre options, **au moins une** doit être configurée dans `.env.local` :
 
 ```bash
 pnpm dev              # serveur de développement
-pnpm test             # tests Vitest
+pnpm test             # tests Vitest (tous)
+pnpm test:unit        # tests unitaires uniquement
 pnpm test:e2e         # tests E2E (Playwright)
+pnpm test:mobile      # tests mobile (Playwright, config dédiée)
 pnpm typecheck        # vérification TypeScript
 pnpm db:push          # applique le schema sur la DB dev
 pnpm db:studio        # UI de visualisation Prisma
 pnpm db:seed-test-data    # injecte les données de test
+pnpm db:seed-demo-data    # injecte des communautés et événements de démo
+pnpm db:dev:reset         # recrée la branche Neon dev depuis la production
 ```
 
 ## Changelog
