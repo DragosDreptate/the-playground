@@ -133,6 +133,8 @@ export async function cancelOrganizerRegistrationAction(
       }
     );
 
+    if (result.refundError) Sentry.captureException(result.refundError);
+
     if (result.promotedRegistration) {
       const promoted = result.promotedRegistration;
       // Resolver construit en request context (getLocale), avant `after()`.
@@ -170,6 +172,8 @@ export async function cancelRegistrationAction(
         paymentService,
       }
     );
+
+    if (result.refundError) Sentry.captureException(result.refundError);
 
     // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(userId);
@@ -551,6 +555,8 @@ export async function removeRegistrationByHostAction(
         paymentService,
       }
     );
+
+    if (result.refundError) Sentry.captureException(result.refundError);
 
     // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(hostUserId);

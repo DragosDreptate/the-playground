@@ -1,9 +1,17 @@
 "use server";
 
 import { auth } from "@/infrastructure/auth/auth.config";
-import { prismaCircleRepository } from "@/infrastructure/repositories";
+import {
+  prismaCircleRepository,
+  prismaMomentRepository,
+  prismaRegistrationRepository,
+} from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
-import { onboardStripeConnect, getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect";
+import {
+  onboardStripeConnect,
+  getStripeConnectStatus,
+  cancelStripeConnect,
+} from "@/domain/usecases/onboard-stripe-connect";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { ConnectAccountStatus } from "@/domain/ports/services/payment-service";
@@ -84,13 +92,15 @@ export async function cancelStripeConnectAction(
   }
   const userId = session.user.id;
 
-  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-  const membership = await circleRepo.findMembership(circleId, userId);
-  if (!isActivePrimaryHost(membership)) {
-    return { success: false, error: "Not authorized", code: "UNAUTHORIZED_CIRCLE_ACTION" };
-  }
-
   return toActionResult(async () => {
-    await circleRepo.update(circleId, { stripeConnectAccountId: null });
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+    await cancelStripeConnect(
+      { circleId, userId },
+      {
+        circleRepository: circleRepo,
+        momentRepository: prismaMomentRepository,
+        registrationRepository: prismaRegistrationRepository,
+      }
+    );
   });
 }

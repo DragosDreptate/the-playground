@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Stripe from "stripe";
 import { createStripePaymentService } from "../stripe-payment-service";
+import { InvalidWebhookSignatureError } from "@/domain/errors";
 
 const WEBHOOK_SECRET = "whsec_test_secret";
 const signer = new Stripe("sk_test_fake");
@@ -89,7 +90,7 @@ describe("StripePaymentService.handleWebhookEvent", () => {
         object: "event",
         type: "charge.refunded",
         account: "acct_organizer",
-        data: { object: { id: "ch_test", object: "charge", payment_intent: "pi_test" } },
+        data: { object: { id: "ch_test", object: "charge", payment_intent: "pi_test", refunded: true } },
       });
 
       const event = await createStripePaymentService().handleWebhookEvent(payload, signature);
@@ -102,13 +103,29 @@ describe("StripePaymentService.handleWebhookEvent", () => {
     });
   });
 
+  describe("given a partial refund on an Organizer account", () => {
+    it("should ignore it", async () => {
+      const { payload, signature } = signed({
+        id: "evt_test",
+        object: "event",
+        type: "charge.refunded",
+        account: "acct_organizer",
+        data: { object: { id: "ch_test", object: "charge", payment_intent: "pi_test", refunded: false } },
+      });
+
+      const event = await createStripePaymentService().handleWebhookEvent(payload, signature);
+
+      expect(event).toEqual({ type: "unknown" });
+    });
+  });
+
   describe("given an invalid signature", () => {
     it("should reject the event", async () => {
       const { payload } = signed(checkoutEvent({ account: "acct_organizer" }));
 
       await expect(
         createStripePaymentService().handleWebhookEvent(payload, "t=1,v1=invalid")
-      ).rejects.toThrow();
+      ).rejects.toThrow(InvalidWebhookSignatureError);
     });
   });
 });

@@ -546,6 +546,14 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return result.count;
   },
 
+  async hasPaymentsOnStripeAccount(accountId: string): Promise<boolean> {
+    const record = await prisma.registration.findFirst({
+      where: { stripeAccountId: accountId },
+      select: { id: true },
+    });
+    return record !== null;
+  },
+
   async findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null> {
     const record = await prisma.registration.findFirst({
       where: { stripePaymentIntentId: paymentIntentId },

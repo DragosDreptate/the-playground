@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { InvalidWebhookSignatureError } from "@/domain/errors";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -66,12 +67,20 @@ export async function POST(request: Request) {
     // Not handled but not an error (idempotence, ignored event type, etc.)
     return NextResponse.json({ received: true, reason: result.reason });
   } catch (error) {
+    if (error instanceof InvalidWebhookSignatureError) {
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 400 }
+      );
+    }
+
+    // Répondre une erreur pour que Stripe rejoue l'événement : sinon, une panne
+    // passagère laisserait un Participant payé sans inscription. Le rejeu est sans
+    // risque de doublon (garde d'idempotence sur stripePaymentIntentId).
     Sentry.captureException(error);
-    // Always return 200 to Stripe to prevent retries on our errors
-    // (Stripe retries on 4xx/5xx, which could cause duplicate processing)
     return NextResponse.json(
       { error: "Webhook processing failed" },
-      { status: 200 }
+      { status: 500 }
     );
   }
 }

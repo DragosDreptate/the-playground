@@ -9,6 +9,7 @@ import type {
   RefundStatus,
 } from "@/domain/ports/services/payment-service";
 import type { Circle } from "@/domain/models/circle";
+import { InvalidWebhookSignatureError } from "@/domain/errors";
 
 /**
  * L'Organisateur est le marchand : il paie les frais et il porte les pertes,
@@ -161,11 +162,12 @@ export function createStripePaymentService(): PaymentService {
       payload: string,
       signature: string
     ): Promise<PaymentEvent> {
-      const event = stripe.webhooks.constructEvent(
-        payload,
-        signature,
-        webhookSecret
-      );
+      let event: Stripe.Event;
+      try {
+        event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      } catch {
+        throw new InvalidWebhookSignatureError();
+      }
 
       // Les paiements vivent sur les comptes des Organisateurs : un événement
       // sans compte ne nous concerne pas (ex. endpoint plateforme, mal configuré).
@@ -218,6 +220,10 @@ export function createStripePaymentService(): PaymentService {
 
       if (event.type === "charge.refunded") {
         const charge = event.data.object as Stripe.Charge;
+        // Remboursement partiel depuis Stripe : le paiement reste acquis pour le reste.
+        if (!charge.refunded) {
+          return { type: "unknown" };
+        }
         return {
           type: "charge_refunded",
           paymentIntentId: (charge.payment_intent as string) ?? "",

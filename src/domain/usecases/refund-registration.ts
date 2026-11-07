@@ -2,6 +2,7 @@ import type { Registration } from "@/domain/models/registration";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
+import { StripeRefundFailedError } from "@/domain/errors";
 
 type RefundRegistrationInput = {
   registration: Registration;
@@ -38,10 +39,16 @@ export async function refundRegistration(
   }
 
   // Call Stripe refund
-  await paymentService.refund({
+  const { status } = await paymentService.refund({
     paymentIntentId: stripePaymentIntentId,
     accountId: stripeAccountId,
   });
+
+  // Un remboursement en attente (solde insuffisant) reste dû par Stripe : seul
+  // un refus laisse l'inscription payée.
+  if (status === "failed") {
+    throw new StripeRefundFailedError(stripePaymentIntentId);
+  }
 
   // Update payment status
   await registrationRepository.update(registration.id, {

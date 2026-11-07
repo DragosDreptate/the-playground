@@ -1,6 +1,6 @@
 # Paiements : l'Organisateur devient le marchand (direct charges)
 
-> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D7 tranchées, lot 0 terminé, lot 1 codé dans `feat/paiements-direct-charges`, non commité.
+> **Statut** : cadrage du 2026-11-07, non implémenté. Décisions D1 à D8 tranchées. Lots 0 et 1 terminés, lot 2 codé dans `feat/paiements-direct-charges`, non commité.
 > **Remplace à terme** le modèle de paiement de [`stripe-connect.md`](stripe-connect.md). Les règles métier de cette spec restent valables (prix verrouillé, pas de liste d'attente sur payant, authentification avant paiement).
 > **Contexte** : aucun paiement réel en production au 2026-11-07, donc rien à migrer côté transactions.
 
@@ -62,6 +62,7 @@ Compléments de doc :
 - **D5. Paiements en attendant : pas de blocage, tranché le 2026-11-07.** Rien en cours selon Dragos.
 - **D6. Moyens de paiement : carte uniquement, tranché le 2026-11-07.** Et vérification de `payment_status` avant de confirmer une inscription. Apple Pay et Google Pay à confirmer (Q5).
 - **D7. Conversion de devises : désactivée, tranché le 2026-11-07** (`adaptive_pricing`), pour tenir « prix affiché = prix payé ».
+- **D8. Remboursement échoué : prévenir l'Organisateur par email, tranché le 2026-11-07.** Nouveau gabarit, livré au lot 3 avec les autres textes.
 
 ## 4. Résultats du lot 0
 
@@ -117,11 +118,13 @@ Fichiers : `stripe-payment-service.ts`, `payment-service.ts`, `mock-payment-serv
 ### Lot 2. Domaine et données
 
 - `Registration.stripeAccountId` : **livré avec le lot 1**, dont il est indispensable. Le paiement vit sur le compte de l'Organisateur, il doit rester remboursable même si la Communauté change de compte. Schéma poussé en dev, **en production à la release seulement, avant le merge** : le code lit cette colonne, y compris dans des requêtes SQL.
-- `refundRegistration` et `refundAllPaidRegistrations` : passent le compte, et distinguent remboursé et en attente.
-- `handlePaymentWebhook` : **traite `charge_refunded`**, ignoré aujourd'hui. L'Organisateur pouvant rembourser depuis Stripe, l'inscription doit suivre.
-- `cancelStripeConnectAction` : interdire la déconnexion avec des paiements remboursables ou un événement payant à venir. Aujourd'hui, elle remet le compte à zéro sans contrôle.
-- Compte fermé ou déconnecté côté Stripe : détecter via `account.updated`, et bloquer les nouveaux paiements.
-- Remboursement impossible : le dire à l'Organisateur plutôt que d'échouer en silence.
+- `refundRegistration` : un refus de Stripe laisse l'inscription payée et lève une erreur. Un remboursement en attente compte comme accepté : Stripe le doit, et notre énumération de statuts n'a pas à changer.
+- `handlePaymentWebhook` : **traite `charge_refunded`**, pour le remboursement total uniquement. Rembourser n'est pas désinscrire : l'inscription reste active, l'Organisateur la retire s'il le souhaite. Un remboursement partiel depuis Stripe laisse l'inscription payée.
+- `handlePaymentWebhook` : refuse et rembourse un paiement arrivé sur un autre compte que celui de la Communauté.
+- `cancelStripeConnect` (usecase, remplace la logique de l'action) : interdit de détacher un compte qui a déjà encaissé, ou dont dépend un événement payant publié. L'Organisateur n'accède à son tableau de bord Express que par nous.
+- Compte bloqué ou fermé côté Stripe : pas de webhook `account.updated`. `createCheckoutSession` relit déjà l'état du compte à chaque paiement et refuse s'il n'est pas actif.
+- Remboursement impossible : remonté à Sentry par les actions de désinscription et de retrait. L'email à l'Organisateur arrive au lot 3 (D8).
+- Route du webhook : répond 500 sur une erreur de traitement pour que Stripe rejoue l'événement, et 400 sur une signature invalide. L'adhésion à la Communauté passe avant l'inscription : une fois l'inscription créée, un rejeu s'arrête à la garde d'idempotence.
 
 ### Lot 3. Interface, textes et légal (FR et EN)
 

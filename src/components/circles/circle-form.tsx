@@ -21,6 +21,7 @@ import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
 import { onboardStripeConnectAction, getStripeLoginLinkAction, cancelStripeConnectAction } from "@/app/actions/stripe";
+import { STRIPE_ERROR_CODES } from "@/domain/errors";
 
 type StripeConnectProps = {
   circleId: string;
@@ -489,6 +490,8 @@ function StripeConnectInline({
                       const result = await cancelStripeConnectAction(circleId);
                       if (result.success) {
                         window.location.reload();
+                      } else if (result.code === STRIPE_ERROR_CODES.ConnectCancelBlocked) {
+                        setError(t("stripeConnect.cancelBlocked"));
                       } else {
                         setError(result.error);
                       }

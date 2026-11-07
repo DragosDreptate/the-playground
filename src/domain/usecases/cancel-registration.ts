@@ -25,6 +25,8 @@ type CancelRegistrationResult = {
   // Statut AVANT annulation : les notifications en aval en dépendent (un départ
   // de liste d'attente ne se communique pas comme une désinscription confirmée).
   previousStatus: RegistrationStatus;
+  // Remboursement échoué : il ne bloque pas l'annulation, à signaler par l'appelant.
+  refundError?: unknown;
 };
 
 export async function cancelRegistration(
@@ -55,14 +57,15 @@ export async function cancelRegistration(
 
   // Refund if paid event + PaymentService available
   // Refund failure must not block the cancellation
+  let refundError: unknown;
   if (moment && deps.paymentService && registration.paymentStatus === "PAID") {
     try {
       await refundRegistration(
         { registration, moment },
         { registrationRepository, paymentService: deps.paymentService }
       );
-    } catch {
-      // Refund failure must not block cancellation — error is captured by the caller
+    } catch (err) {
+      refundError = err;
     }
   }
 
@@ -104,5 +107,5 @@ export async function cancelRegistration(
     }
   }
 
-  return { registration: cancelled, promotedRegistration, previousStatus };
+  return { registration: cancelled, promotedRegistration, previousStatus, refundError };
 }

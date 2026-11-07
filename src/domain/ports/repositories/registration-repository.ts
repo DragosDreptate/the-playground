@@ -83,6 +83,8 @@ export interface RegistrationRepository {
   rejectAllPendingApprovals(momentId: string): Promise<number>;
   /** Trouve une inscription par stripePaymentIntentId (pour l'idempotence webhook). */
   findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
+  /** Vrai si au moins un paiement a eu lieu sur ce compte d'Organisateur. */
+  hasPaymentsOnStripeAccount(accountId: string): Promise<boolean>;
   /** Résumé billetterie pour un événement payant. */
   getPaymentSummary(momentId: string): Promise<{ paidCount: number; totalAmount: number; refundedCount: number }>;
   /**

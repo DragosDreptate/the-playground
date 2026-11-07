@@ -59,6 +59,9 @@ export {
   STRIPE_ERROR_CODES,
   StripeConnectNotActiveError,
   StripeConnectAlreadyActiveError,
+  StripeConnectCancelBlockedError,
+  StripeRefundFailedError,
+  InvalidWebhookSignatureError,
 } from "./stripe-errors";
 export {
   CommentPhotoLimitReachedError,

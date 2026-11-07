@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { handlePaymentWebhook } from "../handle-payment-webhook";
 import { createMockMomentRepository, makeMoment } from "./helpers/mock-moment-repository";
-import { createMockCircleRepository, makeMembership } from "./helpers/mock-circle-repository";
+import { createMockCircleRepository, makeCircle, makeMembership } from "./helpers/mock-circle-repository";
 import { createMockRegistrationRepository, makeRegistration } from "./helpers/mock-registration-repository";
 import { createMockPaymentService } from "./helpers/mock-payment-service";
+import { StripeRefundFailedError } from "@/domain/errors";
 
 const checkoutEvent = {
   type: "checkout_completed" as const,
@@ -15,6 +16,8 @@ const checkoutEvent = {
   accountId: "acct_organizer",
 };
 
+const circleOnAccount = makeCircle({ id: "circle-1", stripeConnectAccountId: "acct_organizer" });
+
 function makeDeps(overrides: {
   paymentService?: Partial<ReturnType<typeof createMockPaymentService>>;
   momentRepository?: Partial<ReturnType<typeof createMockMomentRepository>>;
@@ -24,7 +27,10 @@ function makeDeps(overrides: {
   return {
     paymentService: createMockPaymentService(overrides.paymentService),
     momentRepository: createMockMomentRepository(overrides.momentRepository),
-    circleRepository: createMockCircleRepository(overrides.circleRepository),
+    circleRepository: createMockCircleRepository({
+      findById: vi.fn().mockResolvedValue(circleOnAccount),
+      ...overrides.circleRepository,
+    }),
     registrationRepository: createMockRegistrationRepository(overrides.registrationRepository),
   };
 }
@@ -80,6 +86,61 @@ describe("handlePaymentWebhook", () => {
     });
   });
 
+  describe("given the registration fails, then Stripe replays the event", () => {
+    it("should keep the Circle membership and create the registration on replay", async () => {
+      const moment = makeMoment({ id: "moment-1", price: 1500, capacity: 30 });
+      const create = vi
+        .fn()
+        .mockRejectedValueOnce(new Error("DB unavailable"))
+        .mockResolvedValueOnce(makeRegistration({ paymentStatus: "PAID" }));
+      const deps = makeDeps({
+        paymentService: { handleWebhookEvent: vi.fn().mockResolvedValue(checkoutEvent) },
+        momentRepository: { findById: vi.fn().mockResolvedValue(moment) },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
+          countActiveByMomentId: vi.fn().mockResolvedValue(5),
+          create,
+        },
+        circleRepository: {
+          findMembership: vi.fn().mockResolvedValue(null),
+          addMembership: vi.fn().mockResolvedValue(makeMembership()),
+        },
+      });
+
+      await expect(
+        handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps)
+      ).rejects.toThrow("DB unavailable");
+      expect(deps.circleRepository.addMembership).toHaveBeenCalledWith("circle-1", "user-2", "PLAYER");
+
+      const replay = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(replay.handled).toBe(true);
+      expect(create).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("given a refund refused while the event is full", () => {
+    it("should throw so that Stripe replays the event", async () => {
+      const deps = makeDeps({
+        paymentService: {
+          handleWebhookEvent: vi.fn().mockResolvedValue(checkoutEvent),
+          refund: vi.fn().mockResolvedValue({ status: "failed" }),
+        },
+        momentRepository: {
+          findById: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", price: 1500, capacity: 10 })),
+        },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
+          countActiveByMomentId: vi.fn().mockResolvedValue(10),
+        },
+      });
+
+      await expect(
+        handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps)
+      ).rejects.toThrow(StripeRefundFailedError);
+    });
+  });
+
   describe("given a duplicate paymentIntentId (idempotence)", () => {
     it("should return handled=false without creating a registration", async () => {
       const deps = makeDeps({
@@ -130,6 +191,71 @@ describe("handlePaymentWebhook", () => {
         accountId: "acct_organizer",
       });
       expect(deps.registrationRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a payment on another account than the Circle's", () => {
+    it("should refund it without creating a registration", async () => {
+      const deps = makeDeps({
+        paymentService: {
+          handleWebhookEvent: vi.fn().mockResolvedValue({ ...checkoutEvent, accountId: "acct_other" }),
+        },
+        momentRepository: {
+          findById: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", price: 1500 })),
+        },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
+        },
+      });
+
+      const result = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(result.handled).toBe(false);
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({
+        paymentIntentId: "pi_test_123",
+        accountId: "acct_other",
+      });
+      expect(deps.registrationRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a charge_refunded event", () => {
+    const refundEvent = {
+      type: "charge_refunded" as const,
+      paymentIntentId: "pi_test_123",
+      accountId: "acct_organizer",
+    };
+
+    it("should mark a PAID registration REFUNDED and keep it registered", async () => {
+      const deps = makeDeps({
+        paymentService: { handleWebhookEvent: vi.fn().mockResolvedValue(refundEvent) },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(
+            makeRegistration({ id: "reg-1", status: "REGISTERED", paymentStatus: "PAID" })
+          ),
+        },
+      });
+
+      const result = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(result.handled).toBe(false);
+      expect(deps.registrationRepository.update).toHaveBeenCalledWith("reg-1", { paymentStatus: "REFUNDED" });
+    });
+
+    it.each([
+      ["already refunded", makeRegistration({ paymentStatus: "REFUNDED" })],
+      ["unknown", null],
+    ])("should do nothing when the registration is %s", async (_label, registration) => {
+      const deps = makeDeps({
+        paymentService: { handleWebhookEvent: vi.fn().mockResolvedValue(refundEvent) },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(registration),
+        },
+      });
+
+      await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(deps.registrationRepository.update).not.toHaveBeenCalled();
     });
   });
 

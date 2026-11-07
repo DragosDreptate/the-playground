@@ -1,8 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import { onboardStripeConnect, getStripeConnectStatus } from "../onboard-stripe-connect";
+import { onboardStripeConnect, getStripeConnectStatus, cancelStripeConnect } from "../onboard-stripe-connect";
+import { createMockMomentRepository, makeMoment } from "./helpers/mock-moment-repository";
+import { createMockRegistrationRepository } from "./helpers/mock-registration-repository";
 import { createMockCircleRepository, makeCircle, makeMembership } from "./helpers/mock-circle-repository";
 import { createMockPaymentService } from "./helpers/mock-payment-service";
-import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
+import {
+  CircleNotFoundError,
+  StripeConnectCancelBlockedError,
+  UnauthorizedCircleActionError,
+} from "@/domain/errors";
 
 describe("onboardStripeConnect", () => {
   const userId = "user-1";
@@ -175,6 +181,87 @@ describe("getStripeConnectStatus", () => {
           { circleRepository: circleRepo, paymentService }
         )
       ).rejects.toThrow(UnauthorizedCircleActionError);
+    });
+  });
+});
+
+describe("cancelStripeConnect", () => {
+  const input = { circleId: "circle-1", userId: "user-1" };
+
+  function makeDeps(options: {
+    role?: "HOST" | "PLAYER";
+    accountId?: string | null;
+    moments?: ReturnType<typeof makeMoment>[];
+    hasPayments?: boolean;
+  } = {}) {
+    const { role = "HOST", accountId = "acct_123", moments = [], hasPayments = false } = options;
+    return {
+      circleRepository: createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle({ id: "circle-1", stripeConnectAccountId: accountId })),
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ userId: "user-1", circleId: "circle-1", role })),
+      }),
+      momentRepository: createMockMomentRepository({
+        findByCircleId: vi.fn().mockResolvedValue(moments),
+      }),
+      registrationRepository: createMockRegistrationRepository({
+        hasPaymentsOnStripeAccount: vi.fn().mockResolvedValue(hasPayments),
+      }),
+    };
+  }
+
+  describe("given an account with neither payment nor published paid event", () => {
+    it("should detach the account from the Circle", async () => {
+      const deps = makeDeps({
+        moments: [
+          makeMoment({ status: "DRAFT", price: 1500 }),
+          makeMoment({ status: "PUBLISHED", price: 0 }),
+          makeMoment({ status: "PAST", price: 1500 }),
+        ],
+      });
+
+      await cancelStripeConnect(input, deps);
+
+      expect(deps.circleRepository.update).toHaveBeenCalledWith("circle-1", { stripeConnectAccountId: null });
+    });
+  });
+
+  describe("given an account that cannot be detached", () => {
+    it.each([
+      ["a payment already took place", { hasPayments: true }],
+      ["a paid event is published", { moments: [makeMoment({ status: "PUBLISHED", price: 1500 })] }],
+    ])("should refuse when %s", async (_label, options) => {
+      const deps = makeDeps(options);
+
+      await expect(cancelStripeConnect(input, deps)).rejects.toThrow(StripeConnectCancelBlockedError);
+      expect(deps.circleRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a non-HOST user", () => {
+    it("should refuse", async () => {
+      const deps = makeDeps({ role: "PLAYER" });
+
+      await expect(cancelStripeConnect(input, deps)).rejects.toThrow(UnauthorizedCircleActionError);
+      expect(deps.circleRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a Circle without account", () => {
+    it("should do nothing", async () => {
+      const deps = makeDeps({ accountId: null });
+
+      await cancelStripeConnect(input, deps);
+
+      expect(deps.circleRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a non-existent Circle", () => {
+    it("should throw CircleNotFoundError", async () => {
+      const deps = makeDeps();
+      deps.circleRepository.findById = vi.fn().mockResolvedValue(null);
+
+      await expect(cancelStripeConnect(input, deps)).rejects.toThrow(CircleNotFoundError);
     });
   });
 });
