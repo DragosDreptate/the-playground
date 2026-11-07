@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
+import { createMockRegistrationRepository } from "./helpers/mock-registration-repository";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
 import {
+  CircleHasUnrefundedPaymentsError,
   CircleNotFoundError,
   UnauthorizedCircleActionError,
 } from "@/domain/errors";
@@ -24,7 +26,7 @@ describe("DeleteCircle", () => {
         delete: vi.fn().mockResolvedValue(undefined),
       });
 
-      await deleteCircle(defaultInput, { circleRepository: repo });
+      await deleteCircle(defaultInput, { circleRepository: repo, registrationRepository: createMockRegistrationRepository() });
 
       expect(repo.delete).toHaveBeenCalledWith("circle-1");
     });
@@ -37,7 +39,7 @@ describe("DeleteCircle", () => {
       });
 
       await expect(
-        deleteCircle(defaultInput, { circleRepository: repo })
+        deleteCircle(defaultInput, { circleRepository: repo, registrationRepository: createMockRegistrationRepository() })
       ).rejects.toThrow(CircleNotFoundError);
     });
   });
@@ -50,7 +52,7 @@ describe("DeleteCircle", () => {
       });
 
       await expect(
-        deleteCircle(defaultInput, { circleRepository: repo })
+        deleteCircle(defaultInput, { circleRepository: repo, registrationRepository: createMockRegistrationRepository() })
       ).rejects.toThrow(UnauthorizedCircleActionError);
     });
   });
@@ -65,8 +67,25 @@ describe("DeleteCircle", () => {
       });
 
       await expect(
-        deleteCircle(defaultInput, { circleRepository: repo })
+        deleteCircle(defaultInput, { circleRepository: repo, registrationRepository: createMockRegistrationRepository() })
       ).rejects.toThrow(UnauthorizedCircleActionError);
     });
+  });
+});
+
+describe("DeleteCircle — unrefunded payments", () => {
+  it("should refuse to delete a Circle with Participants paid and not refunded", async () => {
+    const circleRepository = createMockCircleRepository({
+      findById: vi.fn().mockResolvedValue(makeCircle({ id: "circle-1" })),
+      findMembership: vi.fn().mockResolvedValue(makeMembership({ userId: "user-1", circleId: "circle-1", role: "HOST" })),
+    });
+    const registrationRepository = createMockRegistrationRepository({
+      hasUnrefundedPaymentsInCircle: vi.fn().mockResolvedValue(true),
+    });
+
+    await expect(
+      deleteCircle({ circleId: "circle-1", userId: "user-1" }, { circleRepository, registrationRepository })
+    ).rejects.toThrow(CircleHasUnrefundedPaymentsError);
+    expect(circleRepository.delete).not.toHaveBeenCalled();
   });
 });

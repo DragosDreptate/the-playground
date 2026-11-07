@@ -1,6 +1,11 @@
 import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
-import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
+import {
+  CircleHasUnrefundedPaymentsError,
+  CircleNotFoundError,
+  UnauthorizedCircleActionError,
+} from "@/domain/errors";
 
 type DeleteCircleInput = {
   circleId: string;
@@ -9,13 +14,14 @@ type DeleteCircleInput = {
 
 type DeleteCircleDeps = {
   circleRepository: CircleRepository;
+  registrationRepository: RegistrationRepository;
 };
 
 export async function deleteCircle(
   input: DeleteCircleInput,
   deps: DeleteCircleDeps
 ): Promise<void> {
-  const { circleRepository } = deps;
+  const { circleRepository, registrationRepository } = deps;
 
   const circle = await circleRepository.findById(input.circleId);
   if (!circle) {
@@ -28,6 +34,12 @@ export async function deleteCircle(
   );
   if (!isActivePrimaryHost(membership)) {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
+  }
+
+  // La suppression efface les inscriptions en cascade : un Participant payé ne
+  // pourrait plus être remboursé par The Playground.
+  if (await registrationRepository.hasUnrefundedPaymentsInCircle(input.circleId)) {
+    throw new CircleHasUnrefundedPaymentsError(input.circleId);
   }
 
   await circleRepository.delete(input.circleId);

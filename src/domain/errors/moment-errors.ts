@@ -111,3 +111,11 @@ export class MomentCannotBeDeletedError extends DomainError {
     );
   }
 }
+
+export class RefundableLockedError extends DomainError {
+  readonly code = "REFUNDABLE_LOCKED";
+
+  constructor() {
+    super("The refund policy can no longer be removed: members have already paid");
+  }
+}

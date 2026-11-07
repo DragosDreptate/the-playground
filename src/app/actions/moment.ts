@@ -19,7 +19,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
 import { cancelMoment } from "@/domain/usecases/cancel-moment";
 import { refundAllPaidRegistrations } from "@/domain/usecases/refund-all-paid-registrations";
-import { MomentCannotBeDeletedError } from "@/domain/errors";
+import { MomentCannotBeDeletedError, MomentRefundsFailedError } from "@/domain/errors";
 import {
   getMomentParticipantsPage,
   type GetMomentParticipantsPageResult,
@@ -49,6 +49,23 @@ import { sendEachLocaleGroup } from "./helpers/send-each-locale-group";
 import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
+
+/** Remboursements groupés refusés : prévenir le propriétaire, et laisser l'erreur remonter à l'écran. */
+function rethrowAfterReportingRefundFailures(userId: string) {
+  return async (error: unknown): Promise<never> => {
+    if (error instanceof MomentRefundsFailedError) {
+      const { momentId, participantUserIds } = error;
+      const resolver = await buildEmailLocaleResolver(userId);
+      Sentry.captureException(error);
+      after(() =>
+        notifyRefundFailure(momentId, participantUserIds, resolver).catch((err) =>
+          Sentry.captureException(err)
+        )
+      );
+    }
+    throw error;
+  };
+}
 const paymentService = createStripePaymentService();
 
 /** Longueur max du mot d'annulation saisi par l'Organisateur (UI + serveur). */
@@ -295,8 +312,9 @@ export async function updateMomentAction(
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
+        paymentService,
       }
-    );
+    ).catch(rethrowAfterReportingRefundFailures(userId));
 
     // Cleanup ancien blob si une nouvelle image a été uploadée
     if (
@@ -541,7 +559,7 @@ export async function deleteMomentAction(
         registrationRepository: prismaRegistrationRepository,
         paymentService,
       }
-    );
+    ).catch(rethrowAfterReportingRefundFailures(userId));
 
     // Blob cleanup is external to the DB cascade and must run explicitly.
     // Best-effort, différé via after() pour survivre au teardown serverless : les

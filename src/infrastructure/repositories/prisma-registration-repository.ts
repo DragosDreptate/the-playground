@@ -554,6 +554,18 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return record !== null;
   },
 
+  async hasUnrefundedPaymentsInCircle(circleId: string): Promise<boolean> {
+    const record = await prisma.registration.findFirst({
+      where: {
+        paymentStatus: "PAID",
+        status: { in: ["REGISTERED", "CHECKED_IN"] },
+        moment: { circleId, status: { not: "PAST" } },
+      },
+      select: { id: true },
+    });
+    return record !== null;
+  },
+
   async findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null> {
     const record = await prisma.registration.findFirst({
       where: { stripePaymentIntentId: paymentIntentId },

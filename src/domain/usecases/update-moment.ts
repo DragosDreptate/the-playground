@@ -14,6 +14,8 @@ import {
   InvalidPriceError,
   PaidMomentRequiresStripeError,
   PriceLockedError,
+  RefundableLockedError,
+  MomentRefundsFailedError,
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
@@ -119,10 +121,12 @@ export async function updateMoment(
   }
 
   // Price locking rules (only when price is being changed)
-  // activeCount > 1 because the host is always auto-registered (count = 1 minimum)
+  // activeCount > 1 because the host is always auto-registered (count = 1 minimum).
+  // Un Organisateur peut s'être désinscrit : un seul inscrit peut alors être un payant.
   if (safeInput.price !== undefined && safeInput.price !== existing.price && deps.registrationRepository) {
     const activeCount = await deps.registrationRepository.countActiveByMomentId(safeInput.momentId);
-    const hasRegistrations = activeCount > 1;
+    const { paidCount } = await deps.registrationRepository.getPaymentSummary(safeInput.momentId);
+    const hasRegistrations = activeCount > 1 || paidCount > 0;
 
     if (hasRegistrations) {
       const wasFree = existing.price === 0;
@@ -147,8 +151,21 @@ export async function updateMoment(
           registrationRepository: deps.registrationRepository,
           paymentService: deps.paymentService,
         });
-        if (failures.length > 0) throw failures[0].error;
+        if (failures.length > 0) {
+          throw new MomentRefundsFailedError(
+            safeInput.momentId,
+            failures.map(({ registration }) => registration.userId)
+          );
+        }
       }
+    }
+  }
+
+  // Le Participant a payé un événement annoncé remboursable : promesse non révocable.
+  if (safeInput.refundable === false && existing.refundable && deps.registrationRepository) {
+    const { paidCount } = await deps.registrationRepository.getPaymentSummary(safeInput.momentId);
+    if (paidCount > 0) {
+      throw new RefundableLockedError();
     }
   }
 

@@ -1,9 +1,8 @@
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
-import type { PaymentService, RefundParams } from "@/domain/ports/services/payment-service";
-import type { Registration } from "@/domain/models/registration";
-import { StripeRefundFailedError } from "@/domain/errors";
+import type { PaymentService } from "@/domain/ports/services/payment-service";
+import { isConfirmedParticipation, type Registration } from "@/domain/models/registration";
 
 type HandlePaymentWebhookInput = {
   payload: string;
@@ -17,17 +16,15 @@ type HandlePaymentWebhookDeps = {
   registrationRepository: RegistrationRepository;
 };
 
+/** Remboursement automatique refusé par Stripe : à signaler au propriétaire de la Communauté. */
+export type WebhookRefundFailure = {
+  momentId: string;
+  userId: string;
+};
+
 type HandlePaymentWebhookResult =
   | { handled: true; registration: Registration }
-  | { handled: false; reason: string };
-
-/** Un refus remonte en erreur : la route répond 500 et Stripe rejoue l'événement. */
-async function refundOrThrow(paymentService: PaymentService, params: RefundParams): Promise<void> {
-  const { status } = await paymentService.refund(params);
-  if (status === "failed") {
-    throw new StripeRefundFailedError(params.paymentIntentId);
-  }
-}
+  | { handled: false; reason: string; refundFailure?: WebhookRefundFailure };
 
 export async function handlePaymentWebhook(
   input: HandlePaymentWebhookInput,
@@ -68,32 +65,54 @@ export async function handlePaymentWebhook(
     }
   }
 
-  // Load moment to check capacity
+  // Paiement sans place à la clé : pas d'inscription, l'argent retourne au Participant.
+  // Un refus définitif de Stripe n'est pas rejoué : il est remonté une seule fois.
+  async function rejectPayment(reason: string): Promise<HandlePaymentWebhookResult> {
+    if (!paymentIntentId) {
+      return { handled: false, reason };
+    }
+    const { status } = await paymentService.refund({ paymentIntentId, accountId });
+    if (status === "failed") {
+      return {
+        handled: false,
+        reason: `${reason} — refund refused`,
+        refundFailure: { momentId, userId },
+      };
+    }
+    return { handled: false, reason: `${reason} — payment refunded` };
+  }
+
+  // La page de paiement reste ouverte 30 minutes : l'événement a pu changer entre-temps.
   const moment = await momentRepository.findById(momentId);
   if (!moment) {
-    return { handled: false, reason: `Moment not found: ${momentId}` };
+    return rejectPayment(`Moment not found: ${momentId}`);
+  }
+  if (moment.status !== "PUBLISHED" || moment.price <= 0) {
+    return rejectPayment("Event no longer open for payment");
   }
 
-  // Le paiement doit être arrivé sur le compte de cette Communauté : sinon, pas
-  // d'inscription, et l'argent retourne au Participant.
   const circle = await circleRepository.findById(moment.circleId);
   if (circle?.stripeConnectAccountId !== accountId) {
-    if (paymentIntentId) {
-      await refundOrThrow(paymentService, { paymentIntentId, accountId });
-    }
-    return { handled: false, reason: "Payment on another account — payment refunded" };
+    return rejectPayment("Payment on another account");
   }
 
-  // Race condition: check capacity — if full, refund and return
+  // Race condition: check capacity
   if (moment.capacity !== null) {
     const activeCount = await registrationRepository.countActiveByMomentId(momentId);
     if (activeCount >= moment.capacity) {
-      // Event is full — refund the payment
-      if (paymentIntentId) {
-        await refundOrThrow(paymentService, { paymentIntentId, accountId });
-      }
-      return { handled: false, reason: "Event is full — payment refunded" };
+      return rejectPayment("Event is full");
     }
+  }
+
+  const existingRegistration = await registrationRepository.findByMomentAndUser(momentId, userId);
+
+  // Deux pages de paiement ouvertes : le second paiement n'achète rien de plus.
+  if (
+    existingRegistration &&
+    isConfirmedParticipation(existingRegistration.status) &&
+    existingRegistration.paymentStatus === "PAID"
+  ) {
+    return rejectPayment("Participant already paid");
   }
 
   // Auto-join Circle if not already a member. Avant l'inscription : une fois celle-ci
@@ -107,7 +126,6 @@ export async function handlePaymentWebhook(
   // Cases: (1) no existing registration → create
   //        (2) existing CANCELLED registration → reactivate
   //        (3) existing active registration (e.g. Host auto-inscription) → update paymentStatus
-  const existingRegistration = await registrationRepository.findByMomentAndUser(momentId, userId);
   let registration;
   if (existingRegistration) {
     registration = await registrationRepository.update(existingRegistration.id, {

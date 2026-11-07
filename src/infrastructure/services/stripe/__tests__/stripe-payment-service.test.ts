@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Stripe from "stripe";
-import { createStripePaymentService, toConnectAccountStatus } from "../stripe-payment-service";
+import {
+  createStripePaymentService,
+  refundStatusFromError,
+  toConnectAccountStatus,
+} from "../stripe-payment-service";
 import { InvalidWebhookSignatureError } from "@/domain/errors";
 
 const WEBHOOK_SECRET = "whsec_test_secret";
@@ -98,7 +102,6 @@ describe("StripePaymentService.handleWebhookEvent", () => {
       expect(event).toEqual({
         type: "charge_refunded",
         paymentIntentId: "pi_test",
-        accountId: "acct_organizer",
       });
     });
   });
@@ -135,9 +138,32 @@ describe("toConnectAccountStatus", () => {
     ["active", { details_submitted: true, charges_enabled: true }],
     ["verifying", { details_submitted: true, charges_enabled: false, requirements: { disabled_reason: "requirements.pending_verification" } }],
     ["disabled", { details_submitted: true, charges_enabled: false, requirements: { disabled_reason: "requirements.past_due" } }],
-    ["restricted", { details_submitted: false, charges_enabled: false, requirements: { disabled_reason: null, currently_due: ["external_account"] } }],
-    ["pending", { details_submitted: false, charges_enabled: false, requirements: { disabled_reason: null, currently_due: [] } }],
+    ["restricted", { details_submitted: true, charges_enabled: false, requirements: { disabled_reason: null, currently_due: ["external_account"] } }],
+    ["pending", { details_submitted: false, charges_enabled: false, requirements: { disabled_reason: "requirements.past_due", currently_due: ["external_account"] } }],
   ])("should return %s", (status, account) => {
     expect(toConnectAccountStatus(account as unknown as Stripe.Account)).toBe(status);
+  });
+});
+
+describe("refundStatusFromError", () => {
+  const stripeError = (statusCode: number, code?: string) =>
+    Stripe.errors.StripeError.generate({
+      type: statusCode === 403 ? "permission_error" : "invalid_request_error",
+      message: "refused",
+      statusCode,
+      code,
+    } as never);
+
+  it("should treat an already refunded charge as a success", () => {
+    expect(refundStatusFromError(stripeError(400, "charge_already_refunded"))).toBe("succeeded");
+  });
+
+  it.each([400, 403, 404])("should treat a %i from Stripe as a definitive failure", (statusCode) => {
+    expect(refundStatusFromError(stripeError(statusCode))).toBe("failed");
+  });
+
+  it("should leave other errors to the caller so that it can retry", () => {
+    expect(refundStatusFromError(new Error("network"))).toBeNull();
+    expect(refundStatusFromError(new Stripe.errors.StripeAPIError({ message: "down", statusCode: 500 } as never))).toBeNull();
   });
 });

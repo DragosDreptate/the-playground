@@ -8,6 +8,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
 import { handlePaymentWebhook } from "@/domain/usecases/handle-payment-webhook";
+import { notifyRefundFailure } from "@/app/actions/helpers/notify-refund-failure";
 import { sendRegistrationEmails } from "@/app/actions/registration";
 import { buildEmailLocaleResolver } from "@/app/actions/helpers/email-locale-resolver";
 
@@ -62,6 +63,17 @@ export async function POST(request: Request) {
         received: true,
         registrationId: registration.id,
       });
+    }
+
+    if (result.refundFailure) {
+      const { momentId, userId } = result.refundFailure;
+      Sentry.captureMessage(`Stripe webhook: ${result.reason}`, "error");
+      const resolver = await buildEmailLocaleResolver(userId);
+      after(() =>
+        notifyRefundFailure(momentId, [userId], resolver).catch((error) =>
+          Sentry.captureException(error)
+        )
+      );
     }
 
     // Not handled but not an error (idempotence, ignored event type, etc.)

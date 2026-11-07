@@ -3,6 +3,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
+  MomentRefundsFailedError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -171,6 +172,32 @@ describe("DeleteMoment", () => {
 
       expect(registrationRepo.findActiveByMomentId).not.toHaveBeenCalled();
       expect(paymentService.refund).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a refund refused by Stripe", () => {
+    it("should keep the event and report who was not refunded", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const paidReg = makeRegistration({ id: "reg-1", userId: "user-9", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const momentRepo = createMockMomentRepository({ findById: vi.fn().mockResolvedValue(existing) });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg]),
+      });
+      const paymentService = createMockPaymentService({
+        refund: vi.fn().mockResolvedValue({ status: "failed" }),
+      });
+
+      const failure = await deleteMoment(
+        { momentId: "moment-1", userId: "user-1" },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      ).catch((error) => error);
+
+      expect(failure).toBeInstanceOf(MomentRefundsFailedError);
+      expect(failure.participantUserIds).toEqual(["user-9"]);
+      expect(momentRepo.delete).not.toHaveBeenCalled();
     });
   });
 });

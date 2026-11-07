@@ -7,6 +7,8 @@ import {
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
   InvalidTimezoneError,
+  MomentRefundsFailedError,
+  RefundableLockedError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -656,6 +658,95 @@ describe("UpdateMoment", () => {
         "moment-1",
         expect.not.objectContaining({ timezone: expect.anything() })
       );
+    });
+  });
+
+  describe("given the only active registration is a paid one (Organizer unregistered)", () => {
+    it("should refund it when the event becomes free", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", price: 0 })),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(1),
+        getPaymentSummary: vi.fn().mockResolvedValue({ paidCount: 1, totalAmount: 1500, refundedCount: 0 }),
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg]),
+      });
+      const paymentService = createMockPaymentService();
+
+      await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      );
+
+      expect(paymentService.refund).toHaveBeenCalledWith({ paymentIntentId: "pi_1", accountId: "acct_test" });
+    });
+  });
+
+  describe("given a refund refused when the event becomes free", () => {
+    it("should keep the event unchanged and report who was not refunded", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const paidReg = makeRegistration({ id: "reg-1", userId: "user-9", paymentStatus: "PAID", stripePaymentIntentId: "pi_1", stripeAccountId: "acct_test" });
+      const momentRepo = createMockMomentRepository({ findById: vi.fn().mockResolvedValue(existing) });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(2),
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg]),
+      });
+      const paymentService = createMockPaymentService({
+        refund: vi.fn().mockResolvedValue({ status: "failed" }),
+      });
+
+      const failure = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      ).catch((error) => error);
+
+      expect(failure).toBeInstanceOf(MomentRefundsFailedError);
+      expect(failure.participantUserIds).toEqual(["user-9"]);
+      expect(momentRepo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a refundable event with paid registrations", () => {
+    function setup(paidCount: number) {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500, refundable: true });
+      return {
+        momentRepository: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(existing),
+          update: vi.fn().mockResolvedValue(existing),
+        }),
+        circleRepository: createMockCircleRepository({
+          findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+        }),
+        registrationRepository: createMockRegistrationRepository({
+          getPaymentSummary: vi.fn().mockResolvedValue({ paidCount, totalAmount: 0, refundedCount: 0 }),
+        }),
+      };
+    }
+
+    it("should refuse to remove the refund promise", async () => {
+      const deps = setup(1);
+
+      await expect(
+        updateMoment({ momentId: "moment-1", userId: "user-1", refundable: false }, deps)
+      ).rejects.toThrow(RefundableLockedError);
+      expect(deps.momentRepository.update).not.toHaveBeenCalled();
+    });
+
+    it("should allow it while nobody has paid", async () => {
+      const deps = setup(0);
+
+      await updateMoment({ momentId: "moment-1", userId: "user-1", refundable: false }, deps);
+
+      expect(deps.momentRepository.update).toHaveBeenCalled();
     });
   });
 });

@@ -34,7 +34,7 @@ export type PaymentEvent =
       /** Compte de l'Organisateur, sur lequel le paiement a eu lieu. */
       accountId: string;
     }
-  | { type: "charge_refunded"; paymentIntentId: string; accountId: string }
+  | { type: "charge_refunded"; paymentIntentId: string }
   | { type: "unknown" };
 
 /**

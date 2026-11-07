@@ -85,6 +85,8 @@ export interface RegistrationRepository {
   findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
   /** Vrai si au moins un paiement a eu lieu sur ce compte d'Organisateur. */
   hasPaymentsOnStripeAccount(accountId: string): Promise<boolean>;
+  /** Vrai si un Participant d'un événement à venir ou annulé de ce Circle a payé sans être remboursé. */
+  hasUnrefundedPaymentsInCircle(circleId: string): Promise<boolean>;
   /** Résumé billetterie pour un événement payant. */
   getPaymentSummary(momentId: string): Promise<{ paidCount: number; totalAmount: number; refundedCount: number }>;
   /**

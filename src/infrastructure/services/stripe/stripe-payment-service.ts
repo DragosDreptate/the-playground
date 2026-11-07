@@ -32,6 +32,9 @@ export function toConnectAccountStatus(account: Stripe.Account): ConnectAccountS
   if (account.requirements?.disabled_reason === "requirements.pending_verification") {
     return "verifying";
   }
+  if (!account.details_submitted) {
+    return "pending";
+  }
   if (account.requirements?.disabled_reason) {
     return "disabled";
   }
@@ -39,6 +42,17 @@ export function toConnectAccountStatus(account: Stripe.Account): ConnectAccountS
     return "restricted";
   }
   return "pending";
+}
+
+/**
+ * « Déjà remboursé » est un succès (rejeu d'événement, remboursement fait depuis
+ * Stripe). Une requête refusée l'est définitivement. Le reste (réseau, panne de
+ * Stripe) reste une exception : l'appelant peut réessayer.
+ */
+export function refundStatusFromError(error: unknown): RefundStatus | null {
+  if (!(error instanceof Stripe.errors.StripeError)) return null;
+  if (error.code === "charge_already_refunded") return "succeeded";
+  return [400, 402, 403, 404].includes(error.statusCode ?? 0) ? "failed" : null;
 }
 
 function toRefundStatus(status: string | null): RefundStatus {
@@ -209,6 +223,11 @@ export function createStripePaymentService(): PaymentService {
               {},
               { stripeAccount: accountId }
             );
+            // Déjà remboursé (rejeu, ou événements reçus dans le désordre) : ne pas
+            // créer d'inscription sur un paiement rendu.
+            if (charge.refunded) {
+              return { type: "unknown" };
+            }
             receiptUrl = charge.receipt_url ?? "";
           }
         }
@@ -233,7 +252,6 @@ export function createStripePaymentService(): PaymentService {
         return {
           type: "charge_refunded",
           paymentIntentId: (charge.payment_intent as string) ?? "",
-          accountId,
         };
       }
 
@@ -241,11 +259,17 @@ export function createStripePaymentService(): PaymentService {
     },
 
     async refund({ paymentIntentId, accountId }: RefundParams) {
-      const refund = await stripe.refunds.create(
-        { payment_intent: paymentIntentId },
-        { stripeAccount: accountId }
-      );
-      return { status: toRefundStatus(refund.status) };
+      try {
+        const refund = await stripe.refunds.create(
+          { payment_intent: paymentIntentId },
+          { stripeAccount: accountId }
+        );
+        return { status: toRefundStatus(refund.status) };
+      } catch (error) {
+        const status = refundStatusFromError(error);
+        if (status) return { status };
+        throw error;
+      }
     },
   };
 }

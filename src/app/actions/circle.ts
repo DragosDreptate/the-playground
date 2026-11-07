@@ -243,7 +243,10 @@ export async function deleteCircleAction(
   const userId = session.user.id;
   return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    await deleteCircle({ circleId, userId }, { circleRepository: circleRepo });
+    await deleteCircle(
+      { circleId, userId },
+      { circleRepository: circleRepo, registrationRepository: prismaRegistrationRepository }
+    );
     invalidateDashboardCache(userId);
   });
 }

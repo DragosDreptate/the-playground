@@ -144,6 +144,18 @@ Fichiers : `stripe-payment-service.ts`, `payment-service.ts`, `mock-payment-serv
 - E2E : helper de webhook avec `account`, seed adapté, parcours avec un compte Organisateur ordinaire.
 - Validation manuelle du parcours réel, WebKit compris.
 
+**Correctifs de la revue du 2026-11-07 :**
+
+- Un paiement arrivé sur un événement annulé, passé, supprimé ou devenu gratuit est remboursé.
+- Un second paiement du même Participant est remboursé, le premier reste la référence.
+- « Déjà remboursé » est traité comme un succès, et un webhook ne confirme jamais un paiement rendu.
+- Un refus définitif de Stripe dans le webhook est remonté une seule fois, sans rejeu.
+- Une Communauté avec des Participants payés non remboursés ne se supprime plus. Le contrôle porte sur les paiements, pas sur les événements publiés : un paiement en cours sur un événement supprimé est remboursé par le webhook.
+- « Remboursable » ne se retire plus après le premier paiement.
+- `updateMomentAction` passe enfin le service de paiement : un passage en gratuit rembourse bien.
+- Un compte dont le dossier est envoyé garde l'accès à « Voir mes paiements ».
+- L'alerte de D8 couvre aussi la suppression, le passage en gratuit et le webhook.
+
 **Résultat du 2026-11-07 :** 15 tests e2e de `stripe-payment.spec.ts` verts sur Chromium, et parcours réel `stripe-live.spec.ts` vert sur Chromium et WebKit : paiement sur la vraie page Stripe, webhook, inscription, désinscription, remboursement. Ce parcours tourne sur un ancien compte Express de test, faute de compte au profil cible (son inscription exige un humain). Le profil cible a été validé à part au lot 0. Google Pay et la suite e2e complète restent à passer.
 
 ### Lot 5. Release

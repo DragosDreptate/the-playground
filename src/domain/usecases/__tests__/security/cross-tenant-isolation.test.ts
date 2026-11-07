@@ -131,7 +131,7 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       await expect(
         deleteCircle(
           { circleId: "circle-a", userId: "user-attacker" },
-          { circleRepository: circleRepo }
+          { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() }
         )
       ).rejects.toThrow(UnauthorizedCircleActionError);
 

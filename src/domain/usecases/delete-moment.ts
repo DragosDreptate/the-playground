@@ -7,6 +7,7 @@ import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
+  MomentRefundsFailedError,
 } from "@/domain/errors";
 
 type DeleteMomentInput = {
@@ -53,7 +54,12 @@ export async function deleteMoment(
       paymentService: deps.paymentService,
     });
     // Une inscription supprimée ne se rembourse plus : on garde l'événement.
-    if (failures.length > 0) throw failures[0].error;
+    if (failures.length > 0) {
+      throw new MomentRefundsFailedError(
+        input.momentId,
+        failures.map(({ registration }) => registration.userId)
+      );
+    }
   }
 
   await momentRepository.delete(input.momentId);

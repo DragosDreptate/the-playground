@@ -300,10 +300,16 @@ export function MomentFormOptionsSection({
                 {t("form.refundableDescription")}
               </p>
             </div>
+            {/* Prix verrouillé : la politique aussi. Un champ désactivé n'étant pas
+                envoyé, la valeur passe par un champ caché. */}
+            {priceLocked && defaultRefundable && (
+              <input type="hidden" name="refundable" value="on" />
+            )}
             <Switch
               id="refundable"
-              name="refundable"
+              name={priceLocked ? undefined : "refundable"}
               defaultChecked={defaultRefundable}
+              disabled={priceLocked}
             />
           </div>
         )}

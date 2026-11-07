@@ -4,7 +4,6 @@ import { createMockMomentRepository, makeMoment } from "./helpers/mock-moment-re
 import { createMockCircleRepository, makeCircle, makeMembership } from "./helpers/mock-circle-repository";
 import { createMockRegistrationRepository, makeRegistration } from "./helpers/mock-registration-repository";
 import { createMockPaymentService } from "./helpers/mock-payment-service";
-import { StripeRefundFailedError } from "@/domain/errors";
 
 const checkoutEvent = {
   type: "checkout_completed" as const,
@@ -120,7 +119,7 @@ describe("handlePaymentWebhook", () => {
   });
 
   describe("given a refund refused while the event is full", () => {
-    it("should throw so that Stripe replays the event", async () => {
+    it("should report the failure once instead of replaying the event", async () => {
       const deps = makeDeps({
         paymentService: {
           handleWebhookEvent: vi.fn().mockResolvedValue(checkoutEvent),
@@ -135,9 +134,12 @@ describe("handlePaymentWebhook", () => {
         },
       });
 
-      await expect(
-        handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps)
-      ).rejects.toThrow(StripeRefundFailedError);
+      const result = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(result.handled).toBe(false);
+      if (!result.handled) {
+        expect(result.refundFailure).toEqual({ momentId: "moment-1", userId: "user-2" });
+      }
     });
   });
 
@@ -191,6 +193,62 @@ describe("handlePaymentWebhook", () => {
         accountId: "acct_organizer",
       });
       expect(deps.registrationRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given an event no longer open when the payment arrives", () => {
+    it.each([
+      ["cancelled", makeMoment({ id: "moment-1", price: 1500, status: "CANCELLED" })],
+      ["past", makeMoment({ id: "moment-1", price: 1500, status: "PAST" })],
+      ["back to draft", makeMoment({ id: "moment-1", price: 1500, status: "DRAFT" })],
+      ["made free", makeMoment({ id: "moment-1", price: 0, status: "PUBLISHED" })],
+      ["deleted", null],
+    ])("should refund the Participant when the event is %s", async (_label, moment) => {
+      const deps = makeDeps({
+        paymentService: { handleWebhookEvent: vi.fn().mockResolvedValue(checkoutEvent) },
+        momentRepository: { findById: vi.fn().mockResolvedValue(moment) },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
+        },
+      });
+
+      const result = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(result.handled).toBe(false);
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({
+        paymentIntentId: "pi_test_123",
+        accountId: "acct_organizer",
+      });
+      expect(deps.registrationRepository.create).not.toHaveBeenCalled();
+      expect(deps.circleRepository.addMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a second payment for a Participant already paid", () => {
+    it("should refund the second payment and keep the first one", async () => {
+      const deps = makeDeps({
+        paymentService: {
+          handleWebhookEvent: vi.fn().mockResolvedValue({ ...checkoutEvent, paymentIntentId: "pi_second" }),
+        },
+        momentRepository: {
+          findById: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", price: 1500, capacity: null })),
+        },
+        registrationRepository: {
+          findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
+          findByMomentAndUser: vi.fn().mockResolvedValue(
+            makeRegistration({ status: "REGISTERED", paymentStatus: "PAID", stripePaymentIntentId: "pi_first" })
+          ),
+        },
+      });
+
+      const result = await handlePaymentWebhook({ payload: "raw-body", signature: "sig" }, deps);
+
+      expect(result.handled).toBe(false);
+      expect(deps.paymentService.refund).toHaveBeenCalledWith({
+        paymentIntentId: "pi_second",
+        accountId: "acct_organizer",
+      });
+      expect(deps.registrationRepository.update).not.toHaveBeenCalled();
     });
   });
 

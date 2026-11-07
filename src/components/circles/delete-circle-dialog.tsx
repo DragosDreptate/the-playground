@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { deleteCircleAction } from "@/app/actions/circle";
+import { STRIPE_ERROR_CODES } from "@/domain/errors";
 
 type DeleteCircleDialogProps = {
   circleId: string;
@@ -39,7 +40,11 @@ export function DeleteCircleDialog({ circleId, triggerClassName }: DeleteCircleD
     if (result.success) {
       router.push("/dashboard");
     } else {
-      setError(result.error);
+      setError(
+        result.code === STRIPE_ERROR_CODES.CircleHasUnrefundedPayments
+          ? t("delete.blockedByPayments")
+          : result.error
+      );
       setIsPending(false);
     }
   }

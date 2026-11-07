@@ -110,7 +110,7 @@ describe("Security — RBAC", () => {
         });
 
         await expect(
-          deleteCircle(input, { circleRepository: circleRepo })
+          deleteCircle(input, { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() })
         ).rejects.toThrow(UnauthorizedCircleActionError);
       }
     );
@@ -123,7 +123,7 @@ describe("Security — RBAC", () => {
       });
 
       await expect(
-        deleteCircle(input, { circleRepository: circleRepo })
+        deleteCircle(input, { circleRepository: circleRepo, registrationRepository: createMockRegistrationRepository() })
       ).resolves.toBeUndefined();
       expect(circleRepo.delete).toHaveBeenCalledWith("circle-1");
     });
