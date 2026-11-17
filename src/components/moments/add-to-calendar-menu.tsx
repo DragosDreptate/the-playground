@@ -16,7 +16,7 @@ type Props = {
   appUrl: string;
 };
 
-function GoogleCalendarIcon() {
+export function GoogleCalendarIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
       <path

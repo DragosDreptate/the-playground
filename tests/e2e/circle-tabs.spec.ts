@@ -11,7 +11,8 @@ import { SLUGS, AUTH } from "./fixtures";
 
 async function assertTabSwitchPreservesScroll(page: Page) {
   const pastTab = page.getByRole("button", { name: /passé|past/i });
-  const upcomingTab = page.getByRole("button", { name: /prochains|upcoming/i });
+  // Sur mobile, la page publique affiche les libellés courts « À venir / Passés ».
+  const upcomingTab = page.getByRole("button", { name: /prochains|à venir|upcoming/i });
   await expect(pastTab).toBeVisible();
 
   // Scroller jusqu'aux tabs

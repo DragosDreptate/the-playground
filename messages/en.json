@@ -336,7 +336,9 @@
       "memberCount": "{count} members",
       "andOthers": "{count, plural, =1 {and 1 other} other {and # others}}",
       "upcomingMoments": "Upcoming Events",
+      "upcomingMomentsShort": "Upcoming",
       "pastMoments": "Past Events",
+      "pastMomentsShort": "Past",
       "noUpcomingMoments": "No upcoming Events.",
       "noPastMoments": "No past Events.",
       "noPendingMemberships": "Approval enabled — no pending requests.",
@@ -453,6 +455,16 @@
       "viewDashboard": "View my payments",
       "cancel": "Cancel activation",
       "cancelBlocked": "Can't cancel: this Community has already received payments, or has a published paid event."
+    },
+    "calendarFeed": {
+      "label": "Subscribe to calendar",
+      "google": "Google Calendar",
+      "apple": "Apple Calendar",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "hint": "This Community's events are added to your calendar and update automatically.",
+      "feedRegisterLine": "Join: {url}",
+      "feedOnline": "Online"
     }
   },
   "Moment": {
@@ -1775,6 +1787,7 @@
       "rejoindre": "Join a community",
       "waitlist": "Waitlist",
       "calendar": "Add to calendar",
+      "calendarSubscribe": "Subscribe to a Community's calendar",
       "timezone": "Time zones",
       "cancel": "Cancel registration",
       "comments": "Comments",
@@ -1832,6 +1845,14 @@
         "intro": "After registering, an \"Add to calendar\" button is available on the event page. Click it to choose your format:",
         "item1": "Google Calendar: opens directly in your browser",
         "item2": ".ics file: compatible with Apple Calendar, Outlook and most calendar apps"
+      },
+      "calendarSubscribe": {
+        "title": "Subscribe to a Community's calendar",
+        "intro": "On a public Community's page, the \"Subscribe to calendar\" button adds all its events to your calendar. New events, time changes and cancellations show up there automatically.",
+        "item1": "Google Calendar or Apple Calendar: the subscription opens directly in your calendar app",
+        "item2": "Copy link: for Outlook, other calendar apps or a website that gathers events",
+        "item3": "Subscribing does not register you: to attend, join from the event page, linked in each event of your calendar",
+        "item4": "Your calendar app refreshes the calendar at its own pace: a new event may take a few hours to appear"
       },
       "timezone": {
         "title": "Time zones",

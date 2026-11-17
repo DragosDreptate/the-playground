@@ -227,6 +227,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - S'inscrire à un événement = inscription à la Communauté automatique
 - Social proof sur la page événement : liste des inscrits (avatars/initiales), nombre de places restantes
 - Bouton "Ajouter à mon calendrier" après inscription (Google Calendar, Apple Calendar, ICS)
+- Abonnement au calendrier d'une Communauté publique (flux ICS `/api/circles/[slug]/calendar`, bouton « S'abonner au calendrier » sur la page Communauté)
 - Paiement Stripe si nécessaire (pour les événements payants)
 - Notifications email (confirmation, rappels 24h, changements, annulations)
 - Fil de commentaires sur l'événement (avec pièces jointes photos)

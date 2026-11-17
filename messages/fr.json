@@ -336,7 +336,9 @@
       "memberCount": "{count} membres",
       "andOthers": "{count, plural, =1 {et 1 autre} other {et # autres}}",
       "upcomingMoments": "Prochains événements",
+      "upcomingMomentsShort": "À venir",
       "pastMoments": "Événements passés",
+      "pastMomentsShort": "Passés",
       "noUpcomingMoments": "Aucun événement à venir.",
       "noPastMoments": "Aucun événement passé.",
       "noPendingMemberships": "Validation activée — aucune demande en attente.",
@@ -453,6 +455,16 @@
       "viewDashboard": "Voir mes paiements",
       "cancel": "Annuler l'activation",
       "cancelBlocked": "Impossible d'annuler : cette Communauté a déjà encaissé des paiements, ou a un événement payant publié."
+    },
+    "calendarFeed": {
+      "label": "S'abonner au calendrier",
+      "google": "Google Calendar",
+      "apple": "Apple Calendar",
+      "copyLink": "Copier le lien",
+      "linkCopied": "Lien copié",
+      "hint": "Les événements de cette Communauté s'ajoutent à votre agenda et se mettent à jour automatiquement.",
+      "feedRegisterLine": "Inscription : {url}",
+      "feedOnline": "En ligne"
     }
   },
   "Moment": {
@@ -1775,6 +1787,7 @@
       "rejoindre": "Rejoindre une communauté",
       "waitlist": "Liste d'attente",
       "calendar": "Ajouter à son calendrier",
+      "calendarSubscribe": "S'abonner au calendrier d'une Communauté",
       "timezone": "Les fuseaux horaires",
       "cancel": "Annuler son inscription",
       "comments": "Les commentaires",
@@ -1832,6 +1845,14 @@
         "intro": "Après votre inscription, un bouton « Ajouter à mon calendrier » est disponible sur la page de l'événement. Cliquez dessus pour choisir votre format :",
         "item1": "Google Calendar : ouvre directement dans votre navigateur",
         "item2": "Fichier .ics : compatible avec Apple Calendar, Outlook et la plupart des agendas"
+      },
+      "calendarSubscribe": {
+        "title": "S'abonner au calendrier d'une Communauté",
+        "intro": "Sur la page d'une Communauté publique, le bouton « S'abonner au calendrier » ajoute tous ses événements à votre agenda. Les nouveaux événements, les changements d'horaire et les annulations s'y reportent automatiquement.",
+        "item1": "Google Calendar ou Apple Calendar : l'abonnement s'ouvre directement dans votre agenda",
+        "item2": "Copier le lien : pour Outlook, les autres agendas ou un site qui regroupe des événements",
+        "item3": "S'abonner ne vous inscrit pas : pour participer, inscrivez-vous depuis la page de l'événement, dont le lien figure dans chaque événement de votre agenda",
+        "item4": "Votre agenda relit le calendrier à son propre rythme : un nouvel événement peut mettre quelques heures à apparaître"
       },
       "timezone": {
         "title": "Les fuseaux horaires",

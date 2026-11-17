@@ -39,6 +39,7 @@ import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
+import { CircleCalendarSubscribeMenu } from "@/components/circles/circle-calendar-subscribe-menu";
 import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { CoverBlock } from "@/components/circles/cover-block";
@@ -263,8 +264,10 @@ export default async function PublicCirclePage({
   const gradient = getMomentGradient(circle.name);
 
   const appUrl = getAppUrl();
+  // Publique et réelle : seule une telle Communauté est indexée et a un flux calendrier.
+  const circleIndexable = isCircleIndexable(circle);
   const jsonLd =
-    isCircleIndexable(circle)
+    circleIndexable
       ? {
           "@context": "https://schema.org",
           "@type": "Organization",
@@ -609,6 +612,16 @@ export default async function PublicCirclePage({
           <CircleMomentTabs
             upcomingLabel={t("detail.upcomingMoments")}
             pastLabel={t("detail.pastMoments")}
+            upcomingAction={
+              circleIndexable ? (
+                <CircleCalendarSubscribeMenu circleSlug={circle.slug} appUrl={appUrl} />
+              ) : undefined
+            }
+            inlineActionOnMobile
+            shortLabels={{
+              upcoming: t("detail.upcomingMomentsShort"),
+              past: t("detail.pastMomentsShort"),
+            }}
             upcomingContent={
               upcomingMoments.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
