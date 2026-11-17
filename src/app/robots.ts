@@ -3,6 +3,12 @@ import { AGGRESSIVE_CRAWLERS, AI_TRAINING_BOTS } from "@/lib/blocked-bots";
 
 const PRIVATE_PATHS = ["/dashboard/", "/admin/", "/api/", "/auth/"];
 
+// Flux calendrier public d'une Communauté (#647) : servi sous /api/, il doit
+// rester lisible par les agendas (Google Agenda respecte robots.txt) et les
+// agrégateurs. La règle Allow, plus longue, l'emporte sur `Disallow: /api/`.
+// Les robots d'IA ont leur propre groupe, qui garde /api/ interdit.
+const CALENDAR_FEED_PATH = "/api/circles/*/calendar";
+
 // User-generated content: Moments (/m/), Circles (/circles/) and Networks
 // (/networks/, which list their Circles' names and descriptions) in both
 // locales, plus the embed widget. These belong to Hosts, not to the platform.
@@ -23,7 +29,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/m/", "/circles/"],
+        allow: ["/", "/m/", "/circles/", CALENDAR_FEED_PATH],
         disallow: PRIVATE_PATHS,
       },
       {

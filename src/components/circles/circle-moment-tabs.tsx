@@ -9,7 +9,21 @@ type Props = {
   pastContent: ReactNode;
   /** Action affichée à droite des tabs sur le tab "upcoming" (ex: bouton "Créer un événement") */
   upcomingAction?: ReactNode;
+  /** Garde l'action sur la ligne des onglets en mobile (action réduite à une icône). */
+  inlineActionOnMobile?: boolean;
+  /** Libellés courts affichés sous `sm`, pour faire tenir onglets et action sur une ligne. */
+  shortLabels?: { upcoming: string; past: string };
 };
+
+function TabLabel({ label, shortLabel }: { label: string; shortLabel?: string }) {
+  if (!shortLabel) return label;
+  return (
+    <>
+      <span className="sm:hidden">{shortLabel}</span>
+      <span className="hidden sm:inline">{label}</span>
+    </>
+  );
+}
 
 export function CircleMomentTabs({
   upcomingLabel,
@@ -17,13 +31,21 @@ export function CircleMomentTabs({
   upcomingContent,
   pastContent,
   upcomingAction,
+  inlineActionOnMobile = false,
+  shortLabels,
 }: Props) {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   return (
     <div className="space-y-6">
       {/* Tab selector + optional action */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
+      <div
+        className={
+          inlineActionOnMobile
+            ? "flex items-center justify-between gap-3 md:gap-4"
+            : "flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4"
+        }
+      >
         <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
           <button
             type="button"
@@ -34,7 +56,7 @@ export function CircleMomentTabs({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {upcomingLabel}
+            <TabLabel label={upcomingLabel} shortLabel={shortLabels?.upcoming} />
           </button>
           <button
             type="button"
@@ -45,7 +67,7 @@ export function CircleMomentTabs({
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {pastLabel}
+            <TabLabel label={pastLabel} shortLabel={shortLabels?.past} />
           </button>
         </div>
         {activeTab === "upcoming" && upcomingAction}

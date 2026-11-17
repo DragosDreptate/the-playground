@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { generateIcs } from "../generate-ics";
+import { generateIcs, generateIcsFeed } from "../generate-ics";
 
 describe("generateIcs", () => {
   const defaultData = {
@@ -196,6 +196,145 @@ describe("generateIcs", () => {
       expect(ics).toContain("DTSTAMP:20260221T220000Z");
 
       vi.useRealTimers();
+    });
+  });
+});
+
+describe("generateIcsFeed", () => {
+  const event = {
+    uid: "moment-1",
+    title: "Apéro JS #42",
+    description: "Inscription : https://the-playground.fr/m/apero-js-42",
+    startsAt: new Date("2026-11-27T18:00:00Z"),
+    endsAt: new Date("2026-11-27T20:00:00Z"),
+    location: "La Cantine, Toulouse",
+    url: "https://the-playground.fr/m/apero-js-42",
+    cancelled: false,
+    updatedAt: new Date("2026-11-10T09:15:00Z"),
+  };
+
+  function unfold(ics: string): string {
+    return ics.replace(/\r\n /g, "");
+  }
+
+  describe("given a Community calendar with several events", () => {
+    it("should wrap one VEVENT per event in a single VCALENDAR", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS · The Playground",
+        events: [event, { ...event, uid: "moment-2" }],
+      });
+
+      expect(ics.match(/BEGIN:VCALENDAR/g)).toHaveLength(1);
+      expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+      expect(ics).toContain("UID:moment-1@theplayground");
+      expect(ics).toContain("UID:moment-2@theplayground");
+      expect(ics.endsWith("END:VCALENDAR\r\n")).toBe(true);
+    });
+
+    it("should name the calendar and suggest an hourly refresh", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS · The Playground",
+        events: [],
+      });
+
+      expect(ics).toContain("METHOD:PUBLISH");
+      expect(ics).toContain("NAME:Toulouse JS · The Playground");
+      expect(ics).toContain("X-WR-CALNAME:Toulouse JS · The Playground");
+      expect(ics).toContain("REFRESH-INTERVAL;VALUE=DURATION:PT1H");
+      expect(ics).toContain("X-PUBLISHED-TTL:PT1H");
+    });
+
+    it("should never expose an organizer email", () => {
+      const ics = generateIcsFeed({ calendarName: "Toulouse JS", events: [event] });
+
+      expect(ics).not.toContain("ORGANIZER");
+      expect(ics).not.toContain("MAILTO");
+    });
+  });
+
+  describe.each([
+    [false, "STATUS:CONFIRMED"],
+    [true, "STATUS:CANCELLED"],
+  ])("given an event with cancelled=%s", (cancelled, expected) => {
+    it(`should mark it ${expected}`, () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS",
+        events: [{ ...event, cancelled }],
+      });
+
+      expect(ics).toContain(expected);
+    });
+  });
+
+  describe("given an event modified after publication", () => {
+    it("should expose its last modification date", () => {
+      const ics = generateIcsFeed({ calendarName: "Toulouse JS", events: [event] });
+
+      expect(ics).toContain("LAST-MODIFIED:20261110T091500Z");
+    });
+  });
+
+  describe("given a description with invisible control characters", () => {
+    it("should drop them and keep tabs and line breaks", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS",
+        events: [{ ...event, description: "A\u000BB\u000CC\u0000D\u007FE\tF\nG" }],
+      });
+
+      expect(unfold(ics)).toContain("DESCRIPTION:ABCDE\tF\\nG");
+    });
+  });
+
+  describe("given an event without location", () => {
+    it("should omit the LOCATION line", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS",
+        events: [{ ...event, location: null }],
+      });
+
+      expect(ics).not.toContain("LOCATION:");
+    });
+  });
+
+  describe("given an event without end date", () => {
+    it("should end two hours after the start", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS",
+        events: [{ ...event, endsAt: null }],
+      });
+
+      expect(ics).toContain("DTEND:20261127T200000Z");
+    });
+  });
+
+  describe("given a description typed with Windows line endings", () => {
+    it("should escape it without leaving a raw carriage return", () => {
+      const ics = generateIcsFeed({
+        calendarName: "Toulouse JS",
+        events: [{ ...event, description: "Ligne 1\r\nLigne 2" }],
+      });
+
+      expect(unfold(ics)).toContain("DESCRIPTION:Ligne 1\\nLigne 2");
+      expect(ics.replace(/\r\n/g, "")).not.toContain("\r");
+    });
+  });
+
+  describe("given a long accented description", () => {
+    const description = "Événement à Toulouse — ".repeat(20);
+    const ics = generateIcsFeed({
+      calendarName: "Toulouse JS",
+      events: [{ ...event, description }],
+    });
+
+    it("should fold every line to 75 bytes at most (RFC 5545)", () => {
+      const encoder = new TextEncoder();
+      for (const line of ics.split("\r\n")) {
+        expect(encoder.encode(line).length).toBeLessThanOrEqual(75);
+      }
+    });
+
+    it("should restore the full text once unfolded", () => {
+      expect(unfold(ics)).toContain(`DESCRIPTION:${description}`);
     });
   });
 });

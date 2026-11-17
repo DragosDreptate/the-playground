@@ -31,3 +31,16 @@ export const AI_TRAINING_BOTS = [
   "perplexitybot",
   "amazonbot",
 ];
+
+/**
+ * Robots refusés sur le contenu des Communautés servi hors middleware (routes
+ * `/api/*`, que le matcher du middleware exclut) : crawlers agressifs et
+ * robots d'entraînement d'IA, comme sur `/m/` et `/circles/`.
+ */
+export function isBotBlockedOnUgc(userAgent: string | null): boolean {
+  if (!userAgent) return false;
+  const lower = userAgent.toLowerCase();
+  return [...AGGRESSIVE_CRAWLERS, ...AI_TRAINING_BOTS].some((bot) =>
+    lower.includes(bot)
+  );
+}

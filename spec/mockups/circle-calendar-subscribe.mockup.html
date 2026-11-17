@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maquette — S'abonner au calendrier d'une Communauté (#647)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --background: #f8f9fb;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #14112a;
+  --muted: #f1f0f7;
+  --muted-foreground: #6b6f87;
+  --border: #e2e6ea;
+  --primary: #e8437d;
+  --primary-10: rgba(232, 67, 125, 0.10);
+  --success: #16a34a;
+  --radius: 0.5rem;
+  --shadow: 0 10px 30px rgba(20, 17, 42, 0.10), 0 2px 6px rgba(20, 17, 42, 0.06);
+}
+body.dark {
+  --background: #1c1929;
+  --card: #252235;
+  --popover: #252235;
+  --foreground: #f0eff6;
+  --muted: #2b2740;
+  --muted-foreground: #8885a0;
+  --border: #3d3850;
+  --shadow: none;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.5; color: var(--foreground); background: var(--background); }
+
+/* ─── Bandeau maquette ─── */
+.mockup-banner { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 24px; background: #0f0c1a; color: #fff; font-size: 13px; font-weight: 600; }
+.mockup-banner span { color: var(--primary); }
+.theme-toggle { border: 1px solid #3d3850; background: transparent; color: #fff; border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 12px; cursor: pointer; }
+
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+.section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); margin: 40px 0 6px; }
+.section-title:first-child { margin-top: 0; }
+.section-intro { font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px; max-width: 760px; }
+
+/* ─── Cadres ─── */
+.frame { background: var(--background); border: 1px solid var(--border); border-radius: 16px; overflow: visible; }
+.frame-label { display: inline-block; font-size: 11px; font-weight: 600; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; margin-bottom: 10px; background: var(--card); }
+.desktop { padding: 28px 32px 40px; }
+.phones { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+.phone { width: 375px; border: 10px solid #14112a; border-radius: 40px; background: var(--background); padding: 22px 16px 32px; position: relative; }
+body.dark .phone { border-color: #000; }
+.phone-caption { width: 375px; font-size: 13px; color: var(--muted-foreground); margin-top: 10px; }
+.phone-caption strong { color: var(--foreground); }
+.reco { display: inline-block; font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-10); border-radius: 999px; padding: 1px 8px; margin-left: 6px; }
+
+/* ─── Contexte page Communauté (simplifié) ─── */
+.layout { display: flex; gap: 32px; align-items: flex-start; }
+.left-col { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+.cover { aspect-ratio: 1 / 1; border-radius: 16px; background: linear-gradient(135deg, #6d28d9, #e8437d 60%, #f59e0b); }
+.ghost-line { height: 10px; border-radius: 6px; background: var(--muted); }
+.right-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.circle-title { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.sep { border: 0; border-top: 1px solid var(--border); }
+.meta-row { display: flex; align-items: center; gap: 12px; }
+.meta-icon { width: 44px; height: 44px; border-radius: 8px; background: var(--primary-10); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.meta-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); }
+.meta-value { font-size: 14px; font-weight: 500; }
+
+/* ─── Onglets (calqués sur CircleMomentTabs) ─── */
+.tabs-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tabs-row.stack { flex-direction: column; align-items: flex-start; gap: 12px; }
+.tabs { display: inline-flex; gap: 4px; border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+.tab { white-space: nowrap; border-radius: 999px; padding: 4px 16px; font-size: 14px; font-weight: 500; color: var(--muted-foreground); }
+.tab.active { background: var(--foreground); color: var(--background); }
+.phone .tab { padding: 4px 12px; font-size: 13px; }
+
+/* ─── Bouton outline sm (shadcn) ─── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--foreground); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.btn:hover, .btn.is-open { background: var(--muted); }
+.btn .chev { color: var(--muted-foreground); }
+.btn.icon-only { width: 36px; height: 36px; padding: 0; }
+.btn.full { width: 100%; height: 36px; }
+
+/* ─── Menu déroulant ─── */
+.dd { position: relative; display: inline-block; }
+.dd.full { display: block; width: 100%; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 248px; background: var(--popover); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 4px; }
+.dd.full .menu { left: 0; right: auto; }
+.menu-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 4px; font-size: 14px; color: var(--foreground); cursor: pointer; }
+.menu-item:hover, .menu-item.focus { background: var(--muted); }
+.menu-item .sub { display: block; font-size: 12px; color: var(--muted-foreground); }
+.menu-item.copied { color: var(--success); }
+.menu-sep { height: 1px; background: var(--border); margin: 4px -4px; }
+.menu-hint { padding: 6px 8px 4px; font-size: 12px; color: var(--muted-foreground); line-height: 1.45; }
+
+/* ─── Timeline (simplifiée) ─── */
+.timeline { display: flex; flex-direction: column; gap: 14px; }
+.t-item { display: flex; gap: 14px; }
+.t-date { width: 64px; flex-shrink: 0; padding-top: 6px; }
+.t-date .d { font-size: 14px; font-weight: 600; }
+.t-date .w { font-size: 13px; color: var(--muted-foreground); }
+.t-card { flex: 1; min-width: 0; display: flex; gap: 16px; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 6px 16px rgba(20,17,42,0.06); }
+body.dark .t-card { box-shadow: none; }
+.t-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.t-title { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.t-meta { font-size: 12px; color: var(--muted-foreground); display: flex; gap: 12px; flex-wrap: wrap; }
+.t-thumb { width: 88px; height: 88px; border-radius: 8px; flex-shrink: 0; }
+.phone .t-date { display: none; }
+.phone .t-thumb { width: 64px; height: 64px; }
+
+/* ─── Notes ─── */
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.note { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.note h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.note ul { padding-left: 18px; color: var(--muted-foreground); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.note li strong { color: var(--foreground); font-weight: 600; }
+
+/* ─── Aperçu agenda ─── */
+.cal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; max-width: 560px; }
+.cal-head { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 12px; }
+.cal-dot { width: 10px; height: 10px; border-radius: 3px; background: #7c3aed; }
+.cal-ev { border-left: 3px solid #7c3aed; padding: 6px 10px; margin-bottom: 10px; background: var(--muted); border-radius: 0 6px 6px 0; }
+.cal-ev.cancelled { border-left-color: var(--muted-foreground); opacity: 0.7; }
+.cal-ev.cancelled .cal-ev-title { text-decoration: line-through; }
+.cal-ev-title { font-weight: 600; font-size: 14px; }
+.cal-ev-meta { font-size: 12px; color: var(--muted-foreground); }
+.cal-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 4px; white-space: pre-line; }
+.cal-desc a { color: var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">
+  <div>Maquette <span>#647</span> — S'abonner au calendrier d'une Communauté</div>
+  <button class="theme-toggle" onclick="document.body.classList.toggle('dark')">Clair / sombre</button>
+</div>
+
+<!-- Icônes lucide, reprises en inline -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-cal-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 10v4h4"/><path d="m11 14 1.535-1.605a5 5 0 0 1 8 1.5"/><path d="M16 2v4"/><path d="m21 18-1.535 1.605a5 5 0 0 1-8-1.5"/><path d="M21 22v-4h-4"/><path d="M21 8.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.3"/><path d="M3 10h4"/><path d="M8 2v4"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-apple" viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.6c-.02-2.23 1.82-3.3 1.9-3.35-1.04-1.52-2.65-1.72-3.22-1.75-1.37-.14-2.68.81-3.37.81-.7 0-1.77-.79-2.9-.77-1.49.02-2.87.87-3.64 2.2-1.55 2.69-.4 6.67 1.11 8.85.74 1.07 1.62 2.27 2.77 2.22 1.11-.04 1.53-.72 2.88-.72 1.34 0 1.72.72 2.9.7 1.2-.02 1.95-1.09 2.68-2.16.84-1.24 1.19-2.44 1.21-2.5-.03-.01-2.32-.89-2.32-3.53zM14.16 6.06c.61-.74 1.03-1.77.91-2.8-.88.04-1.95.59-2.58 1.33-.57.66-1.07 1.7-.93 2.71.98.08 1.99-.5 2.6-1.24z"/></symbol>
+    <symbol id="i-google" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  </defs>
+</svg>
+
+<main class="page">
+
+  <!-- ═══════════════ BUREAU ═══════════════ -->
+  <h2 class="section-title">1. Bureau — menu ouvert</h2>
+  <p class="section-intro">
+    Le bouton se place à droite des onglets « Prochains événements / Événements passés », dans l'emplacement que le composant prévoit déjà
+    (utilisé dans Mon espace pour « Créer un événement »). Variante <strong>outline</strong>, taille <strong>sm</strong> : il ne concurrence pas « Rejoindre », qui reste le seul bouton principal.
+  </p>
+
+  <span class="frame-label">Page Communauté publique · ≥ 1024 px</span>
+  <div class="frame desktop">
+    <div class="layout">
+      <div class="left-col">
+        <div class="cover"></div>
+        <div class="ghost-line" style="width:70%"></div>
+        <div class="ghost-line" style="width:45%"></div>
+        <button class="btn full" style="background:var(--primary);color:#fff;border-color:var(--primary);">Rejoindre la communauté</button>
+      </div>
+
+      <div class="right-col">
+        <div class="circle-title">Toulouse JS</div>
+        <div class="ghost-line" style="width:90%"></div>
+        <div class="ghost-line" style="width:60%"></div>
+        <hr class="sep">
+        <div class="meta-row">
+          <div class="meta-icon"><svg width="20" height="20"><use href="#i-globe"/></svg></div>
+          <div><div class="meta-label">Visibilité</div><div class="meta-value">Communauté publique</div></div>
+        </div>
+        <hr class="sep">
+
+        <div class="tabs-row">
+          <div class="tabs">
+            <div class="tab active">Prochains événements</div>
+            <div class="tab">Événements passés</div>
+          </div>
+
+          <div class="dd">
+            <button class="btn is-open">
+              <svg width="16" height="16"><use href="#i-cal-sync"/></svg>
+              S'abonner au calendrier
+              <svg class="chev" width="14" height="14"><use href="#i-chev"/></svg>
+            </button>
+            <div class="menu">
+              <div class="menu-item focus">
+                <svg width="16" height="16"><use href="#i-google"/></svg>
+                Google Calendar
+              </div>
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-apple"/></svg>
+                Apple Calendar
+              </div>
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-link"/></svg>
+                Copier le lien
+              </div>
+              <div class="menu-sep"></div>
+              <div class="menu-hint">Les événements de cette Communauté s'ajoutent à votre agenda et se mettent à jour automatiquement.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline" style="margin-top:6px;">
+          <div class="t-item">
+            <div class="t-date"><div class="d">27 nov.</div><div class="w">jeudi</div></div>
+            <div class="t-card">
+              <div class="t-info">
+                <div class="t-title">Apéro JS #42 — Signals partout ?</div>
+                <div class="t-meta"><span>19:00</span><span>La Cantine, Toulouse</span><span>34 inscrits</span></div>
+              </div>
+              <div class="t-thumb" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></div>
+            </div>
+          </div>
+          <div class="t-item">
+            <div class="t-date"><div class="d">11 déc.</div><div class="w">jeudi</div></div>
+            <div class="t-card">
+              <div class="t-info">
+                <div class="t-title">Atelier : tests e2e avec Playwright</div>
+                <div class="t-meta"><span>18:30</span><span>En ligne</span><span>12 inscrits</span></div>
+              </div>
+              <div class="t-thumb" style="background:linear-gradient(135deg,#10b981,#3b82f6)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MOBILE ═══════════════ -->
+  <h2 class="section-title">2. Mobile — deux placements possibles</h2>
+  <p class="section-intro">
+    Sur mobile, les onglets prennent presque toute la largeur. Le bouton « Ajouter à mon calendrier » de la page événement s'y réduit déjà à une icône :
+    la variante A reprend ce choix. La variante B garde le libellé, sur sa propre ligne sous les onglets.
+  </p>
+
+  <div class="phones">
+    <!-- Variante A -->
+    <div>
+      <div class="phone">
+        <div class="tabs-row">
+          <div class="tabs">
+            <div class="tab active">Prochains</div>
+            <div class="tab">Passés</div>
+          </div>
+          <div class="dd">
+            <button class="btn icon-only is-open" aria-label="S'abonner au calendrier">
+              <svg width="16" height="16"><use href="#i-cal-sync"/></svg>
+            </button>
+            <div class="menu" style="min-width:240px;">
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-google"/></svg>
+                Google Calendar
+              </div>
+              <div class="menu-item focus">
+                <svg width="16" height="16"><use href="#i-apple"/></svg>
+                Apple Calendar
+              </div>
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-link"/></svg>
+                Copier le lien
+              </div>
+              <div class="menu-sep"></div>
+              <div class="menu-hint">Les événements de cette Communauté s'ajoutent à votre agenda et se mettent à jour automatiquement.</div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline" style="margin-top:210px;">
+          <div class="t-item">
+            <div class="t-card">
+              <div class="t-info">
+                <div class="t-title">Apéro JS #42 — Signals partout ?</div>
+                <div class="t-meta"><span>jeu. 27 nov. · 19:00</span><span>La Cantine</span></div>
+              </div>
+              <div class="t-thumb" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="phone-caption"><strong>A. Icône sur la ligne des onglets</strong><span class="reco">Reco</span><br>
+        Cohérent avec la page événement, ne repousse pas la liste. Moins visible : l'icône seule se comprend moins vite qu'un libellé.</p>
+    </div>
+
+    <!-- Variante B -->
+    <div>
+      <div class="phone">
+        <div class="tabs-row stack">
+          <div class="tabs">
+            <div class="tab active">Prochains événements</div>
+            <div class="tab">Passés</div>
+          </div>
+          <div class="dd">
+            <button class="btn">
+              <svg width="16" height="16"><use href="#i-cal-sync"/></svg>
+              S'abonner au calendrier
+              <svg class="chev" width="14" height="14"><use href="#i-chev"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="timeline" style="margin-top:20px;">
+          <div class="t-item">
+            <div class="t-card">
+              <div class="t-info">
+                <div class="t-title">Apéro JS #42 — Signals partout ?</div>
+                <div class="t-meta"><span>jeu. 27 nov. · 19:00</span><span>La Cantine</span></div>
+              </div>
+              <div class="t-thumb" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></div>
+            </div>
+          </div>
+          <div class="t-item">
+            <div class="t-card">
+              <div class="t-info">
+                <div class="t-title">Atelier : tests e2e avec Playwright</div>
+                <div class="t-meta"><span>jeu. 11 déc. · 18:30</span><span>En ligne</span></div>
+              </div>
+              <div class="t-thumb" style="background:linear-gradient(135deg,#10b981,#3b82f6)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="phone-caption"><strong>B. Libellé sous les onglets</strong><br>
+        Plus explicite. C'est le comportement par défaut du composant sur mobile, mais il ajoute une ligne avant le premier événement.</p>
+    </div>
+
+    <!-- État copié -->
+    <div>
+      <div class="phone">
+        <div class="tabs-row">
+          <div class="tabs">
+            <div class="tab active">Prochains</div>
+            <div class="tab">Passés</div>
+          </div>
+          <div class="dd">
+            <button class="btn icon-only is-open" aria-label="S'abonner au calendrier">
+              <svg width="16" height="16"><use href="#i-cal-sync"/></svg>
+            </button>
+            <div class="menu" style="min-width:240px;">
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-google"/></svg>
+                Google Calendar
+              </div>
+              <div class="menu-item">
+                <svg width="16" height="16"><use href="#i-apple"/></svg>
+                Apple Calendar
+              </div>
+              <div class="menu-item copied focus">
+                <svg width="16" height="16"><use href="#i-check"/></svg>
+                Lien copié
+              </div>
+              <div class="menu-sep"></div>
+              <div class="menu-hint">Les événements de cette Communauté s'ajoutent à votre agenda et se mettent à jour automatiquement.</div>
+            </div>
+          </div>
+        </div>
+        <div style="height:220px;"></div>
+      </div>
+      <p class="phone-caption"><strong>« Copier le lien »</strong>, juste après le clic<br>
+        Le libellé passe à « Lien copié » pendant 2 secondes, puis le menu se referme. Ce lien sert à Outlook et aux agrégateurs comme Toulouse Tech Hub.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ COMPORTEMENT ═══════════════ -->
+  <h2 class="section-title">3. Ce que fait chaque choix</h2>
+  <div class="notes">
+    <div class="note">
+      <h3>Google Calendar</h3>
+      <ul>
+        <li>Ouvre Google Calendar dans un nouvel onglet, avec l'ajout du calendrier à confirmer.</li>
+        <li>Fiable sur ordinateur. <strong>À vérifier sur mobile</strong>, où Google renvoie parfois vers la version web.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Apple Calendar</h3>
+      <ul>
+        <li>Ouvre un lien <strong>webcal://</strong> : l'iPhone ou le Mac propose directement l'abonnement.</li>
+        <li>Parcours principal des participants (mobile, majoritairement iPhone). <strong>À tester sur un vrai iPhone.</strong></li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Copier le lien</h3>
+      <ul>
+        <li>Copie l'adresse https du flux.</li>
+        <li>Pour Outlook, les agrégateurs d'agendas et les utilisateurs techniques.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Quand le bouton apparaît</h3>
+      <ul>
+        <li>Communautés <strong>publiques et réelles</strong> uniquement (ni privées, ni démo), même règle que le flux.</li>
+        <li>Visible pour tous, connecté ou non, membre ou non.</li>
+        <li>Sur l'onglet « Prochains événements », comme l'emplacement existant. Aussi quand il n'y a aucun événement à venir : on s'abonne pour les suivants.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════ APERÇU AGENDA ═══════════════ -->
+  <h2 class="section-title">4. Ce que voit l'abonné dans son agenda</h2>
+  <p class="section-intro">
+    Le calendrier porte le nom de la Communauté. Chaque événement renvoie vers sa page en tête de description, car un abonné n'est pas inscrit.
+    Un événement en ligne affiche « En ligne », sans le lien visio (D2). Un événement annulé reste visible, marqué annulé.
+  </p>
+  <div class="cal">
+    <div class="cal-head"><span class="cal-dot"></span>Toulouse JS · The Playground</div>
+    <div class="cal-ev">
+      <div class="cal-ev-title">Apéro JS #42 — Signals partout ?</div>
+      <div class="cal-ev-meta">jeu. 27 nov., 19:00 – 21:00 · La Cantine, 27 rue d'Aubuisson, Toulouse</div>
+      <div class="cal-desc">Inscription : <a href="#">https://the-playground.fr/m/apero-js-42</a>
+
+On parle des signals dans les frameworks JS…</div>
+    </div>
+    <div class="cal-ev">
+      <div class="cal-ev-title">Atelier : tests e2e avec Playwright</div>
+      <div class="cal-ev-meta">jeu. 11 déc., 18:30 – 20:00 · En ligne</div>
+      <div class="cal-desc">Inscription : <a href="#">https://the-playground.fr/m/atelier-playwright</a></div>
+    </div>
+    <div class="cal-ev cancelled">
+      <div class="cal-ev-title">Hackathon de Noël</div>
+      <div class="cal-ev-meta">sam. 20 déc. · Annulé</div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
