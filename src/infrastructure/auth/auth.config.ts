@@ -140,7 +140,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // pour Google (email_verified=true requis via OIDC) et pour GitHub (verif
     // email obligatoire avant de marquer une adresse comme primary). LinkedIn
     // est OIDC et renvoie également email_verified : même mitigation que Google.
-    GitHub({ allowDangerousEmailAccountLinking: true }),
+    //
+    // issuer : GitHub renvoie désormais `iss=https://github.com/login/oauth` au
+    // callback (RFC 9207). @auth/core < 0.41.3 ne déclare pas d'issuer pour
+    // GitHub et compare ce paramètre à son fallback `https://authjs.dev` =>
+    // rejet (CallbackRouteError / OAUTH_INVALID_RESPONSE). Même valeur que le
+    // fix upstream de @auth/core 0.41.3. À retirer quand @auth/core >= 0.41.3 :
+    // sinon notre valeur reste prioritaire sur celle d'Auth.js.
+    GitHub({
+      issuer: "https://github.com/login/oauth",
+      allowDangerousEmailAccountLinking: true,
+    }),
     Google({ allowDangerousEmailAccountLinking: true }),
     LinkedIn({ allowDangerousEmailAccountLinking: true }),
     ResendProvider({
