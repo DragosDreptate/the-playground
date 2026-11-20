@@ -145,7 +145,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // callback (RFC 9207). @auth/core < 0.41.3 ne déclare pas d'issuer pour
     // GitHub et compare ce paramètre à son fallback `https://authjs.dev` =>
     // rejet (CallbackRouteError / OAUTH_INVALID_RESPONSE). Même valeur que le
-    // fix upstream de @auth/core 0.41.3, donc sans effet après montée de next-auth.
+    // fix upstream de @auth/core 0.41.3. À retirer quand @auth/core >= 0.41.3 :
+    // sinon notre valeur reste prioritaire sur celle d'Auth.js.
     GitHub({
       issuer: "https://github.com/login/oauth",
       allowDangerousEmailAccountLinking: true,
